@@ -1,7 +1,8 @@
-"use client";
+"use client"; // Redirect 페이지
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI"; // API 호출 함수 가져오기
 
 function Page() {
   const searchParams = useSearchParams();
@@ -10,8 +11,11 @@ function Page() {
   useEffect(() => {
     const code = searchParams.get('code');
     setAuthCode(code);
+
     if (code) {
       console.log("Authorization code:", code);
+      // 백엔드로 코드 전송
+      sendAuthCodeToBackend(code);
     }
   }, [searchParams]);
 
