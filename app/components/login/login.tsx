@@ -6,7 +6,9 @@ const redirectUri = 'http://127.0.0.1:3000/login/oauth/callback/kakao';
 const scope = [
   "profile_nickname",
   "profile_image",
+  "talk_message" // 카카오 메시지 동의 항목 추가
 ].join(",");
+
 
 export default function Login() {
   const [isKakaoReady, setIsKakaoReady] = useState(false); // SDK가 준비된 상태를 관리
