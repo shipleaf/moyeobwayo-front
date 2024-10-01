@@ -55,7 +55,7 @@ export default function TimeTable() {
   const defaultEndDate = new Date(TableData.endDate); // 7일 뒤의 15:00
   defaultEndDate.setHours(15, 0, 0, 0);
 
-  const [dateData, setDateData] = useState({
+  const [dateData,] = useState({
     startDate: defaultStartDate,
     endDate: defaultEndDate,
   });

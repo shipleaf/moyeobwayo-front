@@ -76,8 +76,6 @@ export default function CalendarComp() {
         <DatePicker
           selected={startDate}
           onChange={handleDateChange}
-          startDate={startDate}
-          endDate={endDate}
           selectsRange
           inline
         />
