@@ -34,18 +34,25 @@ const generateTimeIntervalsForDay = (
 export default function UserTimeTable() {
   const [selectedTimes, setSelectedTimes] = useState<Date[]>([]); // 선택된 시간을 관리하는 상태
   const [isSelecting, setIsSelecting] = useState<boolean>(false); // 마우스 클릭 상태 관리
+  const [startSelectTime, setStartSelectTime] = useState<Date | null>(null); // 드래그 시작 시간
+  const [endSelectTime, setEndSelectTime] = useState<Date | null>(null); // 드래그 끝나는 시간
 
   // 마우스 업 이벤트를 문서 전체에서 감지하기 위한 useEffect
   useEffect(() => {
     const handleMouseUp = () => {
+      if (isSelecting && startSelectTime && endSelectTime) {
+        console.log(`Drag selected from ${startSelectTime} to ${endSelectTime}`);
+      }
       setIsSelecting(false); // 마우스를 놓으면 선택 종료
+      setStartSelectTime(null); // 시작 시간 초기화
+      setEndSelectTime(null); // 끝나는 시간 초기화
     };
 
     document.addEventListener("mouseup", handleMouseUp);
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, []);
+  }, [isSelecting, startSelectTime, endSelectTime]);
 
   // 시작, 종료 시간 더미데이터
   const dateData = {
@@ -83,7 +90,7 @@ export default function UserTimeTable() {
   };
 
   return (
-    <div style={{ display: "flex", gap: "40px" }}>
+    <div style={{ display: "flex" }} className="w-[70%]">
       <div>
         <div style={{ display: "flex", gap: "20px" }}>
           {days.map((day, dayIndex) => (
@@ -117,14 +124,14 @@ export default function UserTimeTable() {
                       onMouseEnter={() => {
                         if (isSelecting) {
                           toggleSelectedTime(time); // 마우스가 블록을 지나갈 때 시간 선택/해제
+                          setEndSelectTime(time); // 드래그가 진행될 때 끝나는 시간 업데이트
                         }
                       }}
                       onMouseDown={() => {
                         setIsSelecting(true); // 클릭 시작
                         toggleSelectedTime(time); // 클릭한 블록 즉시 선택/해제
-                      }}
-                      onMouseUp={() => {
-                        setIsSelecting(false); // 마우스를 떼면 선택 종료
+                        setStartSelectTime(time); // 드래그 시작 시간 설정
+                        setEndSelectTime(time); // 드래그 끝나는 시간도 처음에는 시작 시간과 같음
                       }}
                     />
                   )

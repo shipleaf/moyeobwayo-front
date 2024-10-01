@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
 :root {
   --background: #ffffff;
@@ -17,11 +18,91 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Pretendard", sans-serif;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 100 900; /* 100부터 900까지의 다양한 굵기 지원 */
+  font-style: normal;
+  src: url("/fonts/PretendardVariable.woff2") format("woff2");
+}
+
+/* DatePicker */
+.react-datepicker {
+  width: 100% !important; /* 캘린더 너비를 부모의 100%로 설정 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none !important;
+}
+
+.react-datepicker__day-names {
+  padding-left: 6%;
+  padding-right: 6%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.react-datepicker__day-name {
+  color: rgba(60, 60, 67, 0.3) !important;
+  font-family: "Pretendard", "sans-serif";
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.react-datepicker__month-container {
+  width: 100%;
+}
+
+.react-datepicker__header {
+  text-align: left !important;
+  width: 100%;
+  background-color: #fff !important;
+  border: none !important;
+}
+
+.react-datepicker__current-month {
+  padding: 1.5% !important;
+  font-family: "Pretendard", "sans-serif";
+  margin-left: 5% !important;
+}
+
+.react-datepicker__month {
+  width: 100%;
+  margin: 0 !important;
+}
+
+.react-datepicker__day,
+.react-datepicker__time-name {
+  font-family: "Pretendard", "sans-serif";
+  font-weight: 500 !important;
+  font-size: 15px;
+  color: #000 !important;
+}
+
+.react-datepicker__week {
+  padding-left: 6%;
+  padding-right: 6%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5%;
+}
+
+/* 버튼 위치 조정 */
+.react-datepicker__navigation {
+  top: 4% !important;
+}
+
+.react-datepicker__navigation--previous {
+  left: auto !important;
+  right: 10% !important;
 }

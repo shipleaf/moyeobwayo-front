@@ -10,4 +10,3 @@ interface Kakao {
   interface Window {
     Kakao?: Kakao;
   }
-  
