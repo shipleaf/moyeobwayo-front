@@ -1,17 +1,22 @@
-// app/components/login/Login.tsx
+"use client";
+
+// app/components/login/KakaoLogin.tsx
+import { useRecoilState } from "recoil";
+import { kakaoLoginState } from "@/app/recoil/atom";
 import Script from "next/script";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
-const redirectUri = 'http://127.0.0.1:3000/login/oauth/callback/kakao';
+const redirectUri = "http://127.0.0.1:3000/login/oauth/callback/kakao";
 const scope = [
   "profile_nickname",
   "profile_image",
-  "talk_message" // 카카오 메시지 동의 항목 추가
+  "talk_message", // 카카오 메시지 동의 항목 추가
 ].join(",");
 
-
-export default function Login() {
+export default function KakaoLogin() {
   const [isKakaoReady, setIsKakaoReady] = useState(false); // SDK가 준비된 상태를 관리
+  const [kakaoState, setKakaoState] = useRecoilState(kakaoLoginState);
 
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
@@ -19,7 +24,6 @@ export default function Login() {
       console.log("after Init: ", window.Kakao.isInitialized());
     }
   }, [isKakaoReady]);
-  
 
   const kakaoLoginHandler = () => {
     if (window.Kakao && window.Kakao.Auth) {
@@ -41,7 +45,15 @@ export default function Login() {
           setIsKakaoReady(true); // SDK 로드 후에만 초기화 진행
         }}
       />
-      <button onClick={kakaoLoginHandler}>카카오 로그인</button>
+      <button onClick={kakaoLoginHandler}>
+        <Image
+          src="/images/kakao_login_medium_narrow.png"
+          alt=""
+          width={250}
+          height={100}
+          className="mb-[50%]"
+        />
+      </button>
     </>
   );
 }

@@ -1,25 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
-import { FiCalendar } from "react-icons/fi";
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation"; // App Router에서 useParams 사용
+import { getTable } from "@/app/api/getTableAPI";
+import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
 import { MdContentPaste } from "react-icons/md";
 import { HiUserCircle } from "react-icons/hi2";
+import TimeTable from "@/app/components/createParty/TimeTable";
 import Image from "next/image";
-import CalendarComp from "./components/createParty/CalendarComp";
-import TimeTable from "./components/createParty/TimeTable";
-import { RecoilRoot, useRecoilState } from "recoil";
-import { kakaoLoginState } from "./recoil/atom";
+import { FiCalendar } from "react-icons/fi";
 import Modal from "react-modal";
-import KakaoLogin from "./components/login/KakaoLogin";
+import { kakaoLoginState } from "@/app/recoil/atom";
+import KakaoLogin from "@/app/components/login/KakaoLogin";
+import VoteTable from "@/app/components/getParty/voteTable";
+import PartyPriority from "@/app/components/getParty/PartyPriority";
+import { loginState } from "@/app/recoil/atom";
+import TableLogin from "@/app/components/login/TableLogin";
 
-// 예시 사용자 데이터
-const users = [
-  { id: 1, username: "Alice", profileImage: "" },
-  { id: 2, username: "Bob", profileImage: "" },
-  { id: 3, username: "Charlie", profileImage: "" },
-];
+export default function MeetingPage() {
+  const { hash } = useParams(); // meetingId를 URL에서 추출
+  const [tableData, setTableData] = useState(null);
+  const isLoggedIn = useRecoilValue(loginState);
 
-export default function Home() {
+  const users = [
+    { id: 1, username: "Alice", profileImage: "" },
+    { id: 2, username: "Bob", profileImage: "" },
+    { id: 3, username: "Charlie", profileImage: "" },
+  ];
+
   const [selectedButton, setSelectedButton] = useState<"calendar" | "content">(
     "calendar"
   );
@@ -38,6 +46,18 @@ export default function Home() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
+
+  useEffect(() => {
+    if (hash) {
+      getTable({ table_id: hash as string })
+        .then((data) => {
+          setTableData(data); // 데이터를 state에 저장
+        })
+        .catch((error) => {
+          console.error("에러 발생: ", error);
+        });
+    }
+  }, [hash]);
 
   return (
     <RecoilRoot>
@@ -114,7 +134,17 @@ export default function Home() {
           </div>
         </div>
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
-          <CalendarComp />
+          <div className="flex flex-col">
+            <PartyPriority />
+            {isLoggedIn && tableData ? (
+              <VoteTable
+                party={tableData.party}
+                availableTimes={tableData.availableTimes}
+              />
+            ) : (
+              <TableLogin />
+            )}
+          </div>
           <TimeTable />
         </div>
         <div
