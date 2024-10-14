@@ -106,3 +106,17 @@ body {
   left: auto !important;
   right: 10% !important;
 }
+
+.react-datepicker__day--keyboard-selected{
+  color: #7272D9 !important;
+  background-color: #ebebf7 !important;
+  border-radius: 100% !important;
+  font-weight: 700 !important;
+}
+
+.react-datepicker__day--highlighted{
+  color: #7272D9 !important;
+  background-color: #ebebf7 !important;
+  border-radius: 100% !important;
+  font-weight: 700 !important;
+}

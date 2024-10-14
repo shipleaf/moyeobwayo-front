@@ -1,3 +1,5 @@
+"use client"
+
 interface TimeBlockProps {
   time: Date;
   style?: React.CSSProperties;

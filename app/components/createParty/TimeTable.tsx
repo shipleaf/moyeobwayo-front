@@ -37,7 +37,7 @@ const generateTimeIntervalsForDay = (
 // 더미 데이터로 사용할 TableData 변수
 const TableData = {
   startDate: "2023-10-01", // 시작 날짜
-  endDate: "2023-10-10", // 종료 날짜
+  endDate: "2023-10-07", // 종료 날짜
   startTime: "09:00", // 시작 시간
   endTime: "12:00", // 종료 시간
 };
