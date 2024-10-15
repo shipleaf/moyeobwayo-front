@@ -30,9 +30,9 @@ export default function Home() {
     setSelectedButton("content");
 
     // kakaoLoginState가 false일 때 모달을 띄움
-    if (!kakaoState) {
-      setIsModalOpen(true);
-    }
+    // if (!kakaoState) {
+    //   setIsModalOpen(true);
+    // }
   };
 
   const handleCloseModal = () => {
