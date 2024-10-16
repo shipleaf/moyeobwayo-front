@@ -30,9 +30,9 @@ export default function Home() {
     setSelectedButton("content");
 
     // kakaoLoginState가 false일 때 모달을 띄움
-    // if (!kakaoState) {
-    //   setIsModalOpen(true);
-    // }
+    if (!kakaoState) {
+      setIsModalOpen(true);
+    }
   };
 
   const handleCloseModal = () => {
@@ -127,7 +127,9 @@ export default function Home() {
           <div className="w-16 h-16 bg-white rounded-[20%] transform rotate-45 shadow-lg"></div>
         </div>
       </div>
-
+      
+      {/* MeetList Contnet */}
+      
       {/* Kakao 로그인 모달 */}
       <Modal
         isOpen={isModalOpen}

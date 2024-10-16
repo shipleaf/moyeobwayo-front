@@ -3,35 +3,33 @@ import axiosInstance from "./axiosInstance";
 export interface TableId {
   table_id: string;
 }
-
+export interface Party{
+  party_id: string;
+  target_num: number;
+  current_num: number;
+  party_name: string;
+  party_description: string;
+  start_date: string;
+  location_name: string | null;
+  endDate: string;
+  decision_date: string;
+  user_id: string;
+  alarms: any[];
+  dates: {
+    date_id: number;
+    selected_date: string;
+    timeslots: any[];
+  }
+}
 export interface getTableResponse {
-  party: {
-    party_id: string;
-    target_num: number;
-    current_num: number;
-    party_name: string;
-    party_description: string;
-    start_date: string;
-    location_name: string | null;
-    endDate: string;
-    decision_date: string;
-    user_id: string;
-    alarms: any[];
-    dates: {
-      date_id: number;
-      selected_date: string;
-      timeslots: any[];
-    }[];
-  };
-  availableTimes: any[];
+  party: Party;
+  availableTimes: AvailableTimesResponse[];
 }
 
 export interface AvailableTimesResponse {
-  availableTimes: {
-    start: string;
-    end: string;
-    users: string[];
-  }[];
+  start: string;
+  end: string;
+  users: string[];
 }
 
 
