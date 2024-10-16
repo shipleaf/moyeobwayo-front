@@ -22,3 +22,8 @@ export const kakaoLoginState = atom({
   key: "isKakaoLoggedInState",
   default: false,
 });
+
+export const kakaoIDState = atom({
+  key: "kakaoIDState",
+  default: 3720994926,
+});

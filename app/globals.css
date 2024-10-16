@@ -10,7 +10,11 @@
   font-style: normal;
   src: url("/fonts/PretendardVariable.woff2") format("woff2");
 }
-
+/* 전체 스크롤바 숨기기 */
+::-webkit-scrollbar {
+  width: 0px; /* 스크롤바 너비를 0으로 설정하여 숨김 */
+  height: 0px; /* 가로 스크롤바도 숨기려면 height도 설정 */
+}
 /* DatePicker */
 .react-datepicker {
   width: 100% !important; /* 캘린더 너비를 부모의 100%로 설정 */
