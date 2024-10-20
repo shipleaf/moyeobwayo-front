@@ -1,8 +1,15 @@
 import axiosInstance from "./axiosInstance";
-
+import { PartyDate } from "../interfaces/Party";
 export interface TableId {
   table_id: string;
 }
+
+export interface timeslot{
+  slot_id: number,
+  selected_start_time: string,
+  selected_end_time: string,
+}
+
 export interface Party{
   party_id: string;
   target_num: number;
@@ -15,11 +22,7 @@ export interface Party{
   decision_date: string;
   user_id: string;
   alarms: any[];
-  dates: {
-    date_id: number;
-    selected_date: string;
-    timeslots: any[];
-  }
+  dates: PartyDate[]
 }
 export interface getTableResponse {
   party: Party;

@@ -3,7 +3,22 @@
 @tailwind utilities;
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
-
+:root {
+  --background: #ffffff; /* 필요에 맞게 색상 지정 */
+  --foreground: #000000;
+  
+  /* HeatMap 색상 */
+  --MO10: #A1A1FF;
+  --MO20: #8D8DF4;
+  --MO30: #8181E8;
+  --MO40: #7272D9;
+  --MO50: #6161CE;
+  --MO60: #5555BF;
+  --MO70: #4A4AAE;
+  --MO80: #3D3D97;
+  --MO90: #313183;
+  --MO100: #262669;
+}
 @font-face {
   font-family: "Pretendard";
   font-weight: 100 900; /* 100부터 900까지의 다양한 굵기 지원 */
