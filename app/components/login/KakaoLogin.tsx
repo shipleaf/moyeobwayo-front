@@ -45,15 +45,44 @@ export default function KakaoLogin() {
           setIsKakaoReady(true); // SDK 로드 후에만 초기화 진행
         }}
       />
-      <button onClick={kakaoLoginHandler}>
-        <Image
-          src="/images/kakao_login_medium_narrow.png"
-          alt=""
-          width={250}
-          height={100}
-          className="mb-[50%]"
-        />
-      </button>
+      <div className="w-full h-full flex flex-row items-center justify-center bg-[#fff]">
+        <div className="w-[50%] h-[100%]">
+          <Image
+            src="/images/KakaoLoginImage.png"
+            alt=""
+            width={482}
+            height={639}
+            className="w-[80%] h-[100%]"
+          />
+        </div>
+        <div className="w-[50%] h-[100%] flex flex-col gap-[20%]">
+          <div className="flex flex-col pt-[20%]">
+            <span className="font-pretendard font-[600] text-[1.5vw]">
+              간편로그인 후
+            </span>
+            <span className="font-pretendard font-[600] text-[1.5vw]">
+              내 일정을 한번에 확인해보세요!
+            </span>
+            <div>
+              <span className="text-[#6161CE] font-pretendard font-[600] text-[1vw]">
+                30초
+              </span>
+              <span className="text-[#6C6C6C] font-pretendard font-[500] text-[1vw]">
+                면 회원가입이 가능해요
+              </span>
+            </div>
+          </div>
+          <button onClick={kakaoLoginHandler} className="flex items-center justify-center w-[50%]">
+            <Image
+              src="/images/kakao_login_large_wide.png"
+              alt=""
+              width={400}
+              height={200}
+              className="w-[full]"
+            />
+          </button>
+        </div>
+      </div>
     </>
   );
 }
