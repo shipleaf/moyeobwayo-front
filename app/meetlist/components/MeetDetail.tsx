@@ -4,7 +4,7 @@ import { DummyMeet, Alarm, PartyDate, Timeslot, AvailableTime } from "@/app/inte
 import { CheckFat } from '@phosphor-icons/react/dist/ssr';
 import { useSearchParams } from 'next/navigation'; // useRouter를 가져옵니다
 import TimeTable from './TimeTable';
-import {getTable, Party, AvailableTimesResponse,getTableResponse} from '@/app/api/getTableAPI'
+import {getTable, Party, AvailableTimesResponse} from '@/app/api/getTableAPI'
 // Dummies
 export const availableTimes: AvailableTime[] = [
   {
@@ -40,11 +40,18 @@ export const availableTimes: AvailableTime[] = [
   }
 ];
 
+export interface timeRange{
+  startTime:string,
+  endTime:string
+}
 const MeetDetail = () => {
   const searchParams = useSearchParams(); // 검색 파라미터 가져오기
   const table_id = searchParams.get('partyId'); // table_id 가져오기
   const [targetMeet, setTargetMeet] = useState<Party | null>(null); // 상태 초기화
   const [avariableTime, setAvariableTime] = useState<AvailableTimesResponse[] | null>(null)
+  const [timeblocks, setTimeblocks] = useState<PartyDate[] | null>(null);
+  const [currentNum, setCurrentNum] = useState<number | null>(null);
+  const [partyRange, setPartyRange] = useState<timeRange | null>(null);
   useEffect(() => {
     const fetchMeetDetail = async () => {
       if (table_id) { // table_id가 존재할 경우에만 호출
@@ -52,6 +59,12 @@ const MeetDetail = () => {
           const response = await getTable({ table_id: table_id }); // API 호출
           setTargetMeet(response.party); // API로부터 받은 데이터로 상태 업데이트
           setAvariableTime(response.availableTimes)
+          setTimeblocks(response.party.dates)
+          setCurrentNum(response.party.current_num)
+          setPartyRange({
+            startTime: response.party.start_date,
+            endTime: response.party.endDate
+          });
         } catch (error) {
           console.error('Failed to fetch table detail:', error); // 에러 처리
         }
@@ -104,7 +117,11 @@ const MeetDetail = () => {
       <div className="flex gap-4">
         {/* TimeTable */}
         <section className='w-2/3 max-h-[61vh] overflow-auto bg-[#F7F7F7] py-3 px-2 rounded-[10px]'>
-          <TimeTable></TimeTable>
+          <TimeTable 
+            timeblocks={timeblocks} 
+            currentNum={currentNum}
+            partyRange={partyRange}
+            ></TimeTable>
         </section>
         {/* Candidate */}
         <section className='w-1/3 max-h-[61vh] overflow-auto'>
