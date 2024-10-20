@@ -1,6 +1,7 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { voteTime, voteData } from "@/app/api/timeslotAPI";
-import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
 import { userIdValue } from "@/app/recoil/atom";
 import { useRecoilValue } from "recoil";
 
@@ -25,9 +26,18 @@ interface VoteTableProps {
 }
 
 export default function VoteTable({ party, availableTimes }: VoteTableProps) {
-  const selectedDates = party.dates.map(
-    (dateObj) => new Date(dateObj.selected_date).toISOString().split("T")[0]
-  );
+  const selectedDates = party.dates.map((dateObj) => {
+    const utcDate = new Date(dateObj.selected_date);
+    const weekday = utcDate.toLocaleDateString("en-US", {
+      weekday: "short", // Sun, Mon, ...
+      timeZone: "Asia/Seoul",
+    });
+    const day = utcDate.toLocaleDateString("en-US", {
+      day: "numeric", // 17, 18, ...
+      timeZone: "Asia/Seoul",
+    });
+    return { weekday, day }; // 요일과 날짜를 객체로 반환
+  });
 
   const startTime = 9;
   const endTime = 15;
@@ -39,17 +49,12 @@ export default function VoteTable({ party, availableTimes }: VoteTableProps) {
     timeIndex: number;
   } | null>(null);
   const [isSelecting, setIsSelecting] = useState(true);
-
-  const [userId, setUserId] = useState("");
-  const userKey = useRecoilValue(userIdValue);
+  const [loading, setLoading] = useState(true);
+  const userId = useRecoilValue(userIdValue);
 
   useEffect(() => {
-    // userId가 빈 문자열인 경우 localStorage에서 로그인 정보 불러오기
-    if (userId === "") {
-      const savedLoginInfo = loadFromLocalStorage("loginInfo");
-      if (savedLoginInfo && savedLoginInfo.userId) {
-        setUserId(savedLoginInfo.userId);
-      }
+    if (userId) {
+      setLoading(false);
     }
   }, [userId]);
 
@@ -110,6 +115,7 @@ export default function VoteTable({ party, availableTimes }: VoteTableProps) {
 
   const handleMouseUp = async (dateIndex: number, timeIndex: number) => {
     setIsDragging(false);
+
     if (dragStart) {
       const startSlot = timeSlots[dragStart.dateIndex][dragStart.timeIndex];
       const endSlot = timeSlots[dateIndex][timeIndex];
@@ -118,12 +124,8 @@ export default function VoteTable({ party, availableTimes }: VoteTableProps) {
       const voteRequest: voteData = {
         selected_start_time: new Date(`${startSlot.date}T${startSlot.time}`),
         selected_end_time: new Date(`${endSlot.date}T${endSlot.time}`),
-        userEntity: {
-          user_id: userKey,
-        },
-        date: {
-          date_id: startSlot.dateId, // 선택된 date_id
-        },
+        user_id: userId,
+        date_id: startSlot.dateId,
       };
 
       try {
@@ -145,13 +147,20 @@ export default function VoteTable({ party, availableTimes }: VoteTableProps) {
   };
 
   return (
-    <div className="vote-table">
+    <div className="vote-table bg-[#f7f7f7] h-[50%] rounded-[10px] shadow-prior backdrop-blur-48px flex items-start justify-start p-[5%]">
       <table>
         <thead>
           <tr>
             <th>Time</th>
-            {selectedDates.map((date, index) => (
-              <th key={index}>{date}</th>
+            {selectedDates.map(({ weekday, day }, index) => (
+              <th key={index}>
+                <div style={{ textAlign: "center" }}>
+                  <div className="font-pretendard font-[400] m-0">
+                    {weekday}
+                  </div>
+                  <div className="font-pretendard m-0">{day}</div>
+                </div>
+              </th>
             ))}
           </tr>
         </thead>

@@ -12,7 +12,7 @@ export interface SubmitData {
 }
 
 export interface CreateTableResponse {
-  party_id: string;
+  partyId: string;
   target_num: number;
   current_num: number;
   party_name: string;

@@ -35,7 +35,6 @@ export interface AvailableTimesResponse {
   users: string[];
 }
 
-
 export const getTable = async (data: TableId): Promise<getTableResponse> => {
   try {
     const response = await axiosInstance.get(`/party/${data.table_id}`, {

@@ -3,21 +3,14 @@
 import React, { useState } from "react";
 import { FiCalendar } from "react-icons/fi";
 import { MdContentPaste } from "react-icons/md";
-import { HiUserCircle } from "react-icons/hi2";
 import Image from "next/image";
 import CalendarComp from "./components/createParty/CalendarComp";
 import TimeTable from "./components/createParty/TimeTable";
-import { RecoilRoot, useRecoilState } from "recoil";
-import { kakaoLoginState } from "./recoil/atom";
+import { useRecoilState } from "recoil";
+import { kakaoLoginState, selectedStartTime, selectedEndTime } from "./recoil/atom";
 import Modal from "react-modal";
 import KakaoLogin from "./components/login/KakaoLogin";
-
-// 예시 사용자 데이터
-const users = [
-  { id: 1, username: "Alice", profileImage: "" },
-  { id: 2, username: "Bob", profileImage: "" },
-  { id: 3, username: "Charlie", profileImage: "" },
-];
+import { selectedDateState } from "./recoil/atom";
 
 export default function Home() {
   const [selectedButton, setSelectedButton] = useState<"calendar" | "content">(
@@ -25,6 +18,10 @@ export default function Home() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [kakaoState, setKakaoState] = useRecoilState(kakaoLoginState); // Recoil 상태 사용
+
+  const [selectedDates, setSelectedDates] = useRecoilState(selectedDateState);
+  const [startTimeState, setStartTimeState] = useRecoilState(selectedStartTime);
+  const [endTimeState, setEndTimeState] = useRecoilState(selectedEndTime);
 
   const handleButtonClick = () => {
     setSelectedButton("content");
@@ -37,15 +34,20 @@ export default function Home() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setSelectedButton("calendar");
+  };
+
+  const formatTime = (time: number) => {
+    return `${time.toString().padStart(2, "0")}:00`; // 두 자리로 맞추고 ":00" 추가
   };
 
   return (
-    <RecoilRoot>
+    <>
       <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
         <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
           <div className="flex flex-col items-center">
             <Image
-              src="/images/moyeobwayo.png"
+              src="/images/mainLogo.png"
               alt=""
               width={80}
               height={80}
@@ -54,7 +56,7 @@ export default function Home() {
             <div className="flex flex-col items-center">
               <button
                 onClick={handleButtonClick} // content 버튼 클릭 핸들러
-                className={`content w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer mb-[50%] ${
+                className={`content w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer mb-[50%] focus:outline-none ${
                   selectedButton === "content"
                     ? "bg-white text-black"
                     : "bg-[rgba(255,255,255,0.1)] border-none"
@@ -86,36 +88,16 @@ export default function Home() {
                   }`}
                 />
               </button>
-              <div className="relative flex flex-col mt-8">
-                {users.map((user, index) => (
-                  <div
-                    key={user.id}
-                    className="relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer bg-white"
-                    style={{
-                      top: `${index * -45}px`,
-                      zIndex: 10 + index,
-                    }}
-                  >
-                    {user.profileImage ? (
-                      <Image
-                        src={user.profileImage}
-                        alt={user.username}
-                        width={80}
-                        height={80}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <HiUserCircle size={80} className="text-[#ced4da]" />
-                    )}
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
           <CalendarComp />
-          <TimeTable />
+          <TimeTable
+            Dates={selectedDates}
+            startTime={formatTime(startTimeState)}
+            endTime={formatTime(endTimeState)}
+          />
         </div>
         <div
           className={`absolute transition-all duration-300 z-0 ${
@@ -139,6 +121,6 @@ export default function Home() {
       >
         <KakaoLogin />
       </Modal>
-    </RecoilRoot>
+    </>
   );
 }
