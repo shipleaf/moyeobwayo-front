@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import TimeBlock from "./TimeBlock";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
@@ -26,7 +23,7 @@ const generateTimeIntervalsForDay = (
   const currentTime = new Date(start.getTime());
   const times = [];
 
-  while (currentTime <= end) {
+  while (currentTime < end) {
     times.push(new Date(currentTime)); // 현재 시간을 배열에 추가
     currentTime.setMinutes(currentTime.getMinutes() + intervalMinutes); // 30분씩 증가
   }
@@ -34,12 +31,13 @@ const generateTimeIntervalsForDay = (
   return times;
 };
 
-// 더미 데이터로 사용할 TableData 변수
-const TableData = {
-  startDate: "2023-10-01", // 시작 날짜
-  endDate: "2023-10-07", // 종료 날짜
-  startTime: "09:00", // 시작 시간
-  endTime: "12:00", // 종료 시간
+// 1시간 단위로 시간을 반환하는 함수
+const generateHourlyLabels = (startHour: number, endHour: number) => {
+  const labels = [];
+  for (let hour = startHour; hour <= endHour; hour++) {
+    labels.push(`${hour}:00`); // 1시간 간격으로 시간 추가
+  }
+  return labels;
 };
 
 // 요일을 반환하는 함수
@@ -48,35 +46,42 @@ const getWeekday = (date: Date) => {
   return daysOfWeek[date.getDay()];
 };
 
-export default function TimeTable() {
-  // 더미 데이터를 가져와서 사용
-  const now = new Date(TableData.startDate);
-  const defaultStartDate = new Date(now.setHours(9, 0, 0, 0)); // 기본 시작 시간은 09:00
-  const defaultEndDate = new Date(TableData.endDate); // 7일 뒤의 15:00
-  defaultEndDate.setHours(15, 0, 0, 0);
+interface TimeTableProps {
+  Dates: string[];
+  startTime: string;
+  endTime: string;
+}
 
-  const [dateData,] = useState({
-    startDate: defaultStartDate,
-    endDate: defaultEndDate,
-  });
+export default function TimeTable({
+  Dates,
+  startTime,
+  endTime,
+}: TimeTableProps) {
+  const validStartTime = startTime || "09:00"; // 기본값을 "09:00"으로 설정
+  const validEndTime = endTime || "15:00"; // 기본값을 "15:00"으로 설정
+  const startHour = parseInt(validStartTime.split(":")[0]); // 시작 시간을 숫자로 변환
+  const endHour = parseInt(validEndTime.split(":")[0]); // 종료 시간을 숫자로 변환
 
-  const startDate = new Date(dateData.startDate);
-  const endDate = new Date(dateData.endDate);
+  // 시간 라벨을 1시간 단위로 생성
+  const hourlyLabels = generateHourlyLabels(startHour, endHour);
 
-  // 시작 시간과 종료 시간을 startDate와 endDate에서 추출
-  const startHour = parseInt(TableData.startTime.split(":")[0]); // 9시 (09:00)
-  const endHour = parseInt(TableData.endTime.split(":")[0]); // 15시 (15:00)
+  const generateDefaultDates = () => {
+    const today = new Date();
+    const defaultDates: Date[] = [];
+    for (let i = 0; i < 7; i++) {
+      const nextDate = new Date(today);
+      nextDate.setDate(today.getDate() + i);
+      defaultDates.push(nextDate);
+    }
+    return defaultDates;
+  };
 
-  // 시작 날짜부터 종료 날짜까지 날짜 생성
-  const startDay = new Date(startDate.toISOString().split("T")[0]); // 날짜만 추출 (시간은 제외)
-  const endDay = new Date(endDate.toISOString().split("T")[0]); // 날짜만 추출 (시간은 제외)
+  // Dates가 유효한 배열인지 확인하고, 그렇지 않으면 기본값(오늘부터 7일간) 설정
+  const validDates =
+    Array.isArray(Dates) && Dates.length > 0 ? Dates : generateDefaultDates();
 
-  const days: Date[] = [];
-
-  while (startDay <= endDay) {
-    days.push(new Date(startDay));
-    startDay.setDate(startDay.getDate() + 1); // 하루씩 증가
-  }
+  // Dates 배열로부터 Date 객체 배열 생성
+  const days: Date[] = validDates.map((date) => new Date(date));
 
   return (
     <div className="flex flex-col gap-[20px] basis-3/4">
@@ -111,18 +116,16 @@ export default function TimeTable() {
       <div className="Table flex gap-[10px] w-full h-[90%] rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] py-[3%] pr-[2%]">
         {/* 시간축 Time 고정 영역 */}
         <div className="flex flex-col justify-between w-[8%]">
-          <span
-            className={`${roboto.className} font-[500] text-[15px] text-center`}
-          >
-            {TableData.startTime}
-          </span>
-          {/* 종료 시간을 표시 */}
-          <span
-            className={`${roboto.className} font-[500] text-[15px] text-center`}
-          >
-            {TableData.endTime}
-          </span>
+          {hourlyLabels.map((label, index) => (
+            <span
+              key={index}
+              className={`${roboto.className} font-[500] text-[15px] text-center m-0 p-0`}
+            >
+              {label}
+            </span>
+          ))}
         </div>
+
         {/* 각 날짜의 TimeBlock을 같은 열에 배치 */}
         <div className="flex flex-grow gap-[10px]">
           {days.map((day, dayIndex) => (
@@ -137,13 +140,10 @@ export default function TimeTable() {
                     key={index}
                     time={time}
                     style={{
-                      backgroundColor: "white", // 기본 색은 흰색
-                      flexGrow: 1, // 남은 공간을 유연하게 채우도록 설정
+                      backgroundColor: "white",
+                      flexGrow: 1,
                       margin: 0,
                     }}
-                    onMouseEnter={() => {}}
-                    onMouseDown={() => {}}
-                    onMouseUp={() => {}}
                   />
                 )
               )}

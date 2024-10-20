@@ -3,9 +3,6 @@
 interface TimeBlockProps {
   time: Date;
   style?: React.CSSProperties;
-  onMouseEnter?: () => void;
-  onMouseDown?: () => void;
-  onMouseUp?: () => void; // onMouseUp 추가
 }
 
 const TimeBlock: React.FC<TimeBlockProps> = ({ style }) => {

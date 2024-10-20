@@ -5,11 +5,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaPlus, FaMinus } from "react-icons/fa6";
 import { createTable, SubmitData } from "@/app/api/createTable";
-import { useRecoilState } from "recoil";
-import { loginState, userIdValue } from "@/app/recoil/atom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useResetRecoilState } from "recoil";
+import { selectedDateState, selectedEndTime, selectedStartTime, userIdValue } from "@/app/recoil/atom";
+import { useRecoilValue } from "recoil";
 import { loginValue } from "@/app/recoil/atom";
-import TableLogin from "@/app/components/login/TableLogin";
+import CreateTableLogin from "@/app/components/login/CreateTableLogin";
 import Modal from "react-modal";
 import { useRouter } from "next/navigation";
 import { tableLogin, LoginData } from "@/app/api/tableLogin";
@@ -17,29 +17,42 @@ import { tableLogin, LoginData } from "@/app/api/tableLogin";
 export default function CalendarComp() {
   const router = useRouter();
 
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]); // 다중 날짜 선택
+  const [selectedDates, setSelectedDates] = useRecoilState(selectedDateState); // 다중 날짜 선택
   const [isStartToggled, setIsStartToggled] = useState(false); // 시작 시간 AM/PM 상태
-  const [isEndToggled, setIsEndToggled] = useState(false); // 종료 시간 AM/PM 상태
+  const [startTime, setStartTime] = useRecoilState(selectedStartTime); // 시작 시간 (1 ~ 12)
+  const [endTime, setEndTime] = useRecoilState(selectedEndTime); // 종료 시간 (1 ~ 12)
+  const [isEndToggled, setIsEndToggled] = useState(endTime >= 12); // 초기값에 따라 AM/PM 토글 설정
   const [totalPeople, setTotalPeople] = useState<number>(1); // 총 인원수 상태
   const [isTotalPeopleUnset, setIsTotalPeopleUnset] = useState<boolean>(false); // 총 인원 미정 상태
-  const [startTime, setStartTime] = useState<number>(9); // 시작 시간 (1 ~ 12)
-  const [endTime, setEndTime] = useState<number>(15); // 종료 시간 (1 ~ 12)
   const [title, setTitle] = useState<string>(""); // 제목
   const [subTitle, setSubTitle] = useState<string>(""); // 부제
-  const [isLoggedIn, setIsLoggedIn] = useRecoilState<boolean>(loginState);
-  const [userId, setUserId] = useRecoilState<number>(userIdValue);
+  const [userId, setUserId] = useRecoilState(userIdValue);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
   const userName = useRecoilValue(loginValue);
+  const resetSelectedDates = useResetRecoilState(selectedDateState);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
   const toggleStartTime = () => setIsStartToggled(!isStartToggled);
-  const toggleEndTime = () => setIsEndToggled(!isEndToggled);
+  const toggleEndTime = () => {
+    // AM/PM 토글 상태를 변경
+    setIsEndToggled(!isEndToggled);
+
+    // AM에서 PM으로 변경할 경우
+    if (!isEndToggled && endTime < 12) {
+      setEndTime(endTime + 12); // 12를 더해서 PM으로 변환
+    }
+    // PM에서 AM으로 변경할 경우
+    else if (isEndToggled && endTime >= 12) {
+      setEndTime(endTime - 12); // 12를 빼서 AM으로 변환
+    }
+  };
 
   // 날짜 선택 핸들러
   const handleDateChange = (date: Date) => {
-    if (selectedDates.includes(date)) {
+    // 이미 선택된 날짜가 있으면 배열에서 제거하고, 없으면 추가
+    if (selectedDates.some((d) => d.getTime() === date.getTime())) {
       setSelectedDates(
         selectedDates.filter((d) => d.getTime() !== date.getTime())
       );
@@ -70,8 +83,20 @@ export default function CalendarComp() {
     setStartTime(parseInt(e.target.value));
   };
 
+  const convertTo12HourFormat = (hour: number) => {
+    if (hour === 0 || hour === 12) return 12; // 12시 또는 0시일 때는 12로 반환
+    return hour % 12; // 나머지를 통해 12시간 형식으로 변환
+  };
+
   const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setEndTime(parseInt(e.target.value));
+    const selectedHour = parseInt(e.target.value);
+    if (!isEndToggled) {
+      // AM일 때
+      setEndTime(selectedHour === 12 ? 0 : selectedHour); // 12시는 0으로
+    } else {
+      // PM일 때
+      setEndTime(selectedHour === 12 ? 12 : selectedHour + 12); // 12시는 12로 유지, 나머지 값은 +12
+    }
   };
 
   const calculateTime = (time: number, isPM: boolean) => {
@@ -85,6 +110,21 @@ export default function CalendarComp() {
 
   // 제출 시 JSON 객체를 console.log
   const handleSubmit = async () => {
+    if (selectedDates.length === 0) {
+      alert("날짜를 선택해 주세요.");
+      return;
+    }
+
+    if (startTime >= endTime) {
+      alert("시작 시간이 종료 시간보다 늦을 수 없습니다.");
+      return;
+    }
+
+    if (title.trim() === "") {
+      alert("제목을 입력해 주세요.");
+      return;
+    }
+
     if (userName.userId.trim() === "") {
       handleOpenModal(); // 로그인이 안 되어있다면 모달 띄우기
       return;
@@ -113,6 +153,11 @@ export default function CalendarComp() {
       endDateTime.setHours(endHour, 0, 0, 0); // 종료 시간 적용
     }
 
+    // 날짜를 빠른 날짜순으로 정렬
+    const sortedDates = [...selectedDates].sort(
+      (a, b) => a.getTime() - b.getTime()
+    );
+
     // 인터페이스 SubmitData에 맞게 데이터를 매핑
     const dataToSubmit: SubmitData = {
       participants: totalPeople,
@@ -120,7 +165,7 @@ export default function CalendarComp() {
       partyDescription: subTitle,
       startTime: startDateTime as Date, // Date 형식으로 전송
       endTime: endDateTime as Date, // Date 형식으로 전송
-      dates: selectedDates,
+      dates: sortedDates,
       decisionDate: new Date(), // 버튼을 누른 시점의 시간 기록
       user_id: userName.userId,
     };
@@ -128,8 +173,10 @@ export default function CalendarComp() {
     console.log("Submitted Data: ", JSON.stringify(dataToSubmit, null, 2));
 
     try {
-      const result = await createTable(dataToSubmit); // API 호출 시 SubmitData 인터페이스 사용
-      const hash = result.party_id;
+      const result = await createTable(dataToSubmit);
+      console.log(result); // API 호출 시 SubmitData 인터페이스 사용
+      const hash = result.partyId;
+      console.log(hash);
 
       const loginData: LoginData = {
         userName: userName.userId,
@@ -139,11 +186,15 @@ export default function CalendarComp() {
       };
 
       const response = await tableLogin(loginData);
-      setUserId(response.user_id)
-      
-      console.log(response.user_id);
+      setUserId(response.user.user_id);
+
+      console.log(response.user.user_id);
 
       console.log("서버 응답: ", result);
+
+      console.log(selectedDates);
+      resetSelectedDates();
+      console.log(selectedDates);
 
       router.push(`/meeting/${hash}`);
     } catch (error) {
@@ -167,10 +218,16 @@ export default function CalendarComp() {
     customizeWeekDays(); // 컴포넌트가 로드될 때 요일 이름 변경
   }, []);
 
+  const handleLoginSuccess = () => {
+    handleCloseModal();
+    handleSubmit();
+  };
+
   return (
     <div className="mr-[2%] basis-1/4">
       <div className="flex flex-col flex-none items-center justify-center bg-custom-bg border border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom">
         <DatePicker
+          key={selectedDates.toString()} // 선택된 날짜 배열이 변경될 때마다 재렌더링
           selected={null} // 단일 선택 방지
           onChange={(date) => handleDateChange(date as Date)} // 다중 선택 처리
           inline
@@ -183,7 +240,7 @@ export default function CalendarComp() {
               : undefined
           }
         />
-        <hr className="w-[90%] border border-1 border-[#ECECED] my-[1%]" />
+        <hr className="w-[90%] border-1 border-[#ECECED] my-[1%]" />
         <div className="flex flex-row align-center justify-between bg-white w-[84%] py-[5px]">
           <span className="w-[15%] font-pretendard font-[500] text-[18px]">
             Starts
@@ -202,17 +259,18 @@ export default function CalendarComp() {
             </select>
             <button
               onClick={toggleStartTime}
-              className="w-[70%] h-8 flex z-2 flex-row items-center relative p-1 transition-colors duration-300 bg-custom-gray rounded-[6px]"
+              className="relative w-[70%] h-8 flex items-center p-1 transition-colors duration-300 bg-custom-gray rounded-[6px]"
             >
-              <span className="z-10 w-[50%] text-black font-pretendard font-[500]">
+              <span className="z-10 w-[50%] text-black font-pretendard font-[500] text-center">
                 AM
               </span>
               <div
-                className={`toggle absolute bg-white w-[48%] h-6 rounded-[10px] shadow-md transform transition-transform duration-300 z-0 ${
-                  isStartToggled ? "translate-x-10" : ""
+                className={`absolute bg-white w-[48%] h-6 rounded-[10px] shadow-md transition-all duration-300 z-0 ${
+                  isStartToggled ? "left-[50%]" : "left-1"
                 }`}
+                style={{ transform: "translateX(0)" }}
               ></div>
-              <span className="z-10 w-[50%] text-black font-pretendard font-[500]">
+              <span className="z-10 w-[50%] text-black font-pretendard font-[500] text-center">
                 PM
               </span>
             </button>
@@ -224,7 +282,7 @@ export default function CalendarComp() {
           </span>
           <div className="flex flex-row justify-end w-[60%]">
             <select
-              value={endTime}
+              value={convertTo12HourFormat(endTime)} // 12시간 형식으로 변환하여 select에 표시
               onChange={handleEndTimeChange}
               className="w-[55%] pr-[5px] mr-[5%] focus:outline-none rounded-[4.216px] bg-[rgba(120,120,128,0.12)] text-right font-pretendard font-[500]"
             >
@@ -236,27 +294,27 @@ export default function CalendarComp() {
             </select>
             <button
               onClick={toggleEndTime}
-              className="w-[70%] h-8 flex z-2 flex-row items-center relative p-1 transition-colors duration-300 bg-custom-gray rounded-[6px]"
+              className="relative w-[70%] h-8 flex items-center p-1 transition-colors duration-300 bg-custom-gray rounded-[6px]"
             >
-              <span className="z-10 w-[50%] text-black font-pretendard font-[500]">
+              <span className="z-10 w-[50%] text-black font-pretendard font-[500] text-center">
                 AM
               </span>
               <div
-                className={`toggle absolute bg-white w-[48%] h-6 rounded-[10px] shadow-md transform transition-transform duration-300 z-0 ${
-                  isEndToggled ? "translate-x-10" : ""
+                className={`absolute bg-white w-[48%] h-6 rounded-[10px] shadow-md transition-all duration-300 z-0 ${
+                  isEndToggled ? "left-[50%]" : "left-1"
                 }`}
+                style={{ transform: "translateX(0)" }}
               ></div>
-              <span className="z-10 w-[50%] text-black font-pretendard font-[500]">
+              <span className="z-10 w-[50%] text-black font-pretendard font-[500] text-center">
                 PM
               </span>
             </button>
           </div>
         </div>
       </div>
-
       <div className="flex flex-col items-start justify-center bg-custom-bg border border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom mt-[5%] p-[4%] pl-[10%]">
         <div className="flex flex-col items-start">
-          <span className="text-[18px] mb-[3%] font-pretendard font-[600] text-[#222] text-[15px]">
+          <span className="text-[18px] mb-[3%] font-pretendard font-[600] text-[#222]">
             Title
           </span>
           <input
@@ -267,7 +325,7 @@ export default function CalendarComp() {
           />
         </div>
         <div className="flex flex-col">
-          <span className="text-[18px] mb-[3%] font-pretendard font-[600] text-[15px] text-[#222]">
+          <span className="text-[18px] mb-[3%] font-pretendard font-[600] text-[#222]">
             Sub
           </span>
           <input
@@ -347,9 +405,12 @@ export default function CalendarComp() {
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
         className="z-[9999] fixed inset-0 flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-[9998]" // 배경을 어둡게 하면서 z-index 설정
+        overlayClassName="fixed inset-0 bg-black bg-opacity-30 z-[9998]" // 배경을 어둡게 하면서 z-index 설정
       >
-        <TableLogin closeModal={handleCloseModal} />
+        <CreateTableLogin
+          closeModal={handleCloseModal}
+          onLoginSuccess={handleLoginSuccess}
+        />
       </Modal>
     </div>
   );

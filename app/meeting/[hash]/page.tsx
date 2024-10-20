@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // App Router에서 useParams 사용
-import { getTable } from "@/app/api/getTableAPI";
-import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
+import { getTable } from "@/app/api/getTableAPI"; // API 호출 주석 처리
+import { useRecoilState, useRecoilValue } from "recoil";
 import { MdContentPaste } from "react-icons/md";
 import { HiUserCircle } from "react-icons/hi2";
 import TimeTable from "@/app/components/createParty/TimeTable";
@@ -21,6 +21,7 @@ export default function MeetingPage() {
   const { hash } = useParams(); // meetingId를 URL에서 추출
   const [tableData, setTableData] = useState(null);
   const isLoggedIn = useRecoilValue(loginState);
+  const [loading, setLoading] = useState(false);
 
   const users = [
     { id: 1, username: "Alice", profileImage: "" },
@@ -49,23 +50,56 @@ export default function MeetingPage() {
 
   useEffect(() => {
     if (hash) {
+      // hash가 있을 때만 API 호출, loading이 false일 때만
+      // getTable API 호출
       getTable({ table_id: hash as string })
         .then((data) => {
-          setTableData(data); // 데이터를 state에 저장
+          // 서버에서 받아온 날짜를 로컬 날짜로 변환하고 ISO 형식에서 날짜 부분만 추출
+          const dates = data.party.dates.map((date) => {
+            const localDate = new Date(date.selected_date);
+            return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식으로 변환
+          });
+
+          // 시작 시간과 종료 시간은 로컬 시간대로 변환 후 HH:MM 형식만 추출
+          const startTime = new Date(data.party.start_date).toLocaleTimeString(
+            "en-GB",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          );
+
+          const endTime = new Date(data.party.endDate).toLocaleTimeString(
+            "en-GB",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          );
+
+          // 상태 업데이트
+          setTableData({
+            ...data,
+            formattedDates: dates,
+            startTime: startTime,
+            endTime: endTime,
+          });
+          setLoading(false); // API 호출이 끝나면 loading 해제
         })
         .catch((error) => {
           console.error("에러 발생: ", error);
+          setLoading(false); // 에러 발생 시에도 loading 해제
         });
     }
-  }, [hash]);
+  }, [hash]); // hash와 loading을 의존성으로 추가
 
   return (
-    <RecoilRoot>
+    <>
       <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
         <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
           <div className="flex flex-col items-center">
             <Image
-              src="/images/moyeobwayo.png"
+              src="/images/mainLogo.png"
               alt=""
               width={80}
               height={80}
@@ -134,7 +168,7 @@ export default function MeetingPage() {
           </div>
         </div>
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
-          <div className="flex flex-col">
+          <div className="flex flex-col mr-[2%] basis-1/4">
             <PartyPriority />
             {isLoggedIn && tableData ? (
               <VoteTable
@@ -145,7 +179,14 @@ export default function MeetingPage() {
               <TableLogin />
             )}
           </div>
-          <TimeTable />
+          {/* TimeTable 컴포넌트에 변환된 날짜와 시간 전달 */}
+          {tableData && (
+            <TimeTable
+              Dates={tableData.formattedDates}
+              startTime={tableData.startTime}
+              endTime={tableData.endTime}
+            />
+          )}
         </div>
         <div
           className={`absolute transition-all duration-300 z-0 ${
@@ -157,8 +198,6 @@ export default function MeetingPage() {
           <div className="w-16 h-16 bg-white rounded-[20%] transform rotate-45 shadow-lg"></div>
         </div>
       </div>
-
-      {/* Kakao 로그인 모달 */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
@@ -167,6 +206,6 @@ export default function MeetingPage() {
       >
         <KakaoLogin />
       </Modal>
-    </RecoilRoot>
+    </>
   );
 }
