@@ -8,7 +8,6 @@ import CalendarComp from "./components/createParty/CalendarComp";
 import TimeTable from "./components/createParty/TimeTable";
 import { useRecoilState } from "recoil";
 import { kakaoLoginState, selectedStartTime, selectedEndTime } from "./recoil/atom";
-import Modal from "react-modal";
 import KakaoLogin from "./components/login/KakaoLogin";
 import { selectedDateState } from "./recoil/atom";
 
@@ -16,7 +15,6 @@ export default function Home() {
   const [selectedButton, setSelectedButton] = useState<"calendar" | "content">(
     "calendar"
   );
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [kakaoState, setKakaoState] = useRecoilState(kakaoLoginState); // Recoil 상태 사용
 
   const [selectedDates, setSelectedDates] = useRecoilState(selectedDateState);
@@ -25,16 +23,6 @@ export default function Home() {
 
   const handleButtonClick = () => {
     setSelectedButton("content");
-
-    // kakaoLoginState가 false일 때 모달을 띄움
-    if (!kakaoState) {
-      setIsModalOpen(true);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedButton("calendar");
   };
 
   const formatTime = (time: number) => {
@@ -91,14 +79,24 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* page 영역 */}
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
-          <CalendarComp />
-          <TimeTable
-            Dates={selectedDates}
-            startTime={formatTime(startTimeState)}
-            endTime={formatTime(endTimeState)}
-          />
+          {selectedButton === "calendar" ? (
+            <>
+              <CalendarComp />
+              <TimeTable
+                Dates={selectedDates}
+                startTime={formatTime(startTimeState)}
+                endTime={formatTime(endTimeState)}
+              />
+            </>
+          ) : (
+            <KakaoLogin />
+          )}
         </div>
+
+        {/* 삼각형 모양의 데코레이션 */}
         <div
           className={`absolute transition-all duration-300 z-0 ${
             selectedButton === "calendar"
@@ -109,18 +107,6 @@ export default function Home() {
           <div className="w-16 h-16 bg-white rounded-[20%] transform rotate-45 shadow-lg"></div>
         </div>
       </div>
-      
-      {/* MeetList Contnet */}
-      
-      {/* Kakao 로그인 모달 */}
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={handleCloseModal}
-        className="fixed inset-0 flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-[9999]"
-      >
-        <KakaoLogin />
-      </Modal>
     </>
   );
 }
