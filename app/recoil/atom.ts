@@ -41,9 +41,15 @@ export const userIdValue = atom<number | null>({
   default: null,
 });
 
+// 임시적으로 로그인된 default값을 사용함
 export const kakaoLoginState = atom({
   key: "isKakaoLoggedInState",
   default: false,
+});
+
+export const kakaoIDState = atom({
+  key: "kakaoIDState",
+  default: 3720994926,
 });
 
 export const selectedDateState = atom({

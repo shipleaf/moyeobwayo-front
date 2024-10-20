@@ -109,7 +109,9 @@ export default function Home() {
           <div className="w-16 h-16 bg-white rounded-[20%] transform rotate-45 shadow-lg"></div>
         </div>
       </div>
-
+      
+      {/* MeetList Contnet */}
+      
       {/* Kakao 로그인 모달 */}
       <Modal
         isOpen={isModalOpen}

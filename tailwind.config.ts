@@ -16,6 +16,17 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        // HeatMap 색상을 hex 코드로 수정
+        MO10: "#A1A1FF",
+        MO20: "#8D8DF4",
+        MO30: "#8181E8",
+        MO40: "#7272D9",
+        MO50: "#6161CE",
+        MO60: "#5555BF",
+        MO70: "#4A4AAE",
+        MO80: "#3D3D97",
+        MO90: "#313183",
+        MO100: "#262669",
       },
       borderRadius: {
         custom: "10.078px", // 커스텀 border-radius
@@ -38,6 +49,11 @@ const config: Config = {
       },
     },
   },
+  safelist: [
+    {
+      pattern: /bg-MO[0-9]{1,3}/, // bg-MO0부터 bg-MO100까지 모든 경우를 미리 safelist에 추가
+    },
+  ],
   plugins: [],
 };
 export default config;

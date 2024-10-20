@@ -1,37 +1,38 @@
 import axiosInstance from "./axiosInstance";
-
+import { PartyDate } from "../interfaces/Party";
 export interface TableId {
   table_id: string;
 }
 
+export interface timeslot{
+  slot_id: number,
+  selected_start_time: string,
+  selected_end_time: string,
+}
+
+export interface Party{
+  party_id: string;
+  target_num: number;
+  current_num: number;
+  party_name: string;
+  party_description: string;
+  start_date: string;
+  location_name: string | null;
+  endDate: string;
+  decision_date: string;
+  user_id: string;
+  alarms: any[];
+  dates: PartyDate[]
+}
 export interface getTableResponse {
-  party: {
-    party_id: string;
-    target_num: number;
-    current_num: number;
-    party_name: string;
-    party_description: string;
-    start_date: string;
-    location_name: string | null;
-    endDate: string;
-    decision_date: string;
-    user_id: string;
-    alarms: any[];
-    dates: {
-      date_id: number;
-      selected_date: string;
-      timeslots: any[];
-    }[];
-  };
-  availableTimes: any[];
+  party: Party;
+  availableTimes: AvailableTimesResponse[];
 }
 
 export interface AvailableTimesResponse {
-  availableTimes: {
-    start: string;
-    end: string;
-    users: string[];
-  }[];
+  start: string;
+  end: string;
+  users: string[];
 }
 
 export const getTable = async (data: TableId): Promise<getTableResponse> => {

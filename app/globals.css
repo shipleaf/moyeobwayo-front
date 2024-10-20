@@ -4,27 +4,20 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: "Pretendard", sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  --background: #ffffff; /* 필요에 맞게 색상 지정 */
+  --foreground: #000000;
+  
+  /* HeatMap 색상 */
+  --MO10: #A1A1FF;
+  --MO20: #8D8DF4;
+  --MO30: #8181E8;
+  --MO40: #7272D9;
+  --MO50: #6161CE;
+  --MO60: #5555BF;
+  --MO70: #4A4AAE;
+  --MO80: #3D3D97;
+  --MO90: #313183;
+  --MO100: #262669;
 }
 @font-face {
   font-family: "Pretendard";
@@ -32,7 +25,11 @@ body {
   font-style: normal;
   src: url("/fonts/PretendardVariable.woff2") format("woff2");
 }
-
+/* 전체 스크롤바 숨기기 */
+::-webkit-scrollbar {
+  width: 0px; /* 스크롤바 너비를 0으로 설정하여 숨김 */
+  height: 0px; /* 가로 스크롤바도 숨기려면 height도 설정 */
+}
 /* DatePicker */
 .react-datepicker {
   width: 100% !important; /* 캘린더 너비를 부모의 100%로 설정 */
