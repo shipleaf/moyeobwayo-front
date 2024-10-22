@@ -42,7 +42,7 @@ export default function MeetList() {
   return (
     <section className='w-full'>
       {/* parties가 존재하고 배열이 비어있지 않을 경우에만 map을 실행 */}
-      {parties.length > 0 ? (
+      {parties.length > 0 && parties[0] !== null? (
         parties.map((meet, idx) => {
           const partyID = meet.partyId;
           const date = new Date(meet.start_date);
