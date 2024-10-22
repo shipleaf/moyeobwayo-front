@@ -143,13 +143,13 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
           {timeblocks?.map((day, index) => (
             <div
               key={index}
-              className="flex-grow h-full w-[14.2%] flex-shrink-0 flex justify-center items-center gap-[4px]"
+              className="flex-grow h-full w-[14.2%] flex-shrink-0 flex flex-col justify-center items-center gap-[0px]"
             >
               {/* 요일과 날짜 표시 */}
-              <span className={`${roboto.className} font-[500] text-[15px]`}>
+              <span className={`${roboto.className} font-[500] text-[15px] leading-3`}>
                 {getWeekday(new Date(day.selected_date))}
               </span>
-              <span className={`${roboto.className} font-[500] text-[35px]`}>
+              <span className={`${roboto.className} font-[500] text-[35px] leading-11`}>
                 {new Date(day.selected_date).getDate()}
               </span>
             </div>
