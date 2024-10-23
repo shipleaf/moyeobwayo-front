@@ -1,12 +1,10 @@
 "use client";
 
 // app/components/login/KakaoLogin.tsx
-import { useRecoilState } from "recoil";
-import { kakaoLoginState } from "@/app/recoil/atom";
+
 import Script from "next/script";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
 const redirectUri = "http://127.0.0.1:3000/login/oauth/callback/kakao";
 const scope = [
   "profile_nickname",
@@ -16,8 +14,7 @@ const scope = [
 
 export default function KakaoLogin() {
   const [isKakaoReady, setIsKakaoReady] = useState(false); // SDK가 준비된 상태를 관리
-  const [kakaoState, setKakaoState] = useRecoilState(kakaoLoginState);
-
+  
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
       window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
@@ -45,42 +42,47 @@ export default function KakaoLogin() {
           setIsKakaoReady(true); // SDK 로드 후에만 초기화 진행
         }}
       />
-      <div className="w-full h-full flex flex-row items-center justify-center bg-[#fff]">
+      <div className="w-full h-full flex flex-row items-center bg-[#fff] gap-[70px]">
         <div className="w-[50%] h-[100%]">
           <Image
             src="/images/KakaoLoginImage.png"
             alt=""
             width={482}
             height={639}
-            className="w-[80%] h-[100%]"
+            objectFit="contain"
+            className="w-[100%] h-[100%]"
           />
         </div>
-        <div className="w-[50%] h-[100%] flex flex-col gap-[20%]">
-          <div className="flex flex-col pt-[20%]">
-            <span className="font-pretendard font-[600] text-[1.5vw]">
-              간편로그인 후
+        <div className="h-full pt-[188px]">
+          <div className="">
+            <span className="font-pretendard font-[600] text-[32px] mb-4">
+              간편로그인 후 <br /> 내 일정을 한번에 확인해보세요!
             </span>
-            <span className="font-pretendard font-[600] text-[1.5vw]">
-              내 일정을 한번에 확인해보세요!
-            </span>
-            <div>
-              <span className="text-[#6161CE] font-pretendard font-[600] text-[1vw]">
-                30초
+            
+            <div className="mb-[157px]">
+              <span className="text-[#6161CE] font-pretendard font-[600] text-[20px]">
+                10초
               </span>
-              <span className="text-[#6C6C6C] font-pretendard font-[500] text-[1vw]">
+              <span className="text-[#6C6C6C] font-pretendard font-[500] text-[20px]">
                 면 회원가입이 가능해요
               </span>
             </div>
           </div>
-          <button onClick={kakaoLoginHandler} className="flex items-center justify-center w-[50%]">
-            <Image
-              src="/images/kakao_login_large_wide.png"
-              alt=""
-              width={400}
-              height={200}
-              className="w-[full]"
-            />
-          </button>
+          <div 
+            onClick={kakaoLoginHandler} 
+            className="py-5 px-[30px] cursor-pointer hover:bg-[#E5C900]
+            rounded-[10px] bg-[#FDE500] text-[#3B1D04] text-[26px] font-semibold">
+            <div className="flex items-center gap-5">
+              <Image
+                src="/images/KakaoLogo.png"
+                alt=""
+                width={36}
+                height={33}
+              />
+                카카오로 로그인하기
+
+            </div>
+          </div>
         </div>
       </div>
     </>

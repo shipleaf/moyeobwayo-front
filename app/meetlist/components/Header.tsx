@@ -4,34 +4,42 @@ import { useRouter } from 'next/navigation';
 import { Bell, BellSlash } from "@phosphor-icons/react/dist/ssr";
 import Toggle from "./Toggle";
 import { useSetRecoilState, useRecoilValue } from 'recoil';
-import { kakaoIDState, kakaoLoginState } from '@/app/recoil/atom';
+import {kakaoUserState } from '@/app/recoil/atom';
 export default function Header() {
   const router = useRouter();
-  const loginState = useRecoilValue(kakaoLoginState);
-  const setLoginState = useSetRecoilState(kakaoLoginState);
+  const kakaoUser = useRecoilValue(kakaoUserState);
+  const setKakaoUserState = useSetRecoilState(kakaoUserState);
   
   useEffect(() => {
-    if (loginState === true) {
-    } else if (loginState === false) {
-      // 로그인되지 않은 경우에만 alert 및 리다이렉트 실행 (한 번만 실행되도록 설정)
+    // kakaoUser.kakaoUserId가 없으면 리다이렉트 처리
+    if (kakaoUser && kakaoUser.kakaoUserId !== null) {
+      console.log("로그인 상태:", kakaoUser.nickname);
+    } else {
+      // 로그인되지 않은 경우 alert 및 리다이렉트 실행
       alert("로그인 후 이용해주세요!");
       setTimeout(() => {
-        router.push('/');
-      }, 1000);
+        router.push('/login/kakao');  // 카카오 로그인 페이지로 리다이렉트
+      }, 100);
     }
-  }, [loginState, router]);
+  }, [kakaoUser, router]);
   
   
   const handleLogout = () => {
-    // e.preventDefault()
-    
-    setLoginState(false)
-    router.push('/')
-  }
+    // 카카오 사용자 정보를 초기화하여 로그아웃 상태로 변경
+    setKakaoUserState({
+        kakaoUserId: null,
+        nickname: "",
+        profile_image: "",
+    });
+    // 홈 화면으로 리다이렉트
+    router.push('/');
+}
   return (
     <header className="pt-[12px] pb-[13px] flex justify-between items-center">
             <h1 className="font-bold text-[20px]">
-              <strong className="text-[#6161CE]">김선엽님</strong>의 
+              <strong className="text-[#6161CE]">
+                {kakaoUser.kakaoUserId && kakaoUser.nickname}
+                </strong>의 
               <br/>일정 한눈에 보기
             </h1>
             {/* button-group */}

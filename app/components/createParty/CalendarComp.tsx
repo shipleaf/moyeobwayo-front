@@ -5,8 +5,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaPlus, FaMinus } from "react-icons/fa6";
 import { createTable, SubmitData } from "@/app/api/createTable";
-import { useRecoilState, useResetRecoilState } from "recoil";
-import { selectedDateState, selectedEndTime, selectedStartTime, userIdValue } from "@/app/recoil/atom";
+import { useRecoilState} from "recoil";
+import { userIdValue } from "@/app/recoil/atom";
 import { useRecoilValue } from "recoil";
 import { loginValue } from "@/app/recoil/atom";
 import CreateTableLogin from "@/app/components/login/CreateTableLogin";
@@ -17,10 +17,10 @@ import { tableLogin, LoginData } from "@/app/api/tableLogin";
 export default function CalendarComp() {
   const router = useRouter();
 
-  const [selectedDates, setSelectedDates] = useRecoilState(selectedDateState); // 다중 날짜 선택
+  const [selectedDates, setSelectedDates] = useState<Date[]>([])
   const [isStartToggled, setIsStartToggled] = useState(false); // 시작 시간 AM/PM 상태
-  const [startTime, setStartTime] = useRecoilState(selectedStartTime); // 시작 시간 (1 ~ 12)
-  const [endTime, setEndTime] = useRecoilState(selectedEndTime); // 종료 시간 (1 ~ 12)
+  const [startTime, setStartTime] = useState<number>(9); // 시작 시간 (1 ~ 12)
+  const [endTime, setEndTime] = useState<number>(6);; // 종료 시간 (1 ~ 12)
   const [isEndToggled, setIsEndToggled] = useState(endTime >= 12); // 초기값에 따라 AM/PM 토글 설정
   const [totalPeople, setTotalPeople] = useState<number>(1); // 총 인원수 상태
   const [isTotalPeopleUnset, setIsTotalPeopleUnset] = useState<boolean>(false); // 총 인원 미정 상태
@@ -29,7 +29,7 @@ export default function CalendarComp() {
   const [userId, setUserId] = useRecoilState(userIdValue);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
   const userName = useRecoilValue(loginValue);
-  const resetSelectedDates = useResetRecoilState(selectedDateState);
+  
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -52,9 +52,9 @@ export default function CalendarComp() {
   // 날짜 선택 핸들러
   const handleDateChange = (date: Date) => {
     // 이미 선택된 날짜가 있으면 배열에서 제거하고, 없으면 추가
-    if (selectedDates.some((d) => d.getTime() === date.getTime())) {
+    if (selectedDates.some((d:Date) => d.getTime() === date.getTime())) {
       setSelectedDates(
-        selectedDates.filter((d) => d.getTime() !== date.getTime())
+        selectedDates.filter((d:Date) => d.getTime() !== date.getTime())
       );
     } else {
       setSelectedDates([...selectedDates, date]);
@@ -187,14 +187,6 @@ export default function CalendarComp() {
 
       const response = await tableLogin(loginData);
       setUserId(response.user.user_id);
-
-      console.log(response.user.user_id);
-
-      console.log("서버 응답: ", result);
-
-      console.log(selectedDates);
-      resetSelectedDates();
-      console.log(selectedDates);
 
       router.push(`/meeting/${hash}`);
     } catch (error) {

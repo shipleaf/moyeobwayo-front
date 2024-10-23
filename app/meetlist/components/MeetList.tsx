@@ -95,7 +95,7 @@ export default function MeetList() {
           );
         })
       ) : (
-        <p>No parties available.</p> // parties가 없을 때 대체 텍스트 표시
+        <p></p> // parties가 없을 때 대체 텍스트 표시
       )}
     </section>
   );
