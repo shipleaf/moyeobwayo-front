@@ -6,6 +6,7 @@ import { UserCircle } from "@phosphor-icons/react/dist/ssr";
 import MeetList from "./components/MeetList";
 import MeetDetail from "./components/MeetDetail";
 import Header from "./components/Header";
+import Link from "next/link";
 
 // 예시 사용자 데이터
 const users = [
@@ -39,7 +40,8 @@ export default function Page() {
                   className="text-black"
                 />
               </button>
-              <button
+              <Link
+                href={'/'}
                 className="calendar w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer
                     bg-[rgba(255,255,255,0.1)] border-none"
               >
@@ -48,7 +50,7 @@ export default function Page() {
                   weight="bold"
                   className="text-white opacity-100"
                 />
-              </button>
+              </Link>
               <div className="relative flex flex-col mt-8">
                 {users.map((user, index) => (
                   <div

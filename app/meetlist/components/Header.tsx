@@ -5,7 +5,7 @@ import { Bell, BellSlash } from "@phosphor-icons/react/dist/ssr";
 import Toggle from "./Toggle";
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { kakaoUserState } from '@/app/recoil/atom';
-import { loadFromLocalStorage } from '@/app/recoil/recoilUtils';
+import { loadFromLocalStorage, saveToLocalStorage } from '@/app/recoil/recoilUtils';
 export default function Header() {
   const router = useRouter();
   const kakaoUser = useRecoilValue(kakaoUserState);
@@ -56,6 +56,12 @@ export default function Header() {
       nickname: "",
       profile_image: "",
     });
+    const kakaoUserDataByStorage = {
+      kakaoUserId: null, // 응답 데이터 반영
+      nickname: "",
+      profile_image: "",
+    }
+    saveToLocalStorage("kakaoUserDataByStorage",kakaoUserDataByStorage)
     // 홈 화면으로 리다이렉트
     router.push('/');
   }
