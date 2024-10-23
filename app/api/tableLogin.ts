@@ -8,23 +8,12 @@ export interface LoginData {
 }
 
 export interface tableLoginResponse {
-  user_id: number,
-  kakaoProfile: any,
-  user_name: string,
-  party: {
-    party_id: string,
-    target_num: number,
-    current_num: number,
-    party_name: string,
-    party_description: string,
-    start_date: Date,
-    location_name: string
-    enddate: Date,
-    decision_date: Date,
-    user_id: string,
-    alarms: boolean
-    dates: []
-  }
+  user: {
+    userId: number,
+    userName: string,
+    password: number
+  },
+  message: string
 }
 
 export const tableLogin = async (data: LoginData): Promise<tableLoginResponse> => {
