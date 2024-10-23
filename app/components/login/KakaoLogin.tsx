@@ -38,7 +38,6 @@ export default function KakaoLogin() {
       <Script
         src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
         onLoad={() => {
-          console.log("Kakao SDK loaded");
           setIsKakaoReady(true); // SDK 로드 후에만 초기화 진행
         }}
       />
@@ -49,7 +48,7 @@ export default function KakaoLogin() {
             alt=""
             width={482}
             height={639}
-            objectFit="contain"
+            // objectFit="contain"
             className="w-[100%] h-[100%]"
           />
         </div>
