@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation"; // useRouter 추�
 import { sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI"; // API 호출 함수 가져오기
 import { useSetRecoilState } from "recoil";
 import { kakaoUserState } from "@/app/recoil/atom";
+import { loadFromLocalStorage, saveToLocalStorage } from "@/app/recoil/recoilUtils";
 function Page() {
   const searchParams = useSearchParams();
   const router = useRouter(); // useRouter 사용
@@ -24,13 +25,29 @@ function Page() {
         console.log('kakaoUserData', kakaoUserData);
         
         if (kakaoUserData) {
+        const {expires_in, kakaoUserId, nickname, profile_image} = kakaoUserData
+
           setKakaoUserState({
-            kakaoUserId: kakaoUserData.kakaoUserId, // 응답 데이터 반영
-            nickname: kakaoUserData.nickname,
-            profile_image: kakaoUserData.profile_image,
+            kakaoUserId: kakaoUserId, // 응답 데이터 반영
+            nickname: nickname,
+            profile_image: profile_image,
           });
+          
+          // localstorage에 expired_at은 현재시간에서 expiresin초를 더해서 만료시간 계산해서 넣어줘 계산해서 아래함수로 로컬스토리지에 load해봐
+          const currentDate = new Date();
+          const expiresAt = new Date(currentDate.getTime() + expires_in * 1000)
+          const kakaoUserDataByStorage = {
+            kakaoUserId: kakaoUserId, // 응답 데이터 반영
+            nickname: nickname,
+            profile_image: profile_image,
+            expiresAt: expiresAt
+          }
+          saveToLocalStorage("kakaoUserDataByStorage",kakaoUserDataByStorage)
+
+          router.push('/meetlist')
+        }else{
+          throw error
         }
-        router.push('/meetlist')
       } catch (error) {
         setError(error as string);
       } finally {
