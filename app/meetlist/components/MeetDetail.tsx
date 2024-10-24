@@ -62,9 +62,9 @@ const MeetDetail = () => {
           setTargetMeet(response.party); // API로부터 받은 데이터로 상태 업데이트
           setAvariableTime(response.availableTimes)
           setTimeblocks(response.party.dates)
-          setCurrentNum(response.party.current_num)
+          setCurrentNum(response.party.currentNum)
           setPartyRange({
-            startTime: response.party.start_date,
+            startTime: response.party.startDate,
             endTime: response.party.endDate
           });
         } catch (error) {
@@ -96,7 +96,7 @@ const MeetDetail = () => {
     );
   }
 
-  const date = new Date(targetMeet.start_date); // meet 객체에 dateString 속성이 있다고 가정
+  const date = new Date(targetMeet.startDate); // meet 객체에 dateString 속성이 있다고 가정
     const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줌
     const day = date.getDate();
     const hours = date.getHours();
@@ -117,9 +117,9 @@ const MeetDetail = () => {
       >
         <p className='text-[#5E5E5E] text-[14px] font-normal'
         >
-          {targetMeet.target_num}명 중 {targetMeet.current_num}명
+          {targetMeet.targetNum}명 중 {targetMeet.currentNum}명
         </p>
-        <h3 className='mb-[5px] text-[22px] text-[#2D2D2D] font-semibold'>{targetMeet.party_name}</h3>
+        <h3 className='mb-[5px] text-[22px] text-[#2D2D2D] font-semibold'>{targetMeet.partyName}</h3>
         <div className='flex justify-between items-center'>
           <p className='text-[#5E5E5E] text-[16px] font-normal'>
             {month}월 {day}일 ({dayOfWeek}) {hours}:{minutes} ~

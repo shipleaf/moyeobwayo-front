@@ -3,7 +3,7 @@
 import TimeBlock from "./TimeBlock";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
-import { PartyDate, Timeslot } from "@/app/interfaces/Party";
+import { PartyDate } from "@/app/interfaces/Party";
 import { timeslot } from "@/app/api/getTableAPI";
 import { timeRange } from "./MeetDetail";
 import { useEffect, useState } from "react";
@@ -63,7 +63,6 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
       setCountSlot(newCountSlots); // 2차원 배열로 상태 업데이트
     }
   }, [timeblocks, partyRange]);
-  const defaultStartDate = new Date(now.setHours(9, 0, 0, 0)); // 기본 시작 시간은 09:00
   const defaultEndDate = new Date(TableData.endDate); // 7일 뒤의 15:00
   defaultEndDate.setHours(15, 0, 0, 0);
   
@@ -99,10 +98,10 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
     const startMinute = start.getMinutes();
     const endHour = end.getHours();
     const endMinute = end.getMinutes();
-  
+    console.log(startTime)
+    console.log('to debut', start, end)
     // 30분 간격으로 총 몇 개의 슬롯이 있는지 계산
     const totalSlots = Math.ceil(((endHour * 60 + endMinute) - (startHour * 60 + startMinute)) / 30);
-    
     // 슬롯 수만큼 0으로 초기화된 배열 생성
     const result = new Array(totalSlots).fill(0);
   

@@ -17,6 +17,14 @@ interface ApiError {
   message: string;
 }
 
+export interface linkKakaoResponse{
+  user: {
+    userId: number,
+    userName: string,
+    password: number
+  },
+  message: string
+}
 export async function sendAuthCodeToBackend(
   code: string
 ): Promise<KakaoUserResponse | undefined> {
@@ -47,4 +55,30 @@ export async function sendAuthCodeToBackend(
       console.error("Unexpected Error:", error);
     }
   }
+}
+
+export async function linkKakaoAndPartyUser(
+  userID: number, kakaoId: number, partyID:string
+): Promise<linkKakaoResponse | undefined> {
+  try {
+    const response = await axiosInstance.post<linkKakaoResponse>(
+      "/kakaoUser/link",
+      {
+        currentUserID: userID,
+        partyID: partyID,
+        kakaoUserId: kakaoId,
+        code: "anyOK"
+      }
+    );
+
+    if (response.status >= 200 && response.status <= 299) {
+      console.log("Server response:", response.data);
+      return response.data; // Kakao user response
+    } else {
+      throw new Error("Failed to send auth code");
+    }
+  } catch (error: unknown) {
+    throw error
+  } 
+
 }
