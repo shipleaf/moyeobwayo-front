@@ -8,15 +8,15 @@ export interface MeetData {
 // Party 인터페이스 정의 (API 응답에 맞게 수정)
 export interface Party {
   partyId: string;
-  target_num: number;
-  current_num: number;
-  party_name: string;
-  party_description: string;
-  start_date: string;
+  targetNum: number;
+  currentNum: number;
+  partyName: string;
+  partyDescription: string;
+  startDate: string;
   endDate: string;
-  decision_date: string;
-  user_id: string;
-  location_name: string | null;
+  decisionDate: string;
+  userId: string;
+  locationName: string | null;
   alarms: any[];  // alarms 배열, 타입을 더 명확히 할 수 있으면 추가적으로 수정 가능
   dates: any[];   // dates 배열, 타입을 더 명확히 할 수 있으면 추가적으로 수정 가능
 }

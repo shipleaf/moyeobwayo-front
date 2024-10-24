@@ -45,7 +45,7 @@ export default function MeetList() {
       {parties.length > 0 && parties[0] !== null? (
         parties.map((meet, idx) => {
           const partyID = meet.partyId;
-          const date = new Date(meet.start_date);
+          const date = new Date(meet.startDate);
           const month = date.getMonth() + 1;
           const day = date.getDate();
           const hours = date.getHours();
@@ -57,8 +57,8 @@ export default function MeetList() {
           let TimeLabel = diffDaysStartDate > 0 ? `${diffDaysStartDate}일 후` : `${Math.abs(diffDaysStartDate)}일 전`;
   
           // 확정 상태의 timeLabel 계산
-          if (meet.decision_date !== null) {
-            const decisionDate = new Date(meet.decision_date);
+          if (meet.decisionDate !== null) {
+            const decisionDate = new Date(meet.decisionDate);
             const diffTimeDecisionDate = decisionDate.getTime() - decisionDate.getTime();
             const diffDaysDecisionDate = Math.ceil(diffTimeDecisionDate / (1000 * 60 * 60 * 24));
             TimeLabel = diffDaysDecisionDate > 0 ? `${diffDaysDecisionDate}일 후` : `${Math.abs(diffDaysDecisionDate)}일 전`;
@@ -80,7 +80,7 @@ export default function MeetList() {
               }
             >
               <header className='flex justify-between items-center'>
-                <h1 className='text-[16px] font-normal mb-2'>{meet.party_name}</h1>
+                <h1 className='text-[16px] font-normal mb-2'>{meet.partyName}</h1>
                 <p className='text-[14px] font-medium'>{TimeLabel}</p>
               </header>
               <div className='flex justify-between'>

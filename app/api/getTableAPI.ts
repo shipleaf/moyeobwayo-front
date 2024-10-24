@@ -11,13 +11,13 @@ export interface timeslot{
 }
 
 export interface Party{
-  party_id: string;
-  target_num: number;
-  current_num: number;
-  party_name: string;
-  party_description: string;
-  start_date: string;
-  location_name: string | null;
+  partyId: string;
+  targetNum: number;
+  currentNum: number;
+  partyName: string;
+  partyDescription: string;
+  startDate: string;
+  locationName: string | null;
   endDate: string;
   decision_date: string;
   user_id: string;

@@ -13,10 +13,6 @@ import Link from "next/link";
 
 export default function Home() {
 
-  const [selectedDates, setSelectedDates] = useRecoilState(selectedDateState);
-  const [startTimeState, setStartTimeState] = useRecoilState(selectedStartTime);
-  const [endTimeState, setEndTimeState] = useRecoilState(selectedEndTime);
-
   const formatTime = (time: number) => {
     return `${time.toString().padStart(2, "0")}:00`; // 두 자리로 맞추고 ":00" 추가
   };
@@ -65,9 +61,6 @@ export default function Home() {
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
           <CalendarComp />
           <TimeTable
-            Dates={selectedDates}
-            startTime={formatTime(startTimeState)}
-            endTime={formatTime(endTimeState)}
           />
             {/* <KakaoLogin /> */}
         </div>
