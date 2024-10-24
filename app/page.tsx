@@ -1,21 +1,18 @@
-"use client";
-
 import React from "react";
-import { FiCalendar } from "react-icons/fi";
-import { MdContentPaste } from "react-icons/md";
 import Image from "next/image";
 import CalendarComp from "./components/createParty/CalendarComp";
-import TimeTable from "./components/createParty/TimeTable";
-import { useRecoilState } from "recoil";
-import { selectedStartTime, selectedEndTime } from "./recoil/atom";
-import { selectedDateState } from "./recoil/atom";
 import Link from "next/link";
+import { CalendarBlank, Clipboard, UserCircle } from "@phosphor-icons/react/dist/ssr";
+import SampleAvatarList from "./components/SampleAvatarList";
+import SampleTimeTable from "./components/SampleTimeTable";
 
+// 예시 사용자 데이터
+const users = [
+  { id: 1, username: "Alice", profileImage: "" },
+  { id: 2, username: "Bob", profileImage: "" },
+  { id: 3, username: "Charlie", profileImage: "" },
+];
 export default function Home() {
-
-  const formatTime = (time: number) => {
-    return `${time.toString().padStart(2, "0")}:00`; // 두 자리로 맞추고 ":00" 추가
-  };
 
   return (
     <>
@@ -36,7 +33,7 @@ export default function Home() {
                     bg-[rgba(255,255,255,0.1)] border-none`
                 }
               >
-                <MdContentPaste
+                <Clipboard
                   size={30}
                   className=
                       "text-white opacity-100"
@@ -48,11 +45,12 @@ export default function Home() {
                     "bg-white text-black"
                 }`}
               >
-                <FiCalendar
+                <CalendarBlank
                   size={30}
                   className="text-black"
                 />
               </Link>
+              <SampleAvatarList/>
             </div>
           </div>
         </div>
@@ -60,11 +58,8 @@ export default function Home() {
         {/* page 영역 */}
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
           <CalendarComp />
-          <TimeTable
-          />
-            {/* <KakaoLogin /> */}
+          <SampleTimeTable/>
         </div>
-
         {/* 삼각형 모양의 데코레이션 */}
         <div
           className={`absolute transition-all duration-300 z-0 ${

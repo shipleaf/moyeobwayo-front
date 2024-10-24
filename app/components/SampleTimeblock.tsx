@@ -7,7 +7,7 @@ interface TimeBlockProps {
   onMouseUp?: () => void; // onMouseUp 추가
 }
 
-const TimeBlock: React.FC<TimeBlockProps> = ({ style, className }) => {
+const SampleTimeBlock: React.FC<TimeBlockProps> = ({ style, className }) => {
   return (
     <div
       style={{
@@ -18,4 +18,4 @@ const TimeBlock: React.FC<TimeBlockProps> = ({ style, className }) => {
   );
 };
 
-export default TimeBlock;
+export default SampleTimeBlock;
