@@ -4,11 +4,18 @@ export interface TableId {
   table_id: string;
 }
 
-export interface timeslot{
-  slot_id: number,
-  selected_start_time: string,
-  selected_end_time: string,
+export interface userEntity{
+  userId: number,
+  userName: string,
+  password: null
 }
+export interface timeslot{
+  slotId: number,
+  selectedStartTime: string,
+  selectedEndTime: string,
+  userEntity: userEntity
+}
+
 
 export interface Party{
   partyId: string;
