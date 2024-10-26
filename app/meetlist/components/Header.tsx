@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation';
-import { Bell, BellSlash } from "@phosphor-icons/react/dist/ssr";
+import { Bell } from "@phosphor-icons/react/dist/ssr";
 import Toggle from "./Toggle";
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { kakaoUserState } from '@/app/recoil/atom';
@@ -60,8 +60,9 @@ export default function Header() {
       kakaoUserId: null, // 응답 데이터 반영
       nickname: "",
       profile_image: "",
+      expiresAt: new Date()
     }
-    saveToLocalStorage("kakaoUserDataByStorage",kakaoUserDataByStorage)
+    saveToLocalStorage("kakaoUserDataByStorage", kakaoUserDataByStorage)
     // 홈 화면으로 리다이렉트
     router.push('/');
   }

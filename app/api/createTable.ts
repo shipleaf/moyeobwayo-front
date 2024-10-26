@@ -21,8 +21,8 @@ export interface CreateTableResponse {
   endDate: string;
   decision_date: string;
   user_id: number;
-  alarms: any | null;
-  dates: any | null;
+  alarms: boolean | null;
+  dates: boolean | null;
 }
 
 export const createTable = async (

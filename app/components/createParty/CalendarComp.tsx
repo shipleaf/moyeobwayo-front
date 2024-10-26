@@ -5,9 +5,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaPlus, FaMinus } from "react-icons/fa6";
 import { createTable, SubmitData } from "@/app/api/createTable";
-import { useRecoilState, useSetRecoilState} from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { kakaoUserState, userIdValue } from "@/app/recoil/atom";
-import { useRecoilValue, SetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { loginValue } from "@/app/recoil/atom";
 import CreateTableLogin from "@/app/components/login/CreateTableLogin";
 import Modal from "react-modal";
@@ -19,10 +19,10 @@ import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 export default function CalendarComp() {
   const router = useRouter();
 
-  const [selectedDates, setSelectedDates] = useState<Date[]>([])
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [isStartToggled, setIsStartToggled] = useState(false); // 시작 시간 AM/PM 상태
   const [startTime, setStartTime] = useState<number>(9); // 시작 시간 (1 ~ 12)
-  const [endTime, setEndTime] = useState<number>(6);; // 종료 시간 (1 ~ 12)
+  const [endTime, setEndTime] = useState<number>(15); // 종료 시간 (1 ~ 12)
   const [isEndToggled, setIsEndToggled] = useState(endTime >= 12); // 초기값에 따라 AM/PM 토글 설정
   const [totalPeople, setTotalPeople] = useState<number>(1); // 총 인원수 상태
   const [isTotalPeopleUnset, setIsTotalPeopleUnset] = useState<boolean>(false); // 총 인원 미정 상태
@@ -42,14 +42,16 @@ export default function CalendarComp() {
       if (kakaoUser.kakaoUserId !== null) {
         return; // 이미 로그인된 상태
       }
-  
+
       // 카카오 로그인이 되어 있지 않다면, 로컬 스토리지 확인
-      const kakaoUserDataByStorage = await loadFromLocalStorage("kakaoUserDataByStorage");
-  
+      const kakaoUserDataByStorage = await loadFromLocalStorage(
+        "kakaoUserDataByStorage"
+      );
+
       if (kakaoUserDataByStorage) {
         const currentDate = new Date();
         const { expiresAt } = kakaoUserDataByStorage;
-  
+
         // expiresAt을 Date 객체로 변환 후 현재 시간과 비교
         const expiresAtDate = new Date(expiresAt);
         if (currentDate < expiresAtDate) {
@@ -62,7 +64,7 @@ export default function CalendarComp() {
         }
       }
     };
-  
+
     checkUserStatus();
   }, []); // 컴포넌트가 로드될 때 한 번 실행
 
@@ -84,9 +86,9 @@ export default function CalendarComp() {
   // 날짜 선택 핸들러
   const handleDateChange = (date: Date) => {
     // 이미 선택된 날짜가 있으면 배열에서 제거하고, 없으면 추가
-    if (selectedDates.some((d:Date) => d.getTime() === date.getTime())) {
+    if (selectedDates.some((d: Date) => d.getTime() === date.getTime())) {
       setSelectedDates(
-        selectedDates.filter((d:Date) => d.getTime() !== date.getTime())
+        selectedDates.filter((d: Date) => d.getTime() !== date.getTime())
       );
     } else {
       setSelectedDates([...selectedDates, date]);
@@ -142,103 +144,106 @@ export default function CalendarComp() {
 
   // 제출 시 JSON 객체를 console.log
   const handleSubmit = async () => {
-  if (selectedDates.length === 0) {
-    alert("날짜를 선택해 주세요.");
-    return;
-  }
-  if (startTime >= endTime) {
-    alert("시작 시간이 종료 시간보다 늦을 수 없습니다.");
-    return;
-  }
-  if (title.trim() === "") {
-    alert("제목을 입력해 주세요.");
-    return;
-  }
-  // 카카오와 일반 유저 둘 다 로그인이 안 되어 있으면 모달 OPEN
-  if (kakaoUser.kakaoUserId === null && userName.userId.trim() === "") {
-    handleOpenModal();
-    return;
-  }
+    if (selectedDates.length === 0) {
+      alert("날짜를 선택해 주세요.");
+      return;
+    }
+    if (startTime >= endTime) {
+      alert("시작 시간이 종료 시간보다 늦을 수 없습니다.");
+      return;
+    }
+    if (title.trim() === "") {
+      alert("제목을 입력해 주세요.");
+      return;
+    }
+    // 카카오와 일반 유저 둘 다 로그인이 안 되어 있으면 모달 OPEN
+    if (kakaoUser.kakaoUserId === null && userName.userId.trim() === "") {
+      handleOpenModal();
+      return;
+    }
 
-  // startHour와 endHour는 AM/PM 계산을 통해 얻어짐
-  const startHour = calculateTime(startTime, isStartToggled);
-  const endHour = calculateTime(endTime, isEndToggled);
+    // startHour와 endHour는 AM/PM 계산을 통해 얻어짐
+    const startHour = calculateTime(startTime, isStartToggled);
+    const endHour = calculateTime(endTime, isEndToggled);
 
-  // 첫 번째 선택된 날짜에 startHour 추가
-  const firstSelectedDate = selectedDates.length > 0 ? selectedDates[0] : null;
-  // 마지막 선택된 날짜에 endHour 추가
-  const lastSelectedDate = selectedDates.length > 0 ? selectedDates[selectedDates.length - 1] : null;
+    // 첫 번째 선택된 날짜에 startHour 추가
+    const firstSelectedDate =
+      selectedDates.length > 0 ? selectedDates[0] : null;
+    // 마지막 선택된 날짜에 endHour 추가
+    const lastSelectedDate =
+      selectedDates.length > 0 ? selectedDates[selectedDates.length - 1] : null;
 
-  let startDateTime: Date | null = null;
-  let endDateTime: Date | null = null;
+    let startDateTime: Date | null = null;
+    let endDateTime: Date | null = null;
 
-  if (firstSelectedDate) {
-    startDateTime = new Date(firstSelectedDate);
-    startDateTime.setHours(startHour, 0, 0, 0); // 시작 시간 적용
-  }
+    if (firstSelectedDate) {
+      startDateTime = new Date(firstSelectedDate);
+      startDateTime.setHours(startHour, 0, 0, 0); // 시작 시간 적용
+    }
 
-  if (lastSelectedDate) {
-    endDateTime = new Date(lastSelectedDate);
-    endDateTime.setHours(endHour, 0, 0, 0); // 종료 시간 적용
-  }
+    if (lastSelectedDate) {
+      endDateTime = new Date(lastSelectedDate);
+      endDateTime.setHours(endHour, 0, 0, 0); // 종료 시간 적용
+    }
 
-  // 날짜를 빠른 날짜순으로 정렬
-  const sortedDates = [...selectedDates].sort(
-    (a, b) => a.getTime() - b.getTime()
-  );
+    // 날짜를 빠른 날짜순으로 정렬
+    const sortedDates = [...selectedDates].sort(
+      (a, b) => a.getTime() - b.getTime()
+    );
 
-  // 인터페이스 SubmitData에 맞게 데이터를 매핑
-  const dataToSubmit: SubmitData = {
-    participants: totalPeople,
-    partyTitle: title,
-    partyDescription: subTitle,
-    startTime: startDateTime as Date, // Date 형식으로 전송
-    endTime: endDateTime as Date, // Date 형식으로 전송
-    dates: sortedDates,
-    decisionDate: new Date(), // 버튼을 누른 시점의 시간 기록
-    user_id: userName.userId,
-  };
-  // 카카오 유저라면 카카오 정보로 갱신
-  if (kakaoUser.kakaoUserId !== null) {
-    dataToSubmit.user_id = kakaoUser.nickname; // 올바른 속성 접근 방식
-  }
-  
-
-  try {
-    const result = await createTable(dataToSubmit);
-    const hash = result.partyId;
-
-    
-
-    const loginData: LoginData = {
-      userName: userName.userId,
-      password: userName.userPassword,
-      partyId: hash,
-      isKakao: false,
+    // 인터페이스 SubmitData에 맞게 데이터를 매핑
+    const dataToSubmit: SubmitData = {
+      participants: totalPeople,
+      partyTitle: title,
+      partyDescription: subTitle,
+      startTime: startDateTime as Date, // Date 형식으로 전송
+      endTime: endDateTime as Date, // Date 형식으로 전송
+      dates: sortedDates,
+      decisionDate: new Date(), // 버튼을 누른 시점의 시간 기록
+      user_id: userName.userId,
     };
+    // 카카오 유저라면 카카오 정보로 갱신
     if (kakaoUser.kakaoUserId !== null) {
-      loginData.userName = kakaoUser.nickname; // 올바른 속성 접근 방식
-      loginData.isKakao = true
-      loginData.password = ""
+      dataToSubmit.user_id = kakaoUser.nickname; // 올바른 속성 접근 방식
     }
-    const response = await tableLogin(loginData);
-    const userID = response.user.userId;
 
-    setUserId(userID);
-    if (kakaoUser.kakaoUserId !== null) {
-      // 카카오 유저와 파티 유저 연동 처리
-      try {
-        const linkResponse = await linkKakaoAndPartyUser(userID, kakaoUser.kakaoUserId, hash);
-        console.log("linkResponse", linkResponse);
-      } catch (error) {
-        console.error("Kakao link API error:", error);
+    try {
+      const result = await createTable(dataToSubmit);
+      const hash = result.partyId;
+
+      const loginData: LoginData = {
+        userName: userName.userId,
+        password: userName.userPassword,
+        partyId: hash,
+        isKakao: false,
+      };
+      if (kakaoUser.kakaoUserId !== null) {
+        loginData.userName = kakaoUser.nickname; // 올바른 속성 접근 방식
+        loginData.isKakao = true;
+        loginData.password = "";
       }
+      const response = await tableLogin(loginData);
+      const userID = response.user.userId;
+
+      setUserId(userID);
+      if (kakaoUser.kakaoUserId !== null) {
+        // 카카오 유저와 파티 유저 연동 처리
+        try {
+          const linkResponse = await linkKakaoAndPartyUser(
+            userID,
+            kakaoUser.kakaoUserId,
+            hash
+          );
+          console.log("linkResponse", linkResponse);
+        } catch (error) {
+          console.error("Kakao link API error:", error);
+        }
+      }
+      router.push(`/meeting/${hash}`);
+    } catch (error) {
+      console.error("제출 실패: ", error);
     }
-    // router.push(`/meeting/${hash}`);
-  } catch (error) {
-    console.error("제출 실패: ", error);
-  }
-};
+  };
   useEffect(() => {
     console.log("User ID Changed:", userId);
   }, [userId]);
@@ -275,7 +280,7 @@ export default function CalendarComp() {
               (selectedDate) => selectedDate.getTime() === date.getTime()
             )
               ? "selected-date"
-              : undefined
+              : ""
           }
         />
         <hr className="w-[90%] border-1 border-[#ECECED] my-[1%]" />

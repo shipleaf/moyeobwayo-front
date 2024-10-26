@@ -6,7 +6,13 @@ import { useEffect, useState } from "react";
 import { countTimeSlots, getGradationNum } from "@/app/utils/timeslotUtils";
 import { timeRange } from "@/app/meetlist/components/MeetDetail";
 import { PartyDate } from "@/app/interfaces/Party";
-import { timeslot, userEntity } from "@/app/api/getTableAPI";
+import { Timeslot, UserEntity } from "@/app/api/getTableAPI";
+
+interface TimeTableProps {
+  Dates: string[];
+  startTime: string;
+  endTime: string;
+}
 
 // Roboto 폰트 불러오기
 const roboto = Roboto({
@@ -57,13 +63,12 @@ function generateDummyData(): PartyDate[] {
   const dummyData: PartyDate[] = [];
 
 
-  const users: userEntity[] = [
+  const users: UserEntity[] = [
     { userId: 1, userName: '제시카', password: null },
     { userId: 2, userName: '존', password: null },
     { userId: 3, userName: '사라', password: null },
   ];
 
-  const selectedDays = [0, 1, 5]; // 0: 월요일, 1: 화요일, 5: 토요일
 
 
   for (let i = 0; i < 7; i++) {
@@ -73,7 +78,7 @@ function generateDummyData(): PartyDate[] {
     const dateString = newDate.toISOString().split('T')[0]; // ISO 8601 형식의 날짜 문자열
 
     // 타임슬롯과 유저 패턴 설정
-    let timeslots: timeslot[] = [];
+    let timeslots: Timeslot[] = [];
 
       // 날짜마다 패턴 다르게 설정
       if (i === 0) { // 월요일
@@ -154,9 +159,11 @@ const endHour = partyRange
 console.log('timeblocks', timeblocks);
 console.log(startHour, endHour);
 
-export default function TimeTable({}) {
+export default function TimeTable({ Dates, startTime, endTime }: TimeTableProps) {
   // 시간 라벨을 1시간 단위로 생성
   const [countSlot, setCountSlot] = useState<number[][] | undefined>([])
+
+  console.log(Dates, startTime, endTime)
 
   useEffect(() => {
     if (partyRange) {

@@ -1,8 +1,8 @@
 import axiosInstance from "./axiosInstance";
 
 export interface voteData {
-  selected_start_time: Date;
-  selected_end_time: Date;
+  selected_start_time: string;
+  selected_end_time: string;
   user_id: number;
   date_id: number;
 }

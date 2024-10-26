@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getPartyPriority } from "@/app/api/getTableAPI";
-import { AvailableTimesResponse } from "@/app/api/getTableAPI";
+import { getTable } from "@/app/api/getTableAPI";
+import { GetTableResponse } from "@/app/api/getTableAPI";
 
 // 날짜 포맷 함수
 const formatDateTime = (dateTime: string, includeDate: boolean = true) => {
@@ -16,12 +16,11 @@ const formatDateTime = (dateTime: string, includeDate: boolean = true) => {
 
 export default function PartyPriority() {
   const { hash } = useParams();
-  const [priorityData, setPriorityData] =
-    useState<AvailableTimesResponse | null>(null);
+  const [priorityData, setPriorityData] = useState<GetTableResponse | null>(null);
 
   useEffect(() => {
     if (hash) {
-      getPartyPriority({ table_id: hash as string })
+      getTable({ table_id: hash as string })
         .then((data) => {
           setPriorityData(data);
         })
@@ -29,7 +28,7 @@ export default function PartyPriority() {
           console.error("에러 발생: ", error);
         });
     }
-  }, []);
+  }, [hash]);
 
   return (
     <>
@@ -47,9 +46,11 @@ export default function PartyPriority() {
                 <div className="flex flex-row justify-between">
                   <p className="font-pretendard text-[15px] font-[500]">
                     {formatDateTime(timeSlot.start)} ~{" "}
-                    {formatDateTime(timeSlot.end, false)}{" "}
+                    {formatDateTime(timeSlot.end, false)}
                   </p>
-                  <button className="border-1 rounded-[50px] w-[18%] text-[13px] font-pretendard bg-[#6161CE] text-white">확정</button>
+                  <button className="border-1 rounded-[50px] w-[18%] text-[13px] font-pretendard bg-[#6161CE] text-white">
+                    확정
+                  </button>
                 </div>
                 <div className="flex overflow-hidden flex-wrap">
                   {timeSlot.users.map((user, idx) => (

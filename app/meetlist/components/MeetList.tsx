@@ -30,7 +30,7 @@ export default function MeetList() {
           }
         }
       } catch (error) {
-        
+        console.log(error)
       }
     };
 
