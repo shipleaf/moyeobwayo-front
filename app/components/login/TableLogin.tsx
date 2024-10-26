@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { useSetRecoilState } from 'recoil';
-import { loginState, userIdValue } from '@/app/recoil/atom'; // Recoil 상태
-import { tableLogin } from '@/app/api/tableLogin'; // API 호출 함수
-import { LoginData } from '@/app/api/types'; // LoginData 인터페이스
-import { useParams } from 'next/navigation'; // useParams를 import
+import React, { useState } from "react";
+import { useSetRecoilState } from "recoil";
+import { loginState, userIdValue } from "@/app/recoil/atom"; // Recoil 상태
+import { tableLogin } from "@/app/api/tableLogin"; // API 호출 함수
+import { LoginData } from "@/app/api/types"; // LoginData 인터페이스
+import { useParams } from "next/navigation"; // useParams를 import
 
 export default function TableLogin() {
   const { hash } = useParams(); // URL에서 hash 값을 추출
-  const [userName, setUserName] = useState(''); // 사용자 이름 입력 상태
-  const [password, setPassword] = useState(''); // 비밀번호 입력 상태
+  const [userName, setUserName] = useState(""); // 사용자 이름 입력 상태
+  const [password, setPassword] = useState(""); // 비밀번호 입력 상태
   const setIsLoggedIn = useSetRecoilState(loginState); // 로그인 상태 관리
   const setUserIdValue = useSetRecoilState(userIdValue);
 
@@ -25,41 +25,50 @@ export default function TableLogin() {
 
     try {
       const response = await tableLogin(loginData);
-      console.log('API 응답:', response);
+      console.log("API 응답:", response);
 
       setIsLoggedIn(true);
-      setUserIdValue(response.user.user_id);
+      setUserIdValue(response.user.userId);
 
       // 추가적으로 필요한 동작이 있으면 여기에 추가
     } catch (error) {
-      console.error('로그인 실패:', error);
+      console.error("로그인 실패:", error);
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="login-container bg-[#fff] w-full rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] pt-[15%] p-[10%]">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center justify-center gap-[2vh] border-[#285cc4]"
+      >
         <div>
-          <label htmlFor="userName">User ID:</label>
           <input
             type="text"
             id="userName"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
+            placeholder="성함"
             required
+            className="p-[10px] border-1 bg-[#f9fbfc] rounded-[10px] focus:outline-none focus:border-[#285cc4] focus:bg-[#fff]"
           />
         </div>
         <div>
-          <label htmlFor="password">Password:</label>
           <input
             type="password"
             id="password"
             value={password}
+            placeholder="비밀번호(필수X)"
             onChange={(e) => setPassword(e.target.value)}
+            className="p-[10px] border-1 bg-[#f9fbfc] rounded-[10px] focus:outline-none focus:border-[#285cc4] focus:bg-[#fff]"
           />
         </div>
-        <button type="submit">Login</button>
+        <button
+          type="submit"
+          className="bg-[#6161cE] mt-[10%] w-[80%] h-[5vh] text-white rounded-[10px]"
+        >
+          로그인하기
+        </button>
       </form>
     </div>
   );

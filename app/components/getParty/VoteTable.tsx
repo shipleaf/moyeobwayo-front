@@ -1,204 +1,262 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { voteTime, voteData } from "@/app/api/timeslotAPI";
+import React, { useState } from "react";
 import { userIdValue } from "@/app/recoil/atom";
 import { useRecoilValue } from "recoil";
+import { useParams } from "next/navigation";
+import { voteData } from "@/app/api/timeslotAPI";
 
-interface TimeSlot {
-  date: string;
-  time: string;
-  selected: boolean;
-  dateId: number;
-}
+// 1시간 간격으로 시간 표시, 마지막 시간 포함
+const generateDisplaySlots = (startHour: number, endHour: number): string[] => {
+  const slots = [];
+  for (let hour = startHour; hour <= endHour; hour++) {
+    slots.push(`${hour.toString().padStart(2, "0")}:00`);
+  }
+  return slots;
+};
 
-interface VoteTableProps {
+// 15분 간격으로 시간 슬롯 생성
+const generateTimeSlots = (startHour: number, endHour: number): string[] => {
+  const slots = [];
+  for (let hour = startHour; hour < endHour; hour++) {
+    for (let minute = 0; minute < 60; minute += 15) {
+      slots.push(
+        `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`
+      );
+    }
+  }
+  return slots;
+};
+
+// 한국 시간으로 서버에 전달할 시간 포맷 생성
+const formatToServerTime = (date: Date) => {
+  const koreanTime = new Date(date.getTime() + 9 * 60 * 60 * 1000); // 한국 시간대 적용 (GMT+09:00)
+  const year = koreanTime.getFullYear();
+  const month = (koreanTime.getMonth() + 1).toString().padStart(2, "0");
+  const day = koreanTime.getDate().toString().padStart(2, "0");
+  const hours = koreanTime.getHours().toString().padStart(2, "0");
+  const minutes = koreanTime.getMinutes().toString().padStart(2, "0");
+  const seconds = koreanTime.getSeconds().toString().padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
+
+// 요일과 날짜를 개별적으로 포맷팅
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const weekday = date
+    .toLocaleDateString("en-US", { weekday: "short" })
+    .toUpperCase();
+  const day = date.getDate();
+  return { weekday, day };
+};
+
+type TimeSelectorProps = {
   party: {
-    dates: {
-      date_id: number;
-      selected_date: string;
-      timeslots: any[];
-    }[];
-    start_date: string;
+    partyId: string;
+    targetNum: number;
+    currentNum: number;
+    partyName: string;
+    partyDescription: string;
+    startDate: string;
+    locationName: string | null;
     endDate: string;
+    decisionDate: string;
+    userId: string;
+    alarms: Array<any>;
+    dates: Array<{
+      dateId: number;
+      selected_date: string;
+      timeslots: Array<any>;
+    }>;
   };
-  availableTimes: any[];
-}
+};
 
-export default function VoteTable({ party, availableTimes }: VoteTableProps) {
-  const selectedDates = party.dates.map((dateObj) => {
-    const utcDate = new Date(dateObj.selected_date);
-    const weekday = utcDate.toLocaleDateString("en-US", {
-      weekday: "short", // Sun, Mon, ...
-      timeZone: "Asia/Seoul",
-    });
-    const day = utcDate.toLocaleDateString("en-US", {
-      day: "numeric", // 17, 18, ...
-      timeZone: "Asia/Seoul",
-    });
-    return { weekday, day }; // 요일과 날짜를 객체로 반환
-  });
-
-  const startTime = 9;
-  const endTime = 15;
-
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[][]>([]);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState<{
-    dateIndex: number;
-    timeIndex: number;
-  } | null>(null);
-  const [isSelecting, setIsSelecting] = useState(true);
-  const [loading, setLoading] = useState(true);
+export default function TimeSelector({ party }: TimeSelectorProps) {
+  const { dates, startDate, endDate } = party;
   const userId = useRecoilValue(userIdValue);
+  const { hash: partyId } = useParams();
 
-  useEffect(() => {
-    if (userId) {
-      setLoading(false);
+  const startHour = new Date(startDate).getHours();
+  const endHour = new Date(endDate).getHours();
+  const timeSlots = generateTimeSlots(startHour, endHour);
+  const displaySlots = generateDisplaySlots(startHour, endHour);
+
+  const [selectedSlots, setSelectedSlots] = useState<boolean[]>(
+    Array(timeSlots.length * dates.length).fill(false)
+  );
+
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [isDeselecting, setIsDeselecting] = useState(false); // 드래그 취소 플래그 추가
+  const [startIndex, setStartIndex] = useState<number | null>(null);
+  const [endIndex, setEndIndex] = useState<number | null>(null);
+
+  // 드래그 시작 및 종료를 기반으로 voteData 형식의 데이터 생성
+  const generateDragVoteData = (): voteData | null => {
+    if (startIndex === null || endIndex === null) return null;
+
+    const [finalStartIndex, finalEndIndex] = [
+      Math.min(startIndex, endIndex),
+      Math.max(startIndex, endIndex),
+    ];
+
+    const dateIndex = Math.floor(finalStartIndex / timeSlots.length);
+    const timeSlotStart = finalStartIndex % timeSlots.length;
+    const timeSlotEnd = finalEndIndex % timeSlots.length;
+    const dateId = dates[dateIndex].dateId;
+
+    const startHourAdjusted = Math.floor(timeSlotStart / 4) + startHour;
+    const startMinute = (timeSlotStart % 4) * 15;
+    const endHourAdjusted = Math.floor(timeSlotEnd / 4) + startHour;
+    const endMinute = (timeSlotEnd % 4) * 15;
+
+    const selectedStartTime = new Date(
+      new Date(dates[dateIndex].selected_date).setHours(
+        startHourAdjusted,
+        startMinute,
+        0
+      )
+    );
+    const selectedEndTime = new Date(
+      new Date(dates[dateIndex].selected_date).setHours(
+        endHourAdjusted,
+        endMinute + 15,
+        0
+      )
+    );
+
+    return {
+      selected_start_time: formatToServerTime(selectedStartTime),
+      selected_end_time: formatToServerTime(selectedEndTime),
+      user_id: parseInt(userId),
+      date_id: dateId,
+    };
+  };
+
+  // 마우스 드래그 시작
+  const handleMouseDown = (index: number, event: React.MouseEvent) => {
+    event.preventDefault();
+    setIsSelecting(true);
+    setIsDeselecting(selectedSlots[index]); // 선택 상태에 따라 플래그 설정
+    setStartIndex(index);
+    setEndIndex(index);
+  };
+
+  // 마우스 이동 중
+  const handleMouseOver = (index: number) => {
+    if (!isSelecting) return;
+    setEndIndex(index);
+
+    const newSelectedSlots = [...selectedSlots];
+    const rangeStart = Math.min(startIndex!, index);
+    const rangeEnd = Math.max(startIndex!, index);
+
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+      newSelectedSlots[i] = !isDeselecting; // 선택/해제에 따라 변경
     }
-  }, [userId]);
-
-  useEffect(() => {
-    generateTimeSlots();
-  }, [party]);
-
-  const generateTimeSlots = () => {
-    const newTimeSlots: TimeSlot[][] = party.dates.map((dateObj) => {
-      const slots: TimeSlot[] = [];
-      for (let time = startTime; time <= endTime; time++) {
-        slots.push({
-          date: new Date(dateObj.selected_date).toISOString().split("T")[0],
-          time: `${time}:00`,
-          selected: false,
-          dateId: dateObj.date_id,
-        });
-      }
-      return slots;
-    });
-
-    // availableTimes 데이터를 바탕으로 시간 슬롯 업데이트
-    availableTimes.forEach((availableTime) => {
-      const { start, end } = availableTime;
-      const startDate = new Date(start).toISOString().split("T")[0];
-      const endDate = new Date(end).toISOString().split("T")[0];
-      const startHour = new Date(start).getHours();
-      const endHour = new Date(end).getHours();
-
-      newTimeSlots.forEach((daySlots, dateIndex) => {
-        if (daySlots[0].date === startDate || daySlots[0].date === endDate) {
-          daySlots.forEach((slot, timeIndex) => {
-            const slotHour = parseInt(slot.time.split(":")[0]);
-            if (slotHour >= startHour && slotHour <= endHour) {
-              newTimeSlots[dateIndex][timeIndex].selected = true;
-            }
-          });
-        }
-      });
-    });
-
-    setTimeSlots(newTimeSlots);
+    setSelectedSlots(newSelectedSlots);
   };
 
-  const handleMouseDown = (dateIndex: number, timeIndex: number) => {
-    const isSlotSelected = timeSlots[dateIndex][timeIndex].selected;
-    setIsDragging(true);
-    setDragStart({ dateIndex, timeIndex });
-    setIsSelecting(!isSlotSelected);
-    toggleTimeSlot(dateIndex, timeIndex);
-  };
+  // 마우스 드래그 종료
+  const handleMouseUp = () => {
+    setIsSelecting(false);
 
-  const handleMouseOver = (dateIndex: number, timeIndex: number) => {
-    if (isDragging) {
-      toggleTimeSlot(dateIndex, timeIndex);
+    const voteData = generateDragVoteData();
+    if (voteData) {
+      console.log("Selected time range (drag):", voteData);
     }
+    setStartIndex(null);
+    setEndIndex(null);
   };
 
-  const handleMouseUp = async (dateIndex: number, timeIndex: number) => {
-    setIsDragging(false);
+  const handleCellClick = (index: number) => {
+    const newSelectedSlots = [...selectedSlots];
+    newSelectedSlots[index] = !newSelectedSlots[index];
+    setSelectedSlots(newSelectedSlots);
 
-    if (dragStart) {
-      const startSlot = timeSlots[dragStart.dateIndex][dragStart.timeIndex];
-      const endSlot = timeSlots[dateIndex][timeIndex];
+    const dateIndex = Math.floor(index / timeSlots.length);
+    const timeSlotIndex = index % timeSlots.length;
+    const dateId = dates[dateIndex].dateId;
 
-      // voteTime API 호출을 위한 데이터 생성
-      const voteRequest: voteData = {
-        selected_start_time: new Date(`${startSlot.date}T${startSlot.time}`),
-        selected_end_time: new Date(`${endSlot.date}T${endSlot.time}`),
-        user_id: userId,
-        date_id: startSlot.dateId,
-      };
+    const hour = Math.floor(timeSlotIndex / 4) + startHour;
+    const minute = (timeSlotIndex % 4) * 15;
+    const selectedStartTime = new Date(
+      new Date(dates[dateIndex].selected_date).setHours(hour, minute, 0)
+    );
+    const selectedEndTime = new Date(
+      selectedStartTime.getTime() + 15 * 60 * 1000 // 15분 후
+    );
 
-      try {
-        const response = await voteTime(voteRequest); // API 호출
-        console.log("API 응답:", response); // 응답 결과 콘솔 출력
-      } catch (error) {
-        console.error("API 요청 중 오류 발생:", error);
-      }
-    }
-    setDragStart(null);
-  };
+    const voteData: voteData = {
+      selected_start_time: formatToServerTime(selectedStartTime),
+      selected_end_time: formatToServerTime(selectedEndTime),
+      user_id: parseInt(userId),
+      date_id: dateId,
+    };
 
-  const toggleTimeSlot = (dateIndex: number, timeIndex: number) => {
-    setTimeSlots((prev) => {
-      const newSlots = [...prev];
-      newSlots[dateIndex][timeIndex].selected = isSelecting ? true : false;
-      return newSlots;
-    });
+    console.log("Selected time range (click):", voteData);
   };
 
   return (
-    <div className="vote-table bg-[#f7f7f7] h-[50%] rounded-[10px] shadow-prior backdrop-blur-48px flex items-start justify-start p-[5%]">
-      <table>
-        <thead>
-          <tr>
-            <th>Time</th>
-            {selectedDates.map(({ weekday, day }, index) => (
-              <th key={index}>
-                <div style={{ textAlign: "center" }}>
-                  <div className="font-pretendard font-[400] m-0">
-                    {weekday}
-                  </div>
-                  <div className="font-pretendard m-0">{day}</div>
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {timeSlots[0]?.map((_, timeIndex) => (
-            <tr key={timeIndex}>
-              <td>{startTime + timeIndex}:00</td>
-              {selectedDates.map((_, dateIndex) => (
-                <td
-                  key={dateIndex}
-                  className={`time-slot ${
-                    timeSlots[dateIndex][timeIndex].selected ? "selected" : ""
-                  }`}
-                  onMouseDown={() => handleMouseDown(dateIndex, timeIndex)}
-                  onMouseOver={() => handleMouseOver(dateIndex, timeIndex)}
-                  onMouseUp={() => handleMouseUp(dateIndex, timeIndex)}
-                  style={{
-                    backgroundColor: timeSlots[dateIndex][timeIndex].selected
-                      ? "#FFD700"
-                      : "white",
-                    border: "1px solid #ccc",
-                    cursor: "pointer",
-                  }}
-                ></td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <style jsx>{`
-        .selected {
-          background-color: #ffd700;
-        }
-        td {
-          width: 50px;
-          height: 30px;
-        }
-      `}</style>
+    <div
+      onMouseUp={handleMouseUp}
+      style={{ userSelect: "none" }}
+      className="w-[90%] mr-[5%] bg-[#fff] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] pt-[5%]"
+    >
+      <div
+        className="grid items-start justify-center"
+        style={{
+          gridTemplateColumns: `40px repeat(${dates.length}, 50px)`,
+          gap: "0",
+        }}
+      >
+        <div></div>
+        {dates.map((date, index) => {
+          const { weekday, day } = formatDate(date.selected_date);
+          return (
+            <div key={index} className="text-center border-b border-gray-300">
+              <div className="text-xs font-semibold">{weekday}</div>
+              <div className="text-lg font-bold">{day}</div>
+            </div>
+          );
+        })}
+
+        {/* 시간과 슬롯 표시 */}
+        {displaySlots.map((displayTime, displayIndex) => (
+          <React.Fragment key={`display-${displayIndex}`}>
+            <div className="flex flex-col items-start text-right pr-2 row-span-4 border-gray-300 text-[10px] relative top-[-5px]">
+              {displayTime}
+            </div>
+            {timeSlots
+              .slice(displayIndex * 4, displayIndex * 4 + 4)
+              .map((_, innerIndex) => {
+                const cellIndex = displayIndex * 4 + innerIndex;
+                return dates.map((date, dateIndex) => {
+                  const fullCellIndex =
+                    cellIndex + dateIndex * timeSlots.length;
+                  return (
+                    <div
+                      key={fullCellIndex}
+                      data-dateid={date.dateId}
+                      className={`block w-[50px] h-[10px] cursor-pointer ${
+                        selectedSlots[fullCellIndex]
+                          ? "bg-[#A1A1FF]"
+                          : "bg-white"
+                      } ${
+                        innerIndex % 2 === 1 ? "border-b border-dotted" : ""
+                      } border-l border-r border-gray-300`}
+                      onMouseDown={(e) => handleMouseDown(fullCellIndex, e)}
+                      onMouseOver={() => handleMouseOver(fullCellIndex)}
+                      onClick={() => handleCellClick(fullCellIndex)}
+                    />
+                  );
+                });
+              })}
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 }
