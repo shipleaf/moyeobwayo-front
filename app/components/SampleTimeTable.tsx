@@ -1,5 +1,5 @@
 'use client'
-import TimeBlock from "./TimeBlock";
+import TimeBlock from "./createParty/TimeBlock";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
 import { useEffect, useState } from "react";
@@ -154,7 +154,7 @@ const endHour = partyRange
 console.log('timeblocks', timeblocks);
 console.log(startHour, endHour);
 
-export default function TimeTable({}) {
+export default function SampleTimeTable({}) {
   // 시간 라벨을 1시간 단위로 생성
   const [countSlot, setCountSlot] = useState<number[][] | undefined>([])
 

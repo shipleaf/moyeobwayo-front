@@ -3,7 +3,7 @@
 import TimeBlock from "./TimeBlock";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
-import { PartyDate, Timeslot } from "@/app/interfaces/Party";
+import { PartyDate } from "@/app/interfaces/Party";
 import { timeslot } from "@/app/api/getTableAPI";
 import { timeRange } from "./MeetDetail";
 import { useEffect, useState } from "react";
@@ -63,7 +63,6 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
       setCountSlot(newCountSlots); // 2차원 배열로 상태 업데이트
     }
   }, [timeblocks, partyRange]);
-  const defaultStartDate = new Date(now.setHours(9, 0, 0, 0)); // 기본 시작 시간은 09:00
   const defaultEndDate = new Date(TableData.endDate); // 7일 뒤의 15:00
   defaultEndDate.setHours(15, 0, 0, 0);
   
@@ -86,7 +85,6 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
   
     // 일의 자리에서 반올림
     const rounded = Math.round(percent / 10) * 10;
-    console.log(rounded)
     return rounded.toString(); // 숫자를 문자열로 변환
   };
   
@@ -94,21 +92,19 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
     // 시간만 취하기 위해 Date 대신 시간을 직접 추출
     const start = new Date(startTime);
     const end = new Date(endTime);
-  
+    
     const startHour = start.getHours();
     const startMinute = start.getMinutes();
     const endHour = end.getHours();
     const endMinute = end.getMinutes();
-  
     // 30분 간격으로 총 몇 개의 슬롯이 있는지 계산
     const totalSlots = Math.ceil(((endHour * 60 + endMinute) - (startHour * 60 + startMinute)) / 30);
-    
     // 슬롯 수만큼 0으로 초기화된 배열 생성
     const result = new Array(totalSlots).fill(0);
   
     for (const slot of timeslots) {
-      const slotStart = new Date(slot.selected_start_time);
-      const slotEnd = new Date(slot.selected_end_time);
+      const slotStart = new Date(slot.selectedStartTime);
+      const slotEnd = new Date(slot.selectedEndTime);
   
       const slotStartHour = slotStart.getHours();
       const slotStartMinute = slotStart.getMinutes();
@@ -118,13 +114,11 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
       // 시간 차이를 기반으로 슬롯의 인덱스를 계산
       const startIndex = Math.max(0, Math.floor(((slotStartHour * 60 + slotStartMinute) - (startHour * 60 + startMinute)) / 30));
       const endIndex = Math.min(totalSlots - 1, Math.floor(((slotEndHour * 60 + slotEndMinute) - (startHour * 60 + startMinute)) / 30));
-  
       // 각 슬롯에 포함되는 인덱스 범위의 값을 증가
-      for (let i = startIndex; i <= endIndex; i++) {
+      for (let i = startIndex; i < endIndex; i++) {
         result[i]++;
       }
     }
-  
     return result;
   };
 
@@ -143,13 +137,13 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
           {timeblocks?.map((day, index) => (
             <div
               key={index}
-              className="flex-grow h-full w-[14.2%] flex-shrink-0 flex justify-center items-center gap-[4px]"
+              className="flex-grow h-full w-[14.2%] flex-shrink-0 flex flex-col justify-center items-center gap-[0px]"
             >
               {/* 요일과 날짜 표시 */}
-              <span className={`${roboto.className} font-[500] text-[15px]`}>
+              <span className={`${roboto.className} font-[500] text-[15px] leading-3`}>
                 {getWeekday(new Date(day.selected_date))}
               </span>
-              <span className={`${roboto.className} font-[500] text-[35px]`}>
+              <span className={`${roboto.className} font-[500] text-[35px] leading-11`}>
                 {new Date(day.selected_date).getDate()}
               </span>
             </div>

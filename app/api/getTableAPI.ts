@@ -4,20 +4,27 @@ export interface TableId {
   table_id: string;
 }
 
+export interface userEntity{
+  userId: number,
+  userName: string,
+  password: null
+}
 export interface timeslot{
-  slot_id: number,
-  selected_start_time: string,
-  selected_end_time: string,
+  slotId: number,
+  selectedStartTime: string,
+  selectedEndTime: string,
+  userEntity: userEntity
 }
 
+
 export interface Party{
-  party_id: string;
-  target_num: number;
-  current_num: number;
-  party_name: string;
-  party_description: string;
-  start_date: string;
-  location_name: string | null;
+  partyId: string;
+  targetNum: number;
+  currentNum: number;
+  partyName: string;
+  partyDescription: string;
+  startDate: string;
+  locationName: string | null;
   endDate: string;
   decision_date: string;
   user_id: string;

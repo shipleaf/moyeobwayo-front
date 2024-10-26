@@ -1,10 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { DummyMeet, Alarm, PartyDate, Timeslot, AvailableTime } from "@/app/interfaces/Party"
+import { PartyDate, AvailableTime } from "@/app/interfaces/Party"
 import { CheckFat } from '@phosphor-icons/react/dist/ssr';
 import { useSearchParams } from 'next/navigation'; // useRouter를 가져옵니다
 import TimeTable from './TimeTable';
 import {getTable, Party, AvailableTimesResponse} from '@/app/api/getTableAPI'
+import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
+import Image from 'next/image';
 // Dummies
 export const availableTimes: AvailableTime[] = [
   {
@@ -60,9 +62,9 @@ const MeetDetail = () => {
           setTargetMeet(response.party); // API로부터 받은 데이터로 상태 업데이트
           setAvariableTime(response.availableTimes)
           setTimeblocks(response.party.dates)
-          setCurrentNum(response.party.current_num)
+          setCurrentNum(response.party.currentNum)
           setPartyRange({
-            startTime: response.party.start_date,
+            startTime: response.party.startDate,
             endTime: response.party.endDate
           });
         } catch (error) {
@@ -74,10 +76,27 @@ const MeetDetail = () => {
     fetchMeetDetail(); // 비동기 함수 호출
   }, [table_id]); // table_id가 변경될 때마다 호출
   if (!targetMeet) {
-    return <div>Loading...</div>;
+    return (
+      <div className='absolute top-[25vh] left-[10vw]'> {/* 부모 요소에 relative 추가 */}
+        <div className=' flex gap-4 justify-center'> {/* absolute와 transform으로 중앙 정렬 */}
+          <Image
+            width={120}
+            height={120}
+            alt='그레이 로고'
+            src="/images/logo_gray.png"
+          />
+          <MagnifyingGlass color='#777' size={96} weight="duotone" style={{ marginLeft: '10px', marginTop: '25px' }}/>
+        </div>
+        <div className=''> {/* 텍스트 중앙 정렬 */}
+          <span className='text-[#777] text-[50px] font-bold'>
+            No Result Found
+          </span>
+        </div>
+      </div>
+    );
   }
 
-  const date = new Date(targetMeet.start_date); // meet 객체에 dateString 속성이 있다고 가정
+  const date = new Date(targetMeet.startDate); // meet 객체에 dateString 속성이 있다고 가정
     const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줌
     const day = date.getDate();
     const hours = date.getHours();
@@ -98,9 +117,9 @@ const MeetDetail = () => {
       >
         <p className='text-[#5E5E5E] text-[14px] font-normal'
         >
-          {targetMeet.target_num}명 중 {targetMeet.current_num}명
+          {targetMeet.targetNum}명 중 {targetMeet.currentNum}명
         </p>
-        <h3 className='mb-[5px] text-[22px] text-[#2D2D2D] font-semibold'>{targetMeet.party_name}</h3>
+        <h3 className='mb-[5px] text-[22px] text-[#2D2D2D] font-semibold'>{targetMeet.partyName}</h3>
         <div className='flex justify-between items-center'>
           <p className='text-[#5E5E5E] text-[16px] font-normal'>
             {month}월 {day}일 ({dayOfWeek}) {hours}:{minutes} ~
