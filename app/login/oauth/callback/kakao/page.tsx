@@ -17,8 +17,8 @@ function Page() {
       sendAuthCodeToBackend(code)
         .then((data) => {
           console.log(data);
-          if (data.status === 200) { // 서버 응답의 상태가 정상일 때
-            router.push("/meetlist"); // /meetlist 페이지로 이동
+          if (data) {
+            router.push("/meetlist");
           }
         })
         .catch((err) => {

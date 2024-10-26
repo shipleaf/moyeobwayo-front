@@ -92,9 +92,7 @@ export default function Page() {
           </section>
           {/* Detail은 나머지 오른쪽에 배치되어야해 */}
           {/* Detail */}
-
         </div>
-
         <div
           className={`absolute transition-all duration-300 z-0 ${
         "top-[18%] left-[10.5%]"

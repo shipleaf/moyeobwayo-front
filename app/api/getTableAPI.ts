@@ -26,7 +26,7 @@ export interface Party{
 }
 export interface getTableResponse {
   party: Party;
-  availableTimes: AvailableTimesResponse[];
+  availableTime: AvailableTimesResponse[];
 }
 
 export interface AvailableTimesResponse {

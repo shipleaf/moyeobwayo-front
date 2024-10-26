@@ -72,7 +72,10 @@ export default function KakaoLogin() {
               </span>
             </div>
           </div>
-          <button onClick={kakaoLoginHandler} className="flex items-center justify-center w-[50%]">
+          <button
+            onClick={kakaoLoginHandler}
+            className="flex items-center justify-center w-[50%]"
+          >
             <Image
               src="/images/kakao_login_large_wide.png"
               alt=""

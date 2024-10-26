@@ -186,9 +186,9 @@ export default function CalendarComp() {
       };
 
       const response = await tableLogin(loginData);
-      setUserId(response.user.user_id);
+      setUserId(response.user.userId);
 
-      console.log(response.user.user_id);
+      console.log(response.user.userId);
 
       console.log("서버 응답: ", result);
 

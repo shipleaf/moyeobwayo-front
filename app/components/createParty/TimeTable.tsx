@@ -57,6 +57,7 @@ export default function TimeTable({
   startTime,
   endTime,
 }: TimeTableProps) {
+  console.log(Dates, startTime, endTime)
   const validStartTime = startTime || "09:00"; // 기본값을 "09:00"으로 설정
   const validEndTime = endTime || "15:00"; // 기본값을 "15:00"으로 설정
   const startHour = parseInt(validStartTime.split(":")[0]); // 시작 시간을 숫자로 변환
@@ -79,6 +80,8 @@ export default function TimeTable({
   // Dates가 유효한 배열인지 확인하고, 그렇지 않으면 기본값(오늘부터 7일간) 설정
   const validDates =
     Array.isArray(Dates) && Dates.length > 0 ? Dates : generateDefaultDates();
+
+    console.log(validDates)
 
   // Dates 배열로부터 Date 객체 배열 생성
   const days: Date[] = validDates.map((date) => new Date(date));

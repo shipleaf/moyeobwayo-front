@@ -50,8 +50,6 @@ export default function MeetingPage() {
 
   useEffect(() => {
     if (hash) {
-      // hash가 있을 때만 API 호출, loading이 false일 때만
-      // getTable API 호출
       getTable({ table_id: hash as string })
         .then((data) => {
           // 서버에서 받아온 날짜를 로컬 날짜로 변환하고 ISO 형식에서 날짜 부분만 추출
@@ -61,7 +59,7 @@ export default function MeetingPage() {
           });
 
           // 시작 시간과 종료 시간은 로컬 시간대로 변환 후 HH:MM 형식만 추출
-          const startTime = new Date(data.party.start_date).toLocaleTimeString(
+          const startTime = new Date(data.party.startDate).toLocaleTimeString(
             "en-GB",
             {
               hour: "2-digit",
@@ -168,13 +166,10 @@ export default function MeetingPage() {
           </div>
         </div>
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
-          <div className="flex flex-col mr-[2%] basis-1/4">
+          <div className="flex flex-col mr-[2%] basis-1/4 items-center">
             <PartyPriority />
             {isLoggedIn && tableData ? (
-              <VoteTable
-                party={tableData.party}
-                availableTimes={tableData.availableTimes}
-              />
+              <VoteTable party={tableData.party} />
             ) : (
               <TableLogin />
             )}
