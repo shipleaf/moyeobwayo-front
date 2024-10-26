@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // App Router에서 useParams 사용
 import { getTable } from "@/app/api/getTableAPI"; // API 호출 주석 처리
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { MdContentPaste } from "react-icons/md";
 import { HiUserCircle } from "react-icons/hi2";
 import TimeTable from "@/app/components/createParty/TimeTable";
@@ -12,16 +12,38 @@ import { FiCalendar } from "react-icons/fi";
 import Modal from "react-modal";
 import { kakaoLoginState } from "@/app/recoil/atom";
 import KakaoLogin from "@/app/components/login/KakaoLogin";
-import VoteTable from "@/app/components/getParty/voteTable";
+import TimeSelector from "@/app/components/getParty/VoteTable";
 import PartyPriority from "@/app/components/getParty/PartyPriority";
 import { loginState } from "@/app/recoil/atom";
 import TableLogin from "@/app/components/login/TableLogin";
 
+import { Party } from "@/app/api/getTableAPI"; // interfaces 파일의 경로
+
+interface TableData {
+  party: Party;
+  formattedDates: string[];
+  startTime: string;
+  endTime: string;
+}
+
+export interface Timeslot {
+  slotId: number;
+  selectedStartTime: string;
+  selectedEndTime: string;
+  userEntity: UserEntity;
+}
+
+export interface UserEntity {
+  userId: number;
+  userName: string;
+  password: null;
+}
+
 export default function MeetingPage() {
   const { hash } = useParams(); // meetingId를 URL에서 추출
-  const [tableData, setTableData] = useState(null);
+  const [tableData, setTableData] = useState<TableData | null>(null);
   const isLoggedIn = useRecoilValue(loginState);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   const users = [
     { id: 1, username: "Alice", profileImage: "" },
@@ -33,7 +55,7 @@ export default function MeetingPage() {
     "calendar"
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [kakaoState, setKakaoState] = useRecoilState(kakaoLoginState); // Recoil 상태 사용
+  const kakaoState = useRecoilValue(kakaoLoginState); // Recoil 상태 사용
 
   const handleButtonClick = () => {
     setSelectedButton("content");
@@ -169,7 +191,7 @@ export default function MeetingPage() {
           <div className="flex flex-col mr-[2%] basis-1/4 items-center">
             <PartyPriority />
             {isLoggedIn && tableData ? (
-              <VoteTable party={tableData.party} />
+              <TimeSelector party={tableData.party} />
             ) : (
               <TableLogin />
             )}

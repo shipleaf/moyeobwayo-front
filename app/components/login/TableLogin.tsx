@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { loginState, userIdValue } from "@/app/recoil/atom"; // Recoil 상태
 import { tableLogin } from "@/app/api/tableLogin"; // API 호출 함수
-import { LoginData } from "@/app/api/types"; // LoginData 인터페이스
+import { LoginData } from "@/app/api/tableLogin";
 import { useParams } from "next/navigation"; // useParams를 import
 
 export default function TableLogin() {
-  const { hash } = useParams(); // URL에서 hash 값을 추출
+  const { hash } = useParams() as { hash: string }; // hash를 string으로 단언
   const [userName, setUserName] = useState(""); // 사용자 이름 입력 상태
   const [password, setPassword] = useState(""); // 비밀번호 입력 상태
   const setIsLoggedIn = useSetRecoilState(loginState); // 로그인 상태 관리
@@ -19,7 +19,7 @@ export default function TableLogin() {
     const loginData: LoginData = {
       userName: userName,
       password: password,
-      partyId: hash, // 추출한 hash 값 사용
+      partyId: hash,
       isKakao: false,
     };
 

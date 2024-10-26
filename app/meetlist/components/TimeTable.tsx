@@ -3,8 +3,7 @@
 import TimeBlock from "./TimeBlock";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
-import { PartyDate } from "@/app/interfaces/Party";
-import { timeslot } from "@/app/api/getTableAPI";
+import { Timeslot, PartyDate } from "@/app/api/getTableAPI";
 import { timeRange } from "./MeetDetail";
 import { useEffect, useState } from "react";
 // Roboto 폰트 불러오기
@@ -52,7 +51,7 @@ const getWeekday = (date: Date) => {
 export default function TimeTable({timeblocks, currentNum, partyRange}:
   {timeblocks:PartyDate[] | null, currentNum: number | null, partyRange:timeRange|null}) {
   // 더미 데이터를 가져와서 사용
-  const now = new Date(TableData.startDate);
+  // const now = new Date(TableData.startDate);
   const [countSlot, setCountSlot] = useState<number[][] | undefined>([])
   useEffect(() => {
     if (partyRange) {
@@ -88,7 +87,7 @@ export default function TimeTable({timeblocks, currentNum, partyRange}:
     return rounded.toString(); // 숫자를 문자열로 변환
   };
   
-  const countTimeSlots = (timeslots: timeslot[], startTime: string, endTime: string):number[] => {
+  const countTimeSlots = (timeslots: Timeslot[], startTime: string, endTime: string):number[] => {
     // 시간만 취하기 위해 Date 대신 시간을 직접 추출
     const start = new Date(startTime);
     const end = new Date(endTime);

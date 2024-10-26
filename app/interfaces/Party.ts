@@ -1,4 +1,4 @@
-import { timeslot } from "../api/getTableAPI";
+import { Timeslot } from "../api/getTableAPI";
 
 export interface Alarm {
   alarmId: number;
@@ -10,7 +10,7 @@ export interface Alarm {
 export interface PartyDate {
   date_id: number;
   selected_date: string;  // ISO 8601 형식의 날짜 문자열
-  timeslots: timeslot[];
+  timeslots: Timeslot[];
 }
 export interface DummyMeet {
   partyId: string;

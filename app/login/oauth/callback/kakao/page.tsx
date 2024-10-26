@@ -1,74 +1,68 @@
+// pages/login/oauth/callback/kakao/page.tsx
 "use client";
 
+import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation"; // useRouter 추가
-import { sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI"; // API 호출 함수 가져오기
+import { useSearchParams, useRouter } from "next/navigation";
+import { sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI";
 import { useSetRecoilState } from "recoil";
 import { kakaoUserState } from "@/app/recoil/atom";
-import { loadFromLocalStorage, saveToLocalStorage } from "@/app/recoil/recoilUtils";
-function Page() {
+import { saveToLocalStorage } from "@/app/recoil/recoilUtils";
+
+// 클라이언트 사이드 전용으로 페이지를 로드하도록 설정
+const Page = dynamic(() => Promise.resolve(KakaoCallback), { ssr: false });
+
+function KakaoCallback() {
   const searchParams = useSearchParams();
-  const router = useRouter(); // useRouter 사용
-  const code = searchParams.get("code"); // URL에서 code 추출
-  const [loading, setLoading] = useState<boolean>(false); // 로딩 상태 추가
-  const [error, setError] = useState<string | null>(null); // 에러 상태 추가
+  const router = useRouter();
+  const code = searchParams.get("code");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const setKakaoUserState = useSetRecoilState(kakaoUserState);
 
   useEffect(() => {
     const handleLogin = async () => {
-      if (!code) return; // code가 없으면 함수 종료
-      
+      if (!code) return;
       setLoading(true);
-      try {
-        const kakaoUserData = await sendAuthCodeToBackend(code); // await 사용
-        console.log('kakaoUserData', kakaoUserData);
-        
-        if (kakaoUserData) {
-        const {expires_in, kakaoUserId, nickname, profile_image} = kakaoUserData
 
+      try {
+        const kakaoUserData = await sendAuthCodeToBackend(code);
+        if (kakaoUserData) {
+          const { expires_in, kakaoUserId, nickname, profile_image } = kakaoUserData;
           setKakaoUserState({
-            kakaoUserId: kakaoUserId, // 응답 데이터 반영
+            kakaoUserId: kakaoUserId,
             nickname: nickname,
             profile_image: profile_image,
           });
-          
-          // localstorage에 expired_at은 현재시간에서 expiresin초를 더해서 만료시간 계산해서 넣어줘 계산해서 아래함수로 로컬스토리지에 load해봐
-          const currentDate = new Date();
-          const expiresAt = new Date(currentDate.getTime() + expires_in * 1000)
-          const kakaoUserDataByStorage = {
-            kakaoUserId: kakaoUserId, // 응답 데이터 반영
-            nickname: nickname,
-            profile_image: profile_image,
-            expiresAt: expiresAt
-          }
-          saveToLocalStorage("kakaoUserDataByStorage",kakaoUserDataByStorage)
 
-          router.push('/meetlist')
-        }else{
-          throw error
+          const expiresAt = new Date(Date.now() + expires_in * 1000);
+          const kakaoUserDataByStorage = {
+            kakaoUserId,
+            nickname,
+            profile_image,
+            expiresAt,
+          };
+          saveToLocalStorage("kakaoUserDataByStorage", kakaoUserDataByStorage);
+
+          router.push("/meetlist");
+        } else {
+          throw new Error("Login failed");
         }
       } catch (error) {
-        setError(error as string);
+        setError((error as Error).message);
       } finally {
         setLoading(false);
       }
     };
-  
-    handleLogin(); // 비동기 함수 호출
-  }, [code]); // code가 변경될 때마다 실행
+
+    handleLogin();
+  }, [code]);
 
   return (
     <div>
       <h1>Kakao OAuth Callback</h1>
-      {loading && <div>Loading...</div>} {/* 로딩 상태 표시 */}
-      {!loading && code && (
-        <div>
-          <div>Authorization Code:</div>
-          <div>{code}</div>
-        </div>
-      )}
-      {!loading && !code && <div>No authorization code found.</div>}
+      {loading && <div>Loading...</div>}
       {error && <div style={{ color: "red" }}>{error}</div>}
     </div>
   );

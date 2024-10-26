@@ -2,16 +2,11 @@ import React from "react";
 import Image from "next/image";
 import CalendarComp from "./components/createParty/CalendarComp";
 import Link from "next/link";
-import { CalendarBlank, Clipboard, UserCircle } from "@phosphor-icons/react/dist/ssr";
+import { CalendarBlank, Clipboard } from "@phosphor-icons/react/dist/ssr";
 import SampleAvatarList from "./components/SampleAvatarList";
 import SampleTimeTable from "./components/SampleTimeTable";
 
 // 예시 사용자 데이터
-const users = [
-  { id: 1, username: "Alice", profileImage: "" },
-  { id: 2, username: "Bob", profileImage: "" },
-  { id: 3, username: "Charlie", profileImage: "" },
-];
 export default function Home() {
 
   return (

@@ -1,6 +1,6 @@
-import { timeslot } from "../api/getTableAPI";
+import { Timeslot } from "../api/getTableAPI";
 
-export const countTimeSlots = (timeslots: timeslot[], startTime: string, endTime: string):number[] => {
+export const countTimeSlots = (timeslots: Timeslot[], startTime: string, endTime: string):number[] => {
   // 시간만 취하기 위해 Date 대신 시간을 직접 추출
   const start = new Date(startTime);
   const end = new Date(endTime);

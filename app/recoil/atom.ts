@@ -25,7 +25,7 @@ export const loginValue = atom({
 
 export const userIdValue = atom<number | null>({
   key: "userIdState",
-  default: null,
+  default: null as null | number,
 });
 
 // 임시적으로 로그인된 default값을 사용함

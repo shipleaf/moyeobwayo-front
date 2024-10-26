@@ -17,8 +17,8 @@ export interface Party {
   decisionDate: string;
   userId: string;
   locationName: string | null;
-  alarms: any[];  // alarms 배열, 타입을 더 명확히 할 수 있으면 추가적으로 수정 가능
-  dates: any[];   // dates 배열, 타입을 더 명확히 할 수 있으면 추가적으로 수정 가능
+  alarms: boolean[];
+  dates: boolean[];
 }
 
 // getMeetListResponse가 Party 배열을 포함하도록 수정

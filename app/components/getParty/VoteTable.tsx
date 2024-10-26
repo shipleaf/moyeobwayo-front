@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { userIdValue } from "@/app/recoil/atom";
 import { useRecoilValue } from "recoil";
-import { useParams } from "next/navigation";
+// import { useParams } from "next/navigation";
 import { voteData } from "@/app/api/timeslotAPI";
 
 // 1시간 간격으로 시간 표시, 마지막 시간 포함
@@ -65,19 +65,29 @@ type TimeSelectorProps = {
     endDate: string;
     decisionDate: string;
     userId: string;
-    alarms: Array<any>;
+    alarms: boolean[]; // 수정: string[] -> boolean[]
     dates: Array<{
       dateId: number;
       selected_date: string;
-      timeslots: Array<any>;
+      timeslots: Array<{
+        slotId: number;
+        selectedStartTime: string;
+        selectedEndTime: string;
+        userEntity: {
+          userId: number;
+          userName: string;
+          password: null;
+        };
+      }>;
     }>;
   };
 };
 
+
 export default function TimeSelector({ party }: TimeSelectorProps) {
   const { dates, startDate, endDate } = party;
   const userId = useRecoilValue(userIdValue);
-  const { hash: partyId } = useParams();
+  // const { hash: partyId } = useParams();
 
   const startHour = new Date(startDate).getHours();
   const endHour = new Date(endDate).getHours();
@@ -127,12 +137,16 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
       )
     );
 
-    return {
-      selected_start_time: formatToServerTime(selectedStartTime),
-      selected_end_time: formatToServerTime(selectedEndTime),
-      user_id: parseInt(userId),
-      date_id: dateId,
-    };
+    if (userId === null) {
+      throw new Error("User ID is missing");
+    } else {
+      return {
+        selected_start_time: formatToServerTime(selectedStartTime),
+        selected_end_time: formatToServerTime(selectedEndTime),
+        user_id: parseInt(userId.toString()),
+        date_id: dateId,
+      };
+    }
   };
 
   // 마우스 드래그 시작
@@ -189,14 +203,17 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
       selectedStartTime.getTime() + 15 * 60 * 1000 // 15분 후
     );
 
-    const voteData: voteData = {
-      selected_start_time: formatToServerTime(selectedStartTime),
-      selected_end_time: formatToServerTime(selectedEndTime),
-      user_id: parseInt(userId),
-      date_id: dateId,
-    };
+    if (userId === null) {
+      throw new Error("User ID is missing");
+    } else {
+      return {
+        selected_start_time: formatToServerTime(selectedStartTime),
+        selected_end_time: formatToServerTime(selectedEndTime),
+        user_id: parseInt(userId.toString()),
+        date_id: dateId,
+      };
+    }
 
-    console.log("Selected time range (click):", voteData);
   };
 
   return (
