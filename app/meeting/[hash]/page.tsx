@@ -28,16 +28,9 @@ interface TableData {
 
 export interface Timeslot {
   slotId: number;
-  selectedStartTime: string;
-  selectedEndTime: string;
-  userEntity: UserEntity;
+  binaryString: string;
 }
 
-export interface UserEntity {
-  userId: number;
-  userName: string;
-  password: null;
-}
 
 export default function MeetingPage() {
   const { hash } = useParams(); // meetingId를 URL에서 추출
@@ -127,7 +120,7 @@ export default function MeetingPage() {
             />
             <div className="flex flex-col items-center">
               <button
-                onClick={handleButtonClick} // content 버튼 클릭 핸들러
+                onClick={handleButtonClick}
                 className={`content w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer mb-[50%] ${
                   selectedButton === "content"
                     ? "bg-white text-black"
@@ -189,6 +182,14 @@ export default function MeetingPage() {
         </div>
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
           <div className="flex flex-col mr-[2%] basis-1/4 items-center">
+            <div className="w-full flex flex-col mb-[10px]">
+              <span className="font-pretendard font-[600] text-[30px] text-[#6161CE]">
+                {tableData?.party.partyName}
+              </span>
+              <span className="font-pretendard font-[400] text-[15px] text-[#aaa] pl-[2%]">
+                {tableData?.party.partyDescription}
+              </span>
+            </div>
             <PartyPriority />
             {isLoggedIn && tableData ? (
               <TimeSelector party={tableData.party} />
