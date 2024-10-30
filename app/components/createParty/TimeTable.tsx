@@ -156,8 +156,6 @@ const endHour = partyRange
   ? new Date(partyRange.endTime).getHours()  // 한국 시간에서 15시 추출
   : 15;
 
-console.log('timeblocks', timeblocks);
-console.log(startHour, endHour);
 
 export default function TimeTable({ Dates, startTime, endTime }: TimeTableProps) {
   // 시간 라벨을 1시간 단위로 생성

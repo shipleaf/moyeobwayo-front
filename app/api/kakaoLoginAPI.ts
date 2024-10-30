@@ -58,16 +58,14 @@ export async function sendAuthCodeToBackend(
 }
 
 export async function linkKakaoAndPartyUser(
-  userID: number, kakaoId: number, partyID:string
+  userID: number, kakaoId: number
 ): Promise<linkKakaoResponse | undefined> {
   try {
     const response = await axiosInstance.post<linkKakaoResponse>(
       "/kakaoUser/link",
       {
         currentUserID: userID,
-        partyID: partyID,
         kakaoUserId: kakaoId,
-        code: "anyOK"
       }
     );
 

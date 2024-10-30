@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useSetRecoilState } from "recoil";
-import { loginState, userIdValue } from "@/app/recoil/atom"; // Recoil 상태
+import { useSetRecoilState, useRecoilValue } from "recoil";
+import { loginState, userIdValue, kakaoUserState } from "@/app/recoil/atom"; // Recoil 상태
 import { tableLogin } from "@/app/api/tableLogin"; // API 호출 함수
 import { LoginData } from "@/app/api/tableLogin";
 import { useParams } from "next/navigation"; // useParams를 import
+import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 
 export default function TableLogin() {
   const { hash } = useParams() as { hash: string }; // hash를 string으로 단언
@@ -11,7 +12,7 @@ export default function TableLogin() {
   const [password, setPassword] = useState(""); // 비밀번호 입력 상태
   const setIsLoggedIn = useSetRecoilState(loginState); // 로그인 상태 관리
   const setUserIdValue = useSetRecoilState(userIdValue);
-
+  const kakaoUser = useRecoilValue(kakaoUserState);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -29,7 +30,9 @@ export default function TableLogin() {
 
       setIsLoggedIn(true);
       setUserIdValue(response.user.userId);
-
+      if(kakaoUser.kakaoUserId !== null){
+        await linkKakaoAndPartyUser(response.user.userId, kakaoUser.kakaoUserId);
+      }
       // 추가적으로 필요한 동작이 있으면 여기에 추가
     } catch (error) {
       console.error("로그인 실패:", error);

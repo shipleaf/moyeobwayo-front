@@ -232,9 +232,7 @@ export default function CalendarComp() {
           const linkResponse = await linkKakaoAndPartyUser(
             userID,
             kakaoUser.kakaoUserId,
-            hash
           );
-          console.log("linkResponse", linkResponse);
         } catch (error) {
           console.error("Kakao link API error:", error);
         }
