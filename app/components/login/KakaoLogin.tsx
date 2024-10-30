@@ -86,7 +86,6 @@ export default function KakaoLogin() {
                 height={33}
               />
                 카카오로 로그인하기
-
             </div>
           </div>
         </div>
