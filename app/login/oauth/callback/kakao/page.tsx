@@ -4,9 +4,9 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI";
-import { useSetRecoilState } from "recoil";
-import { kakaoUserState } from "@/app/recoil/atom";
+import { linkKakaoAndPartyUser, sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI";
+import { useSetRecoilState, useRecoilValue } from "recoil";
+import { kakaoUserState, userIdValue } from "@/app/recoil/atom";
 import { saveToLocalStorage } from "@/app/recoil/recoilUtils";
 
 // 클라이언트 사이드 전용으로 페이지를 로드하도록 설정
@@ -18,7 +18,6 @@ function KakaoCallback() {
   const code = searchParams.get("code");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
   const setKakaoUserState = useSetRecoilState(kakaoUserState);
 
   useEffect(() => {
@@ -35,7 +34,12 @@ function KakaoCallback() {
             nickname: nickname,
             profile_image: profile_image,
           });
-
+          
+          const storedUserId = sessionStorage.getItem('globalUserId');
+          if (storedUserId) {
+              const userId = parseInt(storedUserId, 10); // 숫자로 변환
+              await linkKakaoAndPartyUser(Number(userId), kakaoUserId)
+          }
           const expiresAt = new Date(Date.now() + expires_in * 1000);
           const kakaoUserDataByStorage = {
             kakaoUserId,

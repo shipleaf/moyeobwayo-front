@@ -216,11 +216,13 @@ export default function CalendarComp() {
         password: userName.userPassword,
         partyId: hash,
         isKakao: false,
+        kakaoUserId: null,
       };
       if (kakaoUser.kakaoUserId !== null) {
         loginData.userName = kakaoUser.nickname; // 올바른 속성 접근 방식
         loginData.isKakao = true;
         loginData.password = "";
+        loginData.kakaoUserId = kakaoUser.kakaoUserId;
       }
       const response = await tableLogin(loginData);
       const userID = response.user.userId;
@@ -232,9 +234,7 @@ export default function CalendarComp() {
           const linkResponse = await linkKakaoAndPartyUser(
             userID,
             kakaoUser.kakaoUserId,
-            hash
           );
-          console.log("linkResponse", linkResponse);
         } catch (error) {
           console.error("Kakao link API error:", error);
         }

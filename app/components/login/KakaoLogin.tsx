@@ -5,7 +5,10 @@
 import Script from "next/script";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-// const redirectUri = "http://127.0.0.1:3000/login/oauth/callback/kakao";
+import { useRecoilValue } from "recoil";
+import { userIdValue } from "@/app/recoil/atom";
+const redirectUri: string = process.env.NEXT_PUBLIC_KAKAO_LOGIN_REDIRECT_URI as string;
+
 const scope = [
   "profile_nickname",
   "profile_image",
@@ -14,8 +17,7 @@ const scope = [
 
 export default function KakaoLogin() {
   const [isKakaoReady, setIsKakaoReady] = useState(false); // SDK가 준비된 상태를 관리
-  const redirectUri = process.env.NEXT_PUBLIC_KAKAO_LOGIN_REDIRECT_URI as string
-  
+  const globalUserId = useRecoilValue(userIdValue);
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
       window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
@@ -24,6 +26,10 @@ export default function KakaoLogin() {
   }, [isKakaoReady]);
 
   const kakaoLoginHandler = () => {
+    if (globalUserId !== null) {
+      // globalUserId를 세션 스토리지에 저장
+      sessionStorage.setItem('globalUserId', globalUserId.toString()); // 문자열로 변환하여 저장
+    }
     if (window.Kakao && window.Kakao.Auth) {
       window.Kakao.Auth.authorize({
         redirectUri,
