@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CalendarBlank, Clipboard } from "@phosphor-icons/react/dist/ssr";
 import SampleAvatarList from "./components/SampleAvatarList";
 import SampleTimeTable from "./components/SampleTimeTable";
+import Footer from "./components/common/Footer";
 
 // 예시 사용자 데이터
 export default function Home() {
@@ -51,10 +52,15 @@ export default function Home() {
         </div>
 
         {/* page 영역 */}
-        <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
-          <CalendarComp />
-          <SampleTimeTable/>
+        <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] overflow-auto">
+          <div className="flex flex-row h-[100%]">
+            <CalendarComp />
+            <SampleTimeTable/>
+          </div>
+          <Footer></Footer>
         </div>
+          
+
         {/* 삼각형 모양의 데코레이션 */}
         <div
           className={`absolute transition-all duration-300 z-0 ${
