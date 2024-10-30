@@ -267,7 +267,7 @@ export default function CalendarComp() {
   };
 
   return (
-    <div className="mr-[2%] basis-1/4">
+    <div className="mr-[2%] basis-1/4 overflow-auto">
       <div className="flex flex-col flex-none items-center justify-center bg-custom-bg border border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom">
         <DatePicker
           key={selectedDates.toString()} // 선택된 날짜 배열이 변경될 때마다 재렌더링

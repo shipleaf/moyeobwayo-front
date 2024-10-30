@@ -45,8 +45,9 @@ export const kakaoUserState = atom({
     nickname: "", // 초기 닉네임은 빈 문자열
     profile_image: "", // 초기 프로필 이미지는 빈 문자열
     kakaoUserId: null as null | number, // null로 초기화
-  },  // 초기값 설정
+  },
 });
+
 export const selectedDateState = atom({
   key: "isSelectedDateState",
   default: [],
