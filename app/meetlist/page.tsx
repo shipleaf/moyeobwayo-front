@@ -27,7 +27,7 @@ export default function Page() {
       <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
         <div className="flex flex-col items-center">
           <Image
-            src="/images/moyeobwayo.png"
+            src="/images/mainLogo.png"
             alt=""
             width={80}
             height={80}

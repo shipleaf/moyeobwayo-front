@@ -13,9 +13,7 @@ export interface UserEntity {
 // Timeslot representing each time slot with user entity information
 export interface Timeslot {
   slotId: number;
-  selectedStartTime: string;
-  selectedEndTime: string;
-  userEntity: UserEntity;
+  byteString: string;
 }
 
 // PartyDate representing each date with timeslots
@@ -25,7 +23,6 @@ export interface PartyDate {
   timeslots: Timeslot[];
 }
 
-// Party representing the main party details
 export interface Party {
   partyId: string;
   targetNum: number;
@@ -36,12 +33,11 @@ export interface Party {
   endDate: string;
   decisionDate: string;
   userId: string;
-  locationName: string | null;
+  locationName: string;
   alarms: boolean[]; // 알람 배열
   dates: PartyDate[]; // 날짜 배열
 }
 
-// AvailableTimesResponse representing available time slots for the party
 export interface AvailableTimesResponse {
   start: string;
   end: string;

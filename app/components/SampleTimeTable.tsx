@@ -1,12 +1,13 @@
 "use client";
-import TimeBlock from "./createParty/TimeBlock";
+// import TimeBlock from "./createParty/TimeBlock";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
-import { useEffect, useState } from "react";
-import { countTimeSlots, getGradationNum } from "@/app/utils/timeslotUtils";
+// import { useEffect, useState } from "react";
+// import { countTimeSlots, getGradationNum } from "@/app/utils/timeslotUtils";
 import { timeRange } from "@/app/meetlist/components/MeetDetail";
 import { PartyDate } from "@/app/interfaces/Party";
-import { Timeslot, UserEntity } from "@/app/api/getTableAPI";
+import { Timeslot } from "@/app/api/getTableAPI";
+// import { UserEntity } from "@/app/api/getTableAPI";
 
 // Roboto 폰트 불러오기
 const roboto = Roboto({
@@ -15,27 +16,27 @@ const roboto = Roboto({
 });
 
 // 30분 간격으로 Date 객체 배열을 생성하는 함수 (시작 시간과 끝나는 시간 사이)
-const generateTimeIntervalsForDay = (
-  baseDate: Date,
-  startHour: number,
-  endHour: number,
-  intervalMinutes: number
-) => {
-  const start = new Date(baseDate); // 날짜에 맞춰서 시작 시간 지정
-  start.setHours(startHour, 0, 0, 0); // 시작 시간 설정
-  const end = new Date(baseDate);
-  end.setHours(endHour, 0, 0, 0); // 종료 시간 설정
+// const generateTimeIntervalsForDay = (
+//   baseDate: Date,
+//   startHour: number,
+//   endHour: number,
+//   intervalMinutes: number
+// ) => {
+//   const start = new Date(baseDate); // 날짜에 맞춰서 시작 시간 지정
+//   start.setHours(startHour, 0, 0, 0); // 시작 시간 설정
+//   const end = new Date(baseDate);
+//   end.setHours(endHour, 0, 0, 0); // 종료 시간 설정
 
-  const currentTime = new Date(start.getTime());
-  const times = [];
+//   const currentTime = new Date(start.getTime());
+//   const times = [];
 
-  while (currentTime < end) {
-    times.push(new Date(currentTime)); // 현재 시간을 배열에 추가
-    currentTime.setMinutes(currentTime.getMinutes() + intervalMinutes); // 30분씩 증가
-  }
+//   while (currentTime < end) {
+//     times.push(new Date(currentTime)); // 현재 시간을 배열에 추가
+//     currentTime.setMinutes(currentTime.getMinutes() + intervalMinutes); // 30분씩 증가
+//   }
 
-  return times;
-};
+//   return times;
+// };
 
 // 1시간 단위로 시간을 반환하는 함수
 const generateHourlyLabels = (startHour: number, endHour: number) => {
@@ -51,16 +52,16 @@ const getWeekday = (date: Date) => {
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   return daysOfWeek[date.getDay()];
 };
-const currentNum = 3;
+// const currentNum = 3;
 function generateDummyData(): PartyDate[] {
   const currentDate = new Date(); // 현재 날짜
   const dummyData: PartyDate[] = [];
 
-  const users: UserEntity[] = [
-    { userId: 1, userName: "제시카", password: null },
-    { userId: 2, userName: "존", password: null },
-    { userId: 3, userName: "사라", password: null },
-  ];
+  // const users: UserEntity[] = [
+  //   { userId: 1, userName: "제시카", password: null },
+  //   { userId: 2, userName: "존", password: null },
+  //   { userId: 3, userName: "사라", password: null },
+  // ];
 
   // const selectedDays = [0, 1, 5]; // 0: 월요일, 1: 화요일, 5: 토요일/
 
@@ -79,15 +80,11 @@ function generateDummyData(): PartyDate[] {
       timeslots = [
         {
           slotId: 1,
-          selectedStartTime: `${dateString}T09:00:00+09:00`, // 09:00
-          selectedEndTime: `${dateString}T12:30:00+09:00`, // 10:30
-          userEntity: users[0], // 제시카
+          byteString: "101101010"
         },
         {
           slotId: 2,
-          selectedStartTime: `${dateString}T11:00:00+09:00`, // 11:00
-          selectedEndTime: `${dateString}T12:30:00+09:00`, // 12:30
-          userEntity: users[1], // 존
+          byteString: "101101010"
         },
       ];
     } else if (i === 1) {
@@ -95,15 +92,11 @@ function generateDummyData(): PartyDate[] {
       timeslots = [
         {
           slotId: 3,
-          selectedStartTime: `${dateString}T14:00:00+09:00`, // 14:00
-          selectedEndTime: `${dateString}T17:30:00+09:00`, // 15:30
-          userEntity: users[1], // 존
+          byteString: "101101010"
         },
         {
           slotId: 4,
-          selectedStartTime: `${dateString}T16:00:00+09:00`, // 16:00
-          selectedEndTime: `${dateString}T17:30:00+09:00`, // 17:30
-          userEntity: users[2], // 사라
+          byteString: "101101010"
         },
       ];
     } else if (i === 5) {
@@ -111,15 +104,11 @@ function generateDummyData(): PartyDate[] {
       timeslots = [
         {
           slotId: 5,
-          selectedStartTime: `${dateString}T10:00:00+09:00`, // 10:00
-          selectedEndTime: `${dateString}T16:30:00+09:00`, // 11:30
-          userEntity: users[0], // 제시카
+          byteString: "101101010"
         },
         {
           slotId: 6,
-          selectedStartTime: `${dateString}T13:00:00+09:00`, // 13:00
-          selectedEndTime: `${dateString}T14:30:00+09:00`, // 14:30
-          userEntity: users[1], // 존
+          byteString: "101101010"
         },
       ];
     }
@@ -162,17 +151,17 @@ console.log(startHour, endHour);
 
 export default function SampleTimeTable({}) {
   // 시간 라벨을 1시간 단위로 생성
-  const [countSlot, setCountSlot] = useState<number[][] | undefined>([]);
+  // const [countSlot, setCountSlot] = useState<number[][] | undefined>([]);
 
-  useEffect(() => {
-    if (partyRange) {
-      // 날짜별로 timeslots에 대해 countTimeSlots 계산
-      const newCountSlots = timeblocks?.map((day) =>
-        countTimeSlots(day.timeslots, partyRange.startTime, partyRange.endTime)
-      );
-      setCountSlot(newCountSlots); // 2차원 배열로 상태 업데이트
-    }
-  }, [timeblocks, partyRange]);
+  // useEffect(() => {
+  //   if (partyRange) {
+  //     // 날짜별로 timeslots에 대해 countTimeSlots 계산
+  //     const newCountSlots = timeblocks?.map((day) =>
+  //       countTimeSlots(day.timeslots, partyRange.startTime, partyRange.endTime)
+  //     );
+  //     setCountSlot(newCountSlots); // 2차원 배열로 상태 업데이트
+  //   }
+  // }, [timeblocks, partyRange]);
   const hourlyLabels = generateHourlyLabels(startHour, endHour);
   return (
     <div className="flex flex-col gap-[20px] basis-3/4">
@@ -216,12 +205,9 @@ export default function SampleTimeTable({}) {
             </div>
           ))}
         </div>
-
-        {/* 각 날짜의 TimeBlock을 같은 열에 배치 */}
-        <div className="flex w-full gap-[10px]">
+        {/* <div className="flex w-full gap-[10px]">
           {timeblocks?.map((day, dayIndex) => (
             <div key={dayIndex} className="w-full">
-              {/* 각 날짜에 대한 TimeBlock 출력 */}
               {generateTimeIntervalsForDay(
                 new Date(day.selected_date),
                 startHour,
@@ -267,7 +253,7 @@ export default function SampleTimeTable({}) {
               })}
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );
