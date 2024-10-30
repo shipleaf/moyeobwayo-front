@@ -5,7 +5,7 @@
 import Script from "next/script";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-const redirectUri = "http://127.0.0.1:3000/login/oauth/callback/kakao";
+// const redirectUri = "http://127.0.0.1:3000/login/oauth/callback/kakao";
 const scope = [
   "profile_nickname",
   "profile_image",
@@ -14,6 +14,7 @@ const scope = [
 
 export default function KakaoLogin() {
   const [isKakaoReady, setIsKakaoReady] = useState(false); // SDK가 준비된 상태를 관리
+  const redirectUri = process.env.NEXT_PUBLIC_KAKAO_LOGIN_REDIRECT_URI as string
   
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
