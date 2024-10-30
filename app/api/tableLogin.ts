@@ -4,7 +4,8 @@ export interface LoginData {
     userName: string,
     password: string,
     partyId: string,
-    isKakao: boolean
+    isKakao: boolean,
+    kakaoUserId: null | number
 }
 
 export interface tableLoginResponse {

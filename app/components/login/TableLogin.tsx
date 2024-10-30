@@ -22,6 +22,7 @@ export default function TableLogin() {
       password: password,
       partyId: hash,
       isKakao: false,
+      kakaoUserId: null
     };
 
     try {
