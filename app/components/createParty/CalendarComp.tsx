@@ -14,7 +14,7 @@ import Modal from "react-modal";
 import { useRouter } from "next/navigation";
 import { tableLogin, LoginData } from "@/app/api/tableLogin";
 import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
-import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
+// import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 
 export default function CalendarComp() {
   const router = useRouter();
@@ -231,10 +231,10 @@ export default function CalendarComp() {
       if (kakaoUser.kakaoUserId !== null) {
         // 카카오 유저와 파티 유저 연동 처리
         try {
-          const linkResponse = await linkKakaoAndPartyUser(
-            userID,
-            kakaoUser.kakaoUserId,
-          );
+          // const linkResponse = await linkKakaoAndPartyUser(
+          //   userID,
+          //   kakaoUser.kakaoUserId,
+          // );
         } catch (error) {
           console.error("Kakao link API error:", error);
         }
