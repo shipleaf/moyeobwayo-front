@@ -18,9 +18,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} antialiased`}
-      >
+      <head>
+        <link rel="icon" href="/icons/moyeobwayoIcon.svg"/>
+        <title>모여봐요</title>
+      </head>
+      <body className={`${geistSans.variable} antialiased`}>
         {/* Kakao Script */}
         <Script
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"

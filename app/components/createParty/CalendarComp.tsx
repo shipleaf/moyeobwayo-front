@@ -275,6 +275,7 @@ export default function CalendarComp() {
           onChange={(date) => handleDateChange(date as Date)} // 다중 선택 처리
           inline
           highlightDates={selectedDates} // 선택된 날짜 강조
+          openToDate={selectedDates[selectedDates.length - 1] || new Date()} // 마지막 선택된 날짜에 고정
           dayClassName={(date) =>
             selectedDates.some(
               (selectedDate) => selectedDate.getTime() === date.getTime()
@@ -283,6 +284,7 @@ export default function CalendarComp() {
               : ""
           }
         />
+
         <hr className="w-[90%] border-1 border-[#ECECED] my-[1%]" />
         <div className="flex flex-row align-center justify-between bg-white w-[84%] py-[5px]">
           <span className="w-[15%] font-pretendard font-[500] text-[18px]">

@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { CheckFat } from "@phosphor-icons/react/dist/ssr";
 import { useSearchParams } from "next/navigation"; // useRouter를 가져옵니다
-import TimeTable from "./TimeTable";
-import { getTable, Party, PartyDate, AvailableTimesResponse } from "@/app/api/getTableAPI";
+// import TimeTable from "./TimeTable";
+import { getTable, Party, AvailableTimesResponse } from "@/app/api/getTableAPI";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
+// import { PartyDate } from "@/app/api/getTableAPI";
 
 // Dummies
 export const availableTimes: AvailableTimesResponse[] = [
@@ -53,9 +54,9 @@ const MeetDetail = () => {
   const [avariableTime, setAvariableTime] = useState<
     AvailableTimesResponse[] | null
   >(null);
-  const [timeblocks, setTimeblocks] = useState<PartyDate[] | null>(null);
-  const [currentNum, setCurrentNum] = useState<number | null>(null);
-  const [partyRange, setPartyRange] = useState<timeRange | null>(null);
+  // const [timeblocks, setTimeblocks] = useState<PartyDate[] | null>(null);
+  // const [currentNum, setCurrentNum] = useState<number | null>(null);
+  // const [partyRange, setPartyRange] = useState<timeRange | null>(null);
 
   useEffect(() => {
     const fetchMeetDetail = async () => {
@@ -65,12 +66,12 @@ const MeetDetail = () => {
           const response = await getTable({ table_id: table_id }); // API 호출
           setTargetMeet(response.party); // API로부터 받은 데이터로 상태 업데이트
           setAvariableTime(response.availableTime);
-          setTimeblocks(response.party.dates);
-          setCurrentNum(response.party.currentNum);
-          setPartyRange({
-            startTime: response.party.startDate,
-            endTime: response.party.endDate,
-          });
+          // setTimeblocks(response.party.dates);
+          // setCurrentNum(response.party.currentNum);
+          // setPartyRange({
+            // startTime: response.party.startDate,
+            // endTime: response.party.endDate,
+          // });
         } catch (error) {
           console.error("Failed to fetch table detail:", error); // 에러 처리
         }
@@ -151,11 +152,11 @@ const MeetDetail = () => {
       <div className="flex gap-4">
         {/* TimeTable */}
         <section className="w-2/3 max-h-[61vh] overflow-auto bg-[#F7F7F7] py-3 px-2 rounded-[10px]">
-          <TimeTable
+          {/* <TimeTable
             timeblocks={timeblocks}
             currentNum={currentNum}
             partyRange={partyRange}
-          ></TimeTable>
+          ></TimeTable> */}
         </section>
         {/* Candidate */}
         <section className="w-1/3 max-h-[61vh] overflow-auto">
