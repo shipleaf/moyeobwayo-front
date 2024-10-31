@@ -43,7 +43,7 @@ export default function Header() {
       alert("로그인 후 이용해주세요!");
       setTimeout(() => {
         router.push('/login/kakao');  // 카카오 로그인 페이지로 리다이렉트
-      }, 100);
+      }, 10);
     };
 
     checkUserStatus();

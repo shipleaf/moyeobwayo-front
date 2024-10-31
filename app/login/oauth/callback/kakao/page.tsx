@@ -7,7 +7,6 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { linkKakaoAndPartyUser, sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI";
 import { useSetRecoilState } from "recoil";
 import { kakaoUserState } from "@/app/recoil/atom";
-import { saveToLocalStorage } from "@/app/recoil/recoilUtils";
 
 // 클라이언트 사이드 전용으로 페이지를 로드하도록 설정
 const Page = dynamic(() => Promise.resolve(KakaoCallback), { ssr: false });
@@ -28,7 +27,7 @@ function KakaoCallback() {
       try {
         const kakaoUserData = await sendAuthCodeToBackend(code);
         if (kakaoUserData) {
-          const { expires_in, kakaoUserId, nickname, profile_image } = kakaoUserData;
+          const {kakaoUserId, nickname, profile_image } = kakaoUserData;
           setKakaoUserState({
             kakaoUserId: kakaoUserId,
             nickname: nickname,
@@ -40,16 +39,7 @@ function KakaoCallback() {
               const userId = parseInt(storedUserId, 10); // 숫자로 변환
               await linkKakaoAndPartyUser(Number(userId), kakaoUserId)
           }
-          const expiresAt = new Date(Date.now() + expires_in * 1000);
-          const kakaoUserDataByStorage = {
-            kakaoUserId,
-            nickname,
-            profile_image,
-            expiresAt,
-          };
-          saveToLocalStorage("kakaoUserDataByStorage", kakaoUserDataByStorage);
-
-          router.push("/meetlist");
+          router.push("/");
         } else {
           throw new Error("Login failed");
         }

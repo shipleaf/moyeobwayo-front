@@ -12,8 +12,10 @@ import { loginValue } from "@/app/recoil/atom";
 import CreateTableLogin from "@/app/components/login/CreateTableLogin";
 import Modal from "react-modal";
 import { useRouter } from "next/navigation";
-import { tableLogin, LoginData } from "@/app/api/tableLogin";
+import {LoginData } from "@/app/api/tableLogin";
 import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
+import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
+import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 // import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 
 export default function CalendarComp() {
@@ -33,7 +35,7 @@ export default function CalendarComp() {
   const userName = useRecoilValue(loginValue);
   const kakaoUser = useRecoilValue(kakaoUserState);
   const setKakaoUserState = useSetRecoilState(kakaoUserState);
-
+  
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
@@ -224,21 +226,8 @@ export default function CalendarComp() {
         loginData.password = "";
         loginData.kakaoUserId = kakaoUser.kakaoUserId;
       }
-      const response = await tableLogin(loginData);
-      const userID = response.user.userId;
-
-      setUserId(userID);
-      if (kakaoUser.kakaoUserId !== null) {
-        // 카카오 유저와 파티 유저 연동 처리
-        try {
-          // const linkResponse = await linkKakaoAndPartyUser(
-          //   userID,
-          //   kakaoUser.kakaoUserId,
-          // );
-        } catch (error) {
-          console.error("Kakao link API error:", error);
-        }
-      }
+      await tableLoginHandler(loginData, setUserId);
+      
       router.push(`/meeting/${hash}`);
     } catch (error) {
       console.error("제출 실패: ", error);
