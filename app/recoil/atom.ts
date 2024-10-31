@@ -38,6 +38,7 @@ export const kakaoIDState = atom({
   key: "kakaoIDState",
   default: 3720994926,
 });
+
 // 카카오 사용자 정보 상태 (프로필 이미지, 닉네임)
 export const kakaoUserState = atom({
   key: "kakaoUserState",

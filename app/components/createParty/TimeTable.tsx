@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
 import TimeBlock from "./TimeBlock";
-import { PartyDate } from "@/app/api/getTableAPI";
+// import { PartyDate } from "@/app/api/getTableAPI";
 import { selectedAvatarState } from "@/app/recoil/atom";
 
 // Roboto 폰트 불러오기
@@ -17,11 +17,14 @@ interface TimeTableProps {
   Dates: string[];
   startTime: string;
   endTime: string;
-  timeslots: [
-    userId: number,
-    userName: string,
-    byteString: string,
-  ]
+  voteTimeslots: {
+    dateId: number;
+    timeslots: {
+      userId: number;
+      username: string;
+      byteString: string;
+    }[];
+  }[];
 }
 
 // 1시간 단위로 시간을 반환하는 함수
@@ -35,21 +38,13 @@ export const getGradationNum = (currentVal: number, maxNum: number): string => {
   return rounded.toString();
 };
 
-function generateDummyData(): PartyDate[] {
-  const dummyData: PartyDate[] = [];
-
-  return dummyData;
-}
-
-const dummyData = generateDummyData();
-
 // 시간 슬롯을 30분 간격으로 생성하는 함수
 
 export default function TimeTable({
   Dates,
   startTime,
   endTime,
-  timeslots,
+  voteTimeslots,
 }: TimeTableProps) {
   const dates = Dates.map((dateString) => {
     return new Date(dateString); // 서버에서 받은 날짜 문자열을 Date 객체로 변환
@@ -134,13 +129,12 @@ export default function TimeTable({
           ))}
         </div>
         <div className="flex flex-grow gap-[10px]">
-          {dummyData.map((day, dateIndex) => (
+          {voteTimeslots.map((day, dateIndex) => (
             <div key={dateIndex} className="flex-grow">
               {timeSlots.map((timeSlot, slotIndex) => {
                 let votes = 0;
 
                 if (selectedAvatar) {
-                  // 선택된 아바타가 있을 경우 해당 userId의 데이터만 가져오기
                   const selectedUserSlot = day.timeslots.find(
                     (slot) => slot.userId === selectedAvatar.id
                   );
@@ -148,14 +142,12 @@ export default function TimeTable({
                     ? Number(selectedUserSlot.byteString[slotIndex])
                     : 0;
                 } else {
-                  // 선택된 아바타가 없을 경우 모든 유저의 합산 결과 표시
                   votes = day.timeslots.reduce(
                     (acc, timeslot) =>
                       acc + Number(timeslot.byteString[slotIndex]),
                     0
                   );
                 }
-
                 const colorLevel = getGradationNum(votes, maxVotes);
 
                 return (

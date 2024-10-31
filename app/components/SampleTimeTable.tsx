@@ -3,7 +3,6 @@ import { useRecoilValue } from "recoil";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
 import TimeBlock from "./createParty/TimeBlock";
-import { PartyDate } from "../api/getTableAPI";
 import { selectedAvatarState } from "../recoil/atom";
 
 // Roboto 폰트 불러오기
@@ -11,6 +10,18 @@ const roboto = Roboto({
   weight: ["400", "500", "700"],
   subsets: ["latin"],
 });
+
+export interface PartyDate {
+  dateId: number;
+  timeslots: Timeslot[];
+}
+
+export interface Timeslot {
+  userId: number;
+  byteString: string;
+  dateId: number;
+  userName: string;
+}
 
 // 1시간 단위로 시간을 반환하는 함수
 const generateHourlyLabels = () => {
@@ -57,63 +68,63 @@ function generateDummyData(): PartyDate[] {
   dummyData.push({
     dateId: 1,
     timeslots: [
-      { userId: 1, dateId: 1, byteString: "100000010111" },
-      { userId: 2, dateId: 1, byteString: "000000000111" },
-      { userId: 3, dateId: 1, byteString: "000000000111" },
+      { userId: 1, dateId: 1, byteString: "100000010111", userName: "제시카" },
+      { userId: 2, dateId: 1, byteString: "000000000111", userName: "존" },
+      { userId: 3, dateId: 1, byteString: "000000000111", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 2,
     timeslots: [
-      { userId: 1, dateId: 2, byteString: "100000101111" },
-      { userId: 2, dateId: 2, byteString: "111111000111" },
-      { userId: 3, dateId: 2, byteString: "000101111111" },
+      { userId: 1, dateId: 2, byteString: "100000101111", userName: "제시카" },
+      { userId: 2, dateId: 2, byteString: "111111000111", userName: "존" },
+      { userId: 3, dateId: 2, byteString: "000101111111", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 3,
     timeslots: [
-      { userId: 1, dateId: 3, byteString: "100000000111" },
-      { userId: 2, dateId: 3, byteString: "000111111111" },
-      { userId: 3, dateId: 3, byteString: "110110000111" },
+      { userId: 1, dateId: 3, byteString: "100000000111", userName: "제시카" },
+      { userId: 2, dateId: 3, byteString: "000111111111", userName: "존" },
+      { userId: 3, dateId: 3, byteString: "110110000111", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 4,
     timeslots: [
-      { userId: 1, dateId: 4, byteString: "101010101111" },
-      { userId: 2, dateId: 4, byteString: "010101010111" },
-      { userId: 3, dateId: 4, byteString: "111111111111" },
+      { userId: 1, dateId: 4, byteString: "101010101111", userName: "제시카" },
+      { userId: 2, dateId: 4, byteString: "010101010111", userName: "존" },
+      { userId: 3, dateId: 4, byteString: "111111111111", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 5,
     timeslots: [
-      { userId: 1, dateId: 5, byteString: "000000111111" },
-      { userId: 2, dateId: 5, byteString: "111111111111" },
-      { userId: 3, dateId: 5, byteString: "101010101111" },
+      { userId: 1, dateId: 5, byteString: "000000111111", userName: "제시카" },
+      { userId: 2, dateId: 5, byteString: "111111111111", userName: "존" },
+      { userId: 3, dateId: 5, byteString: "101010101111", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 6,
     timeslots: [
-      { userId: 1, dateId: 6, byteString: "001001001111" },
-      { userId: 2, dateId: 6, byteString: "110110110111" },
-      { userId: 3, dateId: 6, byteString: "101010101111" },
+      { userId: 1, dateId: 6, byteString: "001001001111", userName: "제시카" },
+      { userId: 2, dateId: 6, byteString: "110110110111", userName: "존" },
+      { userId: 3, dateId: 6, byteString: "101010101111", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 7,
     timeslots: [
-      { userId: 1, dateId: 7, byteString: "111111000011" },
-      { userId: 2, dateId: 7, byteString: "000111000111" },
-      { userId: 3, dateId: 7, byteString: "101101010111" },
+      { userId: 1, dateId: 7, byteString: "111111000011", userName: "제시카" },
+      { userId: 2, dateId: 7, byteString: "000111000111", userName: "존" },
+      { userId: 3, dateId: 7, byteString: "101101010111", userName: "사라" },
     ],
   });
 
@@ -197,7 +208,6 @@ export default function SampleTimeTable() {
                     0
                   );
                 }
-
                 const colorLevel = getGradationNum(votes, maxVotes);
 
                 return (

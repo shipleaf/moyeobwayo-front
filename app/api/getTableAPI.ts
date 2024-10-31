@@ -12,7 +12,8 @@ export interface UserEntity {
 
 // Timeslot representing each time slot with user entity information
 export interface Timeslot {
-  slotId: number;
+  userId: number,
+  username: string,
   byteString: string;
 }
 
@@ -20,7 +21,7 @@ export interface Timeslot {
 export interface PartyDate {
   dateId: number;
   selected_date: string;
-  timeslots: Timeslot[];
+  convertedTimeslots: Timeslot[];
 }
 
 export interface Party {

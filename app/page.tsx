@@ -49,7 +49,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
         {/* page 영역 */}
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] overflow-auto">
           <div className="flex flex-row h-[100%]">
@@ -58,9 +57,6 @@ export default function Home() {
           </div>
           <Footer></Footer>
         </div>
-          
-
-        {/* 삼각형 모양의 데코레이션 */}
         <div
           className={`absolute transition-all duration-300 z-0 ${
               "top-[31%] left-[10.5%]"

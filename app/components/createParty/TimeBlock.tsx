@@ -1,5 +1,5 @@
 interface TimeBlockProps {
-  time: Date;
+  time: string;
   style?: React.CSSProperties;
   className?: string;
   onMouseEnter?: () => void;

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation"; // App Router에서 useParams 사용
 import { getTable } from "@/app/api/getTableAPI"; // API 호출 주석 처리
-import { useRecoilState } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
+import { selectedAvatarState } from "@/app/recoil/atom";
 import { MdContentPaste } from "react-icons/md";
 import { HiUserCircle } from "react-icons/hi2";
 import TimeTable from "@/app/components/createParty/TimeTable";
@@ -16,35 +17,27 @@ import TimeSelector from "@/app/components/getParty/VoteTable";
 import PartyPriority from "@/app/components/getParty/PartyPriority";
 import TableLogin from "@/app/components/login/TableLogin";
 import { Party } from "@/app/api/getTableAPI"; // interfaces 파일의 경로
-import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
-import { decodeJWT } from "@/app/utils/jwtUtils";
-import Link from "next/link";
-import { LoginData } from "@/app/api/tableLogin";
-import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 
 interface TableData {
   party: Party;
   formattedDates: string[];
   startTime: string;
   endTime: string;
-  timeslots: { userId: number; username: string; byteString: string }[];
-}
-
-export interface Timeslot {
-  slotId: number;
-  binaryString: string;
+  convertedTimeslots: {
+    userId: number;
+    username: string;
+    byteString: string;
+  }[];
 }
 
 export default function MeetingPage() {
   const { hash } = useParams(); // meetingId를 URL에서 추출
   const [tableData, setTableData] = useState<TableData | null>(null);
+  const isLoggedIn = useRecoilValue(loginState);
   const [, setLoading] = useState(false);
-
-  const users = [
-    { id: 1, username: "Alice", profileImage: "" },
-    { id: 2, username: "Bob", profileImage: "" },
-    { id: 3, username: "Charlie", profileImage: "" },
-  ];
+  const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
+  const [selectedAvatar, setSelectedAvatar] =
+    useState<GetUserAvatarResponse | null>(null);
 
   const [selectedButton, setSelectedButton] = useState<"calendar" | "content">(
     "calendar"
@@ -56,6 +49,9 @@ export default function MeetingPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
+  useEffect(()=>{
+    
+  })
   useEffect(() => {
     const fetchKakaoData = async () => {
       const jwt = await loadFromLocalStorage("kakaoUserJWT");
@@ -80,43 +76,48 @@ export default function MeetingPage() {
       }
     }
     if (hash) {
-      getTable({ table_id: hash as string })
-        .then((data) => {
-          // 서버에서 받아온 날짜를 로컬 날짜로 변환하고 ISO 형식에서 날짜 부분만 추출
-          const dates = data.party.dates.map((date) => {
+      setLoading(true);
+
+      // 두 개의 API 요청을 동시에 호출
+      Promise.all([
+        getTable({ table_id: hash as string }),
+        getUserAvatar({ table_id: hash as string }),
+      ])
+        .then(([tableDataResponse, userAvatarResponse]) => {
+          // 첫 번째 API 응답 처리
+          const dates = tableDataResponse.party.dates.map((date) => {
             const localDate = new Date(date.selected_date);
             return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식으로 변환
           });
+          const timeslots = tableDataResponse.party.dates.map((date) => ({
+            dateId: date.dateId,
+            timeslots: (date.convertedTimeslots || []).map((slot) => ({
+              userId: slot.userId,
+              username: slot.username,
+              byteString: slot.byteString,
+            })),
+          }));
 
-          const timeslots = data.party.dates.flatMap((date) =>
-            date.timeslots.map((slot) => ({
-              userId: slot.userId as number,
-              username: slot.username as string,
-              byteString: slot.byteString as string,
-            }))
-          );
+          const startTime = new Date(
+            tableDataResponse.party.startDate
+          ).toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-          // 시작 시간과 종료 시간은 로컬 시간대로 변환 후 HH:MM 형식만 추출
-          const startTime = new Date(data.party.startDate).toLocaleTimeString(
-            "en-GB",
-            {
-              hour: "2-digit",
-              minute: "2-digit",
-            }
-          );
+          const endTime = new Date(
+            tableDataResponse.party.endDate
+          ).toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-          const endTime = new Date(data.party.endDate).toLocaleTimeString(
-            "en-GB",
-            {
-              hour: "2-digit",
-              minute: "2-digit",
-            }
-          );
-
-          console.log("server", dates);
+          // 두 번째 API 응답 처리
+          setUsers(userAvatarResponse);
+          console.log(users);
           // 상태 업데이트
           setTableData({
-            ...data,
+            ...tableDataResponse,
             formattedDates: dates,
             startTime: startTime,
             endTime: endTime,
@@ -128,10 +129,12 @@ export default function MeetingPage() {
         })
         .catch((error) => {
           console.error("에러 발생: ", error);
-          setLoading(false); // 에러 발생 시에도 loading 해제
+        })
+        .finally(() => {
+          setLoading(false); // 모든 API 호출이 끝나면 loading 해제
         });
     }
-  }, [hash]); // hash와 loading을 의존성으로 추가
+  }, [hash]);
 
   return (
     <>
@@ -143,7 +146,8 @@ export default function MeetingPage() {
               alt=""
               width={80}
               height={80}
-              className="mb-[50%]"
+              className="mb-[50%] cursor-pointer"
+              onClick={handleLogoCLick}
             />
             <div className="flex flex-col items-center">
               <Link
@@ -183,23 +187,46 @@ export default function MeetingPage() {
               <div className="relative flex flex-col mt-8">
                 {users.map((user, index) => (
                   <div
-                    key={user.id}
-                    className="relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer bg-white"
+                    key={user.userId}
+                    onClick={() => setSelectedAvatar(user)}
+                    className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 ${
+                      selectedAvatar?.userId === user.userId
+                        ? "translate-y-[-20px] ring-4 ring-blue-500"
+                        : ""
+                    }`}
                     style={{
                       top: `${index * -45}px`,
                       zIndex: 10 + index,
                     }}
                   >
-                    {user.profileImage ? (
-                      <Image
-                        src={user.profileImage}
-                        alt={user.username}
-                        width={80}
-                        height={80}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <HiUserCircle size={80} className="text-[#ced4da]" />
+                    <div className="relative w-full h-full rounded-full overflow-hidden">
+                      {user.profileImage == null ? (
+                        <Image
+                          src={`/images/sample_avatar${index + 1}.png`}
+                          alt={user.userName}
+                          width={79}
+                          height={79}
+                          className="rounded-full"
+                        />
+                      ) : (
+                        <Image
+                          src={user.profileImage}
+                          alt={user.userName}
+                          width={79}
+                          height={79}
+                          className="rounded-full"
+                        />
+                      )}
+                      <div className="inset-0 rounded-full bg-[#6161CE] backdrop-blur-[2px]"></div>
+                    </div>
+                    {/* 선택된 아바타의 이름 표시 */}
+                    {selectedAvatar?.userId === user.userId && (
+                      <div
+                        className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-md shadow-md text-xs text-gray-700"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        {user.userName}
+                      </div>
                     )}
                   </div>
                 ))}
@@ -230,6 +257,7 @@ export default function MeetingPage() {
               Dates={tableData.formattedDates}
               startTime={tableData.startTime}
               endTime={tableData.endTime}
+              voteTimeslots={tableData.timeslots}
             />
           )}
         </div>
