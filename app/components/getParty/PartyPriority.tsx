@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation"; // useRouter 추가
 import { getTable } from "@/app/api/getTableAPI";
-import { GetTableResponse, AvailableTimesResponse } from "@/app/api/getTableAPI";
+import {
+  GetTableResponse,
+  AvailableTimesResponse,
+} from "@/app/api/getTableAPI";
 import { completeTime } from "@/app/api/partyCompleteAPI";
 import { useRecoilValue } from "recoil";
 import { userIdValue } from "@/app/recoil/atom";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { MdOutlineContentCopy } from "react-icons/md";
+import { CheckFat } from "@phosphor-icons/react";
 
 // 날짜 포맷 함수
 const formatDateTime = (dateTime: string, includeDate: boolean = true) => {
@@ -21,7 +25,7 @@ const formatDateTime = (dateTime: string, includeDate: boolean = true) => {
 
 interface TimeSlot {
   start: string; // 시작 시간, string 형식
-  end: string;   // 종료 시간, string 형식
+  end: string; // 종료 시간, string 형식
   locationName?: string; // 장소 이름 (optional)
   dateId: number; // 날짜 ID
   users: string[]; // 참여자 이름 리스트
@@ -45,7 +49,9 @@ const convertAvailableTimeToTimeSlot = (
 export default function PartyPriority() {
   const { hash } = useParams();
   const router = useRouter(); // router 객체 생성
-  const [priorityData, setPriorityData] = useState<GetTableResponse | null>(null);
+  const [priorityData, setPriorityData] = useState<GetTableResponse | null>(
+    null
+  );
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const userId = useRecoilValue(userIdValue);
@@ -105,7 +111,10 @@ export default function PartyPriority() {
 
   return (
     <>
-      <div className="w-full overflow-y-auto max-h-[40%] flex flex-col items-center mb-[10%] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px]">
+      <div
+        className="py-[13px] px-[15px] w-full overflow-y-auto max-h-[40%] 
+      flex flex-col gap-2 items-center mb-[10%] rounded-[10px]  "
+      >
         {priorityData ? (
           Array.isArray(priorityData.availableTime) &&
           priorityData.availableTime.length > 0 ? (
@@ -118,7 +127,8 @@ export default function PartyPriority() {
               return (
                 <div
                   key={index}
-                  className="priorList rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[90%] mb-[3%] h-[40%] box-border p-[10px]"
+                  className=" priorList px-2 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px]
+                  flex flex-col gap-2"
                 >
                   <div className="flex flex-row justify-between">
                     <p className="font-pretendard text-[15px] font-[500]">
@@ -131,6 +141,14 @@ export default function PartyPriority() {
                     >
                       확정
                     </button>
+                  </div>
+                  <div className="flex gap-[3px] items-center">
+                    <div className="w-[14px] h-[14px] bg-[#6161CE] rounded-full flex justify-center items-center">
+                      <CheckFat size={10} weight="fill" color="white" />
+                    </div>
+                    <p className="text-black text-[15px] font-medium">
+                      가능인원
+                    </p>
                   </div>
                   <div className="flex overflow-hidden flex-wrap">
                     {timeSlot.users.map((user, idx) => (
