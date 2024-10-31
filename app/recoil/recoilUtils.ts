@@ -5,7 +5,7 @@ export interface KakaoUserData {
   expiresAt: Date;
 }
 
-export const saveToLocalStorage = (key: string, value: KakaoUserData) => {
+export const saveToLocalStorage = (key: string, value: string) => {
   if (typeof window !== "undefined") {
     localStorage.setItem(key, JSON.stringify(value));
   }
