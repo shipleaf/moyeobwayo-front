@@ -11,19 +11,12 @@ import TimeTable from "@/app/components/createParty/TimeTable";
 import Image from "next/image";
 import { FiCalendar } from "react-icons/fi";
 import Modal from "react-modal";
-import { kakaoLoginState } from "@/app/recoil/atom";
+import {kakaoUserState, userIdValue } from "@/app/recoil/atom";
 import KakaoLogin from "@/app/components/login/KakaoLogin";
 import TimeSelector from "@/app/components/getParty/VoteTable";
 import PartyPriority from "@/app/components/getParty/PartyPriority";
-import { loginState } from "@/app/recoil/atom";
 import TableLogin from "@/app/components/login/TableLogin";
-import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
 import { Party } from "@/app/api/getTableAPI"; // interfaces 파일의 경로
-import { useRouter } from "next/navigation";
-import {
-  getUserAvatar,
-  GetUserAvatarResponse,
-} from "@/app/api/getUserAvatarAPI";
 
 interface TableData {
   party: Party;
@@ -40,7 +33,6 @@ interface TableData {
 export default function MeetingPage() {
   const { hash } = useParams(); // meetingId를 URL에서 추출
   const [tableData, setTableData] = useState<TableData | null>(null);
-  const router = useRouter();
   const isLoggedIn = useRecoilValue(loginState);
   const [, setLoading] = useState(false);
   const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
@@ -51,51 +43,38 @@ export default function MeetingPage() {
     "calendar"
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const kakaoState = useRecoilValue(kakaoLoginState); // Recoil 상태 사용
-
-  const resetSelection = () => setSelectedAvatar(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        resetSelection();
-      }
-    };
-
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        resetSelection();
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    document.addEventListener("keydown", handleEscKey);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-      document.removeEventListener("keydown", handleEscKey);
-    };
-  }, []);
-
-  const handleButtonClick = () => {
-    setSelectedButton("content");
-
-    // kakaoLoginState가 false일 때 모달을 띄움
-    if (!kakaoState) {
-      setIsModalOpen(true);
-    }
-  };
-
-  const handleLogoCLick = () => {
-    router.push("/");
-  };
+  const [globalKakaoState, setGlobalKakaoState] = useRecoilState(kakaoUserState); // Recoil 상태 사용
+  const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue)
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-
+  useEffect(()=>{
+    
+  })
   useEffect(() => {
+    const fetchKakaoData = async () => {
+      const jwt = await loadFromLocalStorage("kakaoUserJWT");
+      if (jwt) {
+        const kakaoData = decodeJWT(jwt);
+        const KakaoData_obj = {
+          nickname: kakaoData?.nickname as string,
+          kakaoUserId: kakaoData?.kakao_user_id as number,
+          profile_image: kakaoData?.profile_image as string,
+        }
+
+        const loginDate:LoginData = {
+          userName: KakaoData_obj.nickname,
+          password: null,
+          partyId: hash as string,
+          isKakao: true,
+          kakaoUserId: KakaoData_obj.kakaoUserId
+        }
+        await tableLoginHandler(loginDate ,setGlobalUserId)
+        
+        setGlobalKakaoState(KakaoData_obj)
+      }
+    }
     if (hash) {
       setLoading(true);
 
@@ -144,6 +123,9 @@ export default function MeetingPage() {
             endTime: endTime,
             timeslots: timeslots,
           });
+          console.log(tableData);
+          fetchKakaoData()
+          setLoading(false); // API 호출이 끝나면 loading 해제
         })
         .catch((error) => {
           console.error("에러 발생: ", error);
@@ -168,8 +150,8 @@ export default function MeetingPage() {
               onClick={handleLogoCLick}
             />
             <div className="flex flex-col items-center">
-              <button
-                onClick={handleButtonClick}
+              <Link
+                href={'/meetlist'}
                 className={`content w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer mb-[50%] ${
                   selectedButton === "content"
                     ? "bg-white text-black"
@@ -184,7 +166,7 @@ export default function MeetingPage() {
                       : "text-white opacity-100"
                   }`}
                 />
-              </button>
+              </Link>
               <button
                 onClick={() => setSelectedButton("calendar")}
                 className={`calendar w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer ${
@@ -263,7 +245,7 @@ export default function MeetingPage() {
               </span>
             </div>
             <PartyPriority />
-            {isLoggedIn && tableData ? (
+            {( globalKakaoState.kakaoUserId !== null || globalUserId) && tableData ? (
               <TimeSelector party={tableData.party} />
             ) : (
               <TableLogin />

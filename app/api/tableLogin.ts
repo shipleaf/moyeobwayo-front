@@ -2,7 +2,7 @@ import axiosInstance from "./axiosInstance";
 
 export interface LoginData {
     userName: string,
-    password: string,
+    password: string | null,
     partyId: string,
     isKakao: boolean,
     kakaoUserId: null | number

@@ -2,15 +2,7 @@ import axiosInstance from "./axiosInstance";
 import axios, { AxiosError } from "axios";
 
 interface KakaoUserResponse {
-  access_token: string;
-  alarm_off: boolean;
-  expires_in: number;
-  kakaoUserId: number;
-  kakao_message_allow: boolean;
-  nickname: string;
-  profile_image: string;
-  refresh_token: string;
-  refresh_token_expires_in: number;
+  token: string;
 }
 
 interface ApiError {
