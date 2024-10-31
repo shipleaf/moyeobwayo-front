@@ -16,7 +16,7 @@ import TimeSelector from "@/app/components/getParty/VoteTable";
 import PartyPriority from "@/app/components/getParty/PartyPriority";
 import { loginState } from "@/app/recoil/atom";
 import TableLogin from "@/app/components/login/TableLogin";
-
+import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
 import { Party } from "@/app/api/getTableAPI"; // interfaces 파일의 경로
 
 interface TableData {
@@ -61,7 +61,9 @@ export default function MeetingPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-
+  useEffect(()=>{
+    
+  })
   useEffect(() => {
     if (hash) {
       getTable({ table_id: hash as string })
