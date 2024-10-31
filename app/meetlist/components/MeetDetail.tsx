@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation"; // useRouter를 가져옵니�
 import { getTable, Party, AvailableTimesResponse } from "@/app/api/getTableAPI";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
+import Link from "next/link";
 // import { PartyDate } from "@/app/api/getTableAPI";
 
 // Dummies
@@ -144,9 +145,12 @@ const MeetDetail = () => {
             {month}월 {day}일 ({dayOfWeek}) {hours}:{minutes} ~
           </p>
           {/* Button */}
-          <button className="py-[7px] px-4 text-white rounded-[50px] font-bold bg-[var(--mo-50,#6161CE)] hover:bg-[#4949A0]">
-            보러 가기
-          </button>
+          <Link href={`/meeting/${table_id}`}>
+            <div 
+              className="py-[7px] px-4 text-white rounded-[50px] font-bold bg-[var(--mo-50,#6161CE)] hover:bg-[#4949A0]">
+              보러 가기
+            </div>
+          </Link>
         </div>
       </div>
       <div className="flex gap-4">
