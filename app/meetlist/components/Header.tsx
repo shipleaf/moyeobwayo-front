@@ -62,7 +62,8 @@ export default function Header() {
       profile_image: "",
       expiresAt: new Date()
     }
-    saveToLocalStorage("kakaoUserDataByStorage", kakaoUserDataByStorage)
+    
+    saveToLocalStorage("kakaoUserJWT", "")
     // 홈 화면으로 리다이렉트
     router.push('/');
   }

@@ -7,6 +7,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { linkKakaoAndPartyUser, sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI";
 import { useSetRecoilState } from "recoil";
 import { kakaoUserState } from "@/app/recoil/atom";
+import { saveToLocalStorage } from "@/app/recoil/recoilUtils";
+import { decodeJWT} from "@/app/utils/jwtUtils";
 
 // 클라이언트 사이드 전용으로 페이지를 로드하도록 설정
 const Page = dynamic(() => Promise.resolve(KakaoCallback), { ssr: false });
@@ -25,19 +27,21 @@ function KakaoCallback() {
       setLoading(true);
 
       try {
-        const kakaoUserData = await sendAuthCodeToBackend(code);
-        if (kakaoUserData) {
-          const {kakaoUserId, nickname, profile_image } = kakaoUserData;
+        const responseData = await sendAuthCodeToBackend(code);
+        if (responseData) {
+          const { token } = responseData;
+          const kakaoUserData = decodeJWT(token)
+          console.log(kakaoUserData)
           setKakaoUserState({
-            kakaoUserId: kakaoUserId,
-            nickname: nickname,
-            profile_image: profile_image,
+            kakaoUserId: kakaoUserData?.kakao_user_id as number,
+            nickname: kakaoUserData?.nickname as string,
+            profile_image: kakaoUserData?.profile_image as string
           });
-          
+          saveToLocalStorage("kakaoUserJWT", token)
           const storedUserId = sessionStorage.getItem('globalUserId');
           if (storedUserId) {
               const userId = parseInt(storedUserId, 10); // 숫자로 변환
-              await linkKakaoAndPartyUser(Number(userId), kakaoUserId)
+              await linkKakaoAndPartyUser(Number(userId), kakaoUserData?.kakao_user_id as number)
           }
           router.push("/");
         } else {

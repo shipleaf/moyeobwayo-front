@@ -3,21 +3,24 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // App Router에서 useParams 사용
 import { getTable } from "@/app/api/getTableAPI"; // API 호출 주석 처리
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { MdContentPaste } from "react-icons/md";
 import { HiUserCircle } from "react-icons/hi2";
 import TimeTable from "@/app/components/createParty/TimeTable";
 import Image from "next/image";
 import { FiCalendar } from "react-icons/fi";
 import Modal from "react-modal";
-import { kakaoLoginState } from "@/app/recoil/atom";
+import {kakaoUserState, userIdValue } from "@/app/recoil/atom";
 import KakaoLogin from "@/app/components/login/KakaoLogin";
 import TimeSelector from "@/app/components/getParty/VoteTable";
 import PartyPriority from "@/app/components/getParty/PartyPriority";
-import { loginState } from "@/app/recoil/atom";
 import TableLogin from "@/app/components/login/TableLogin";
-import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
 import { Party } from "@/app/api/getTableAPI"; // interfaces 파일의 경로
+import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
+import { decodeJWT } from "@/app/utils/jwtUtils";
+import Link from "next/link";
+import { LoginData } from "@/app/api/tableLogin";
+import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 
 interface TableData {
   party: Party;
@@ -35,7 +38,6 @@ export interface Timeslot {
 export default function MeetingPage() {
   const { hash } = useParams(); // meetingId를 URL에서 추출
   const [tableData, setTableData] = useState<TableData | null>(null);
-  const isLoggedIn = useRecoilValue(loginState);
   const [, setLoading] = useState(false);
 
   const users = [
@@ -48,24 +50,35 @@ export default function MeetingPage() {
     "calendar"
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const kakaoState = useRecoilValue(kakaoLoginState); // Recoil 상태 사용
-
-  const handleButtonClick = () => {
-    setSelectedButton("content");
-
-    // kakaoLoginState가 false일 때 모달을 띄움
-    if (!kakaoState) {
-      setIsModalOpen(true);
-    }
-  };
+  const [globalKakaoState, setGlobalKakaoState] = useRecoilState(kakaoUserState); // Recoil 상태 사용
+  const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue)
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-  useEffect(()=>{
-    
-  })
   useEffect(() => {
+    const fetchKakaoData = async () => {
+      const jwt = await loadFromLocalStorage("kakaoUserJWT");
+      if (jwt) {
+        const kakaoData = decodeJWT(jwt);
+        const KakaoData_obj = {
+          nickname: kakaoData?.nickname as string,
+          kakaoUserId: kakaoData?.kakao_user_id as number,
+          profile_image: kakaoData?.profile_image as string,
+        }
+
+        const loginDate:LoginData = {
+          userName: KakaoData_obj.nickname,
+          password: null,
+          partyId: hash as string,
+          isKakao: true,
+          kakaoUserId: KakaoData_obj.kakaoUserId
+        }
+        await tableLoginHandler(loginDate ,setGlobalUserId)
+        
+        setGlobalKakaoState(KakaoData_obj)
+      }
+    }
     if (hash) {
       getTable({ table_id: hash as string })
         .then((data) => {
@@ -110,6 +123,7 @@ export default function MeetingPage() {
             timeslots: timeslots,
           });
           console.log(tableData);
+          fetchKakaoData()
           setLoading(false); // API 호출이 끝나면 loading 해제
         })
         .catch((error) => {
@@ -132,8 +146,8 @@ export default function MeetingPage() {
               className="mb-[50%]"
             />
             <div className="flex flex-col items-center">
-              <button
-                onClick={handleButtonClick}
+              <Link
+                href={'/meetlist'}
                 className={`content w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer mb-[50%] ${
                   selectedButton === "content"
                     ? "bg-white text-black"
@@ -148,7 +162,7 @@ export default function MeetingPage() {
                       : "text-white opacity-100"
                   }`}
                 />
-              </button>
+              </Link>
               <button
                 onClick={() => setSelectedButton("calendar")}
                 className={`calendar w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer ${
@@ -204,7 +218,7 @@ export default function MeetingPage() {
               </span>
             </div>
             <PartyPriority />
-            {isLoggedIn && tableData ? (
+            {( globalKakaoState.kakaoUserId !== null || globalUserId) && tableData ? (
               <TimeSelector party={tableData.party} />
             ) : (
               <TableLogin />
