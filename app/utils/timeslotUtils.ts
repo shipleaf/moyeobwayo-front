@@ -36,14 +36,14 @@
 //   return result;
 // };
 
-// export const getGradationNum: (currentVal: number, maxNum: number) => string = (currentVal, maxNum) => {
-//   if(maxNum === 0){
-//     return "0"
-//   }
+export const getGradationNum: (currentVal: number, maxNum: number) => string = (currentVal, maxNum) => {
+  if(maxNum === 0){
+    return "0"
+  }
   
-//   const percent = (currentVal / maxNum) * 100;
+  const percent = (currentVal / maxNum) * 100;
 
-//   // 일의 자리에서 반올림
-//   const rounded = Math.round(percent / 10) * 10;
-//   return rounded.toString(); // 숫자를 문자열로 변환
-// };
+  // 일의 자리에서 반올림
+  const rounded = Math.round(percent / 10) * 10;
+  return rounded.toString(); // 숫자를 문자열로 변환
+};

@@ -40,7 +40,7 @@ export default function CreateTableLogin({
 
   return (
     <>
-      <div className="bg-white rounded-[10px] flex flex-row w-[20vw] h-[60vh] overflow-hidden items-center justify-center">
+      <div className="bg-white rounded-[10px] flex flex-row w-[360px] h-[60vh] overflow-hidden items-center justify-center">
         <form
           onSubmit={handleSubmit}
           className="flex flex-col items-center justify-center gap-[2vh] border-[#285cc4]"

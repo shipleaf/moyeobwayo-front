@@ -31,7 +31,6 @@ export interface Timeslot {
   binaryString: string;
 }
 
-
 export default function MeetingPage() {
   const { hash } = useParams(); // meetingId를 URL에서 추출
   const [tableData, setTableData] = useState<TableData | null>(null);
