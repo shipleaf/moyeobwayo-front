@@ -24,6 +24,7 @@ interface TableData {
   formattedDates: string[];
   startTime: string;
   endTime: string;
+  timeslots: { userId: number; username: string; byteString: string }[];
 }
 
 export interface Timeslot {
@@ -74,6 +75,14 @@ export default function MeetingPage() {
             return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식으로 변환
           });
 
+          const timeslots = data.party.dates.flatMap((date) =>
+            date.timeslots.map((slot) => ({
+              userId: slot.userId as number,
+              username: slot.username as string,
+              byteString: slot.byteString as string,
+            }))
+          );
+
           // 시작 시간과 종료 시간은 로컬 시간대로 변환 후 HH:MM 형식만 추출
           const startTime = new Date(data.party.startDate).toLocaleTimeString(
             "en-GB",
@@ -91,13 +100,16 @@ export default function MeetingPage() {
             }
           );
 
+          console.log("server", dates);
           // 상태 업데이트
           setTableData({
             ...data,
             formattedDates: dates,
             startTime: startTime,
             endTime: endTime,
+            timeslots: timeslots,
           });
+          console.log(tableData);
           setLoading(false); // API 호출이 끝나면 loading 해제
         })
         .catch((error) => {
@@ -199,7 +211,7 @@ export default function MeetingPage() {
             )}
           </div>
           {/* TimeTable 컴포넌트에 변환된 날짜와 시간 전달 */}
-          {tableData && (
+          {tableData !== null && (
             <TimeTable
               Dates={tableData.formattedDates}
               startTime={tableData.startTime}
