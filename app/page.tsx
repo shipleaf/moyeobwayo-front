@@ -9,7 +9,6 @@ import Footer from "./components/common/Footer";
 
 // 예시 사용자 데이터
 export default function Home() {
-
   return (
     <>
       <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { loginState, userIdValue, kakaoUserState } from "@/app/recoil/atom"; // Recoil 상태
-import { tableLogin } from "@/app/api/tableLogin"; // API 호출 함수
 import { LoginData } from "@/app/api/tableLogin";
 import { useParams } from "next/navigation"; // useParams를 import
 import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
