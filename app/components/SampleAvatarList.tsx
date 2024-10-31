@@ -24,16 +24,16 @@ export default function SampleAvatarList() {
         resetSelection();
       }
     };
-  
+
     const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         resetSelection();
       }
     };
-  
+
     document.addEventListener("mousedown", handleOutsideClick);
     document.addEventListener("keydown", handleEscKey);
-  
+
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
       document.removeEventListener("keydown", handleEscKey);
@@ -45,10 +45,10 @@ export default function SampleAvatarList() {
       {users.map((user, index) => (
         <div
           key={user.id}
-          onClick={() => setSelectedAvatar(user)} // 아바타 클릭 시 상태 업데이트
-          className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer p-0 m-0 ${
-            selectedAvatar?.id === user.id ? "ring-4 ring-blue-500" : ""
-          }`} // 선택된 아바타에 스타일 추가
+          onClick={() => setSelectedAvatar(user)}
+          className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 ${
+            selectedAvatar?.id === user.id ? "translate-y-[-20px] ring-4 ring-blue-500" : ""
+          }`}
           style={{
             top: `${index * -45}px`,
             zIndex: 10 + index,
@@ -68,6 +68,15 @@ export default function SampleAvatarList() {
             )}
             <div className="inset-0 rounded-full bg-[#6161CE] backdrop-blur-[2px]"></div>
           </div>
+          {/* 선택된 아바타의 이름 표시 */}
+          {selectedAvatar?.id === user.id && (
+            <div
+              className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-md shadow-md text-xs text-gray-700"
+              style={{ whiteSpace: "nowrap" }}
+            >
+              {user.username}
+            </div>
+          )}
         </div>
       ))}
     </div>

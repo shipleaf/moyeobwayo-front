@@ -1,5 +1,5 @@
 "use client";
-// import TimeBlock from "./TimeBlock";
+import TimeBlock from "./TimeBlock";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
 // import { useState } from "react";
@@ -44,6 +44,15 @@ const roboto = Roboto({
 //   return times;
 // };
 
+export const getGradationNum = (currentVal: number, maxNum: number): string => {
+  if (maxNum === 0) {
+    return "0";
+  }
+  const percent = (currentVal / maxNum) * 100;
+  const rounded = Math.round(percent / 10) * 10;
+  return rounded.toString();
+};
+
 // 1시간 단위로 시간을 반환하는 함수
 const generateHourlyLabels = (startHour: number, endHour: number) => {
   const labels = [];
@@ -81,52 +90,7 @@ function generateDummyData(): PartyDate[] {
     // 날짜마다 패턴 다르게 설정
     if (i === 0) {
       // 월요일
-      timeslots = [
-    //     {
-    //       slotId: 1,
-    //       selectedStartTime: `${dateString}T09:00:00+09:00`, // 09:00
-    //       selectedEndTime: `${dateString}T12:30:00+09:00`, // 10:30
-    //       userEntity: users[0], // 제시카
-    //     },
-    //     {
-    //       slotId: 2,
-    //       selectedStartTime: `${dateString}T11:00:00+09:00`, // 11:00
-    //       selectedEndTime: `${dateString}T12:30:00+09:00`, // 12:30
-    //       userEntity: users[1], // 존
-    //     },
-    //   ];
-    // } else if (i === 1) {
-    //   // 화요일
-    //   timeslots = [
-    //     {
-    //       slotId: 3,
-    //       selectedStartTime: `${dateString}T14:00:00+09:00`, // 14:00
-    //       selectedEndTime: `${dateString}T17:30:00+09:00`, // 15:30
-    //       userEntity: users[1], // 존
-    //     },
-    //     {
-    //       slotId: 4,
-    //       selectedStartTime: `${dateString}T16:00:00+09:00`, // 16:00
-    //       selectedEndTime: `${dateString}T17:30:00+09:00`, // 17:30
-    //       userEntity: users[2], // 사라
-    //     },
-    //   ];
-    // } else if (i === 5) {
-    //   // 토요일
-    //   timeslots = [
-    //     {
-    //       slotId: 5,
-    //       selectedStartTime: `${dateString}T10:00:00+09:00`, // 10:00
-    //       selectedEndTime: `${dateString}T16:30:00+09:00`, // 11:30
-    //       userEntity: users[0], // 제시카
-    //     },
-    //     {
-    //       slotId: 6,
-    //       selectedStartTime: `${dateString}T13:00:00+09:00`, // 13:00
-    //       selectedEndTime: `${dateString}T14:30:00+09:00`, // 14:30
-    //       userEntity: users[1], // 존
-    //     },
-      ];
+      timeslots = [];
     }
 
     dummyData.push({
@@ -170,7 +134,7 @@ export default function TimeTable({
 }: TimeTableProps) {
   // const [countSlot, setCountSlot] = useState<number[][] | undefined>([]);
 
-  console.log(Dates, startTime, endTime);
+  const dates = Dates
 
   // useEffect(() => {
   //   if (partyRange) {
@@ -193,16 +157,16 @@ export default function TimeTable({
           Time
         </div>
         <div className="flex flex-grow gap-[10px]">
-          {timeblocks?.map((day, index) => (
+          {dates.map((date, index) => (
             <div
               key={index}
               className="flex-grow rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] h-full flex justify-center items-center gap-[10px]"
             >
               <span className={`${roboto.className} font-[500] text-[17px]`}>
-                {getWeekday(new Date(day.selected_date))}
+                {getWeekday(date)}
               </span>
               <span className={`${roboto.className} font-[500] text-[35px]`}>
-                {new Date(day.selected_date).getDate()}
+                {date.getDate()}
               </span>
             </div>
           ))}
@@ -219,55 +183,58 @@ export default function TimeTable({
             </div>
           ))}
         </div>
-        {/* <div className="flex w-full gap-[10px]">
-          {timeblocks?.map((day, dayIndex) => (
-            <div key={dayIndex} className="w-full">
-              {generateTimeIntervalsForDay(
-                new Date(day.selected_date),
-                startHour,
-                endHour,
-                30
-              ).map((time, index, array) => {
-                const colorLevel = getGradationNum(
-                  countSlot &&
-                    Array.isArray(countSlot[dayIndex]) &&
-                    countSlot[dayIndex][index] !== undefined
-                    ? countSlot[dayIndex][index]
-                    : 0,
-                  currentNum as number
-                );
+        <div className="flex flex-grow gap-[10px]">
+          {dummyData.map((day, dateIndex) => (
+            <div key={dateIndex} className="flex-grow">
+              {timeSlots.map((timeSlot, slotIndex) => {
+                let votes = 0;
 
-                console.log(colorLevel);
+                if (selectedAvatar) {
+                  // 선택된 아바타가 있을 경우 해당 userId의 데이터만 가져오기
+                  const selectedUserSlot = day.timeslots.find(
+                    (slot) => slot.userId === selectedAvatar.id
+                  );
+                  votes = selectedUserSlot
+                    ? Number(selectedUserSlot.byteString[slotIndex])
+                    : 0;
+                } else {
+                  // 선택된 아바타가 없을 경우 모든 유저의 합산 결과 표시
+                  votes = day.timeslots.reduce(
+                    (acc, timeslot) =>
+                      acc + Number(timeslot.byteString[slotIndex]),
+                    0
+                  );
+                }
+
+                const colorLevel = getGradationNum(votes, maxVotes);
+
                 return (
                   <TimeBlock
-                    key={index}
-                    time={time}
-                    className={`bg-${
-                      colorLevel === "0" ? "white" : `MO${colorLevel}`
-                    }`}
+                    key={`${dateIndex}-${slotIndex}`}
+                    time={`${getWeekday(dates[dateIndex])} ${dates[
+                      dateIndex
+                    ].getDate()} ${timeSlot}`}
+                    className={
+                      colorLevel === "0" ? "bg-white" : `bg-MO${colorLevel}`
+                    }
                     style={{
                       height: "6vh",
-                      marginBottom: index % 2 === 1 ? "4px" : "0",
-                      border: "0.572px solid #EBEBEB",
+                      marginBottom: slotIndex % 2 === 0 ? "0" : "4px",
                       borderRadius:
-                        index === 0
-                          ? "10px 10px 0 0" // 첫 번째 요소
-                          : index === array.length - 1
-                          ? "0 0 10px 10px"
-                          : "0", // 마지막 요소
+                        slotIndex % 2 === 0 ? "10px 10px 0 0" : "0 0 10px 10px",
                       borderBottom:
-                        index === array.length - 1
-                          ? "none" // 마지막 요소는 경계선 없음
-                          : index % 2 === 0
-                          ? "0.572px dashed #EBEBEB" // 짝수 index에서는 대시선
-                          : "0.572px solid #EBEBEB", // 홀수 index에서는 실선
+                        slotIndex === timeSlots.length - 1
+                          ? "none"
+                          : slotIndex % 2 === 0
+                          ? "0.572px dashed #EBEBEB"
+                          : "0.572px solid #EBEBEB",
                     }}
                   />
                 );
               })}
             </div>
           ))}
-        </div> */}
+        </div>
       </div>
     </div>
   );

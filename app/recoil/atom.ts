@@ -65,7 +65,7 @@ export const selectedEndTime = atom({
 
 // Avator(유저) 강조 관련 변수
 
-export const selectedAvatarState = atom<null | { id: number; username: string; profileImage: string }>({
+export const selectedAvatarState = atom<null | { id: number; }>({
   key: "selectedAvatarState",
   default: null,
 });
