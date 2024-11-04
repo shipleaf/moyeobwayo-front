@@ -7,12 +7,14 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRecoilValue } from "recoil";
 import { userIdValue } from "@/app/recoil/atom";
-const redirectUri: string = process.env.NEXT_PUBLIC_KAKAO_LOGIN_REDIRECT_URI as string;
+const redirectUri: string = process.env
+  .NEXT_PUBLIC_KAKAO_LOGIN_REDIRECT_URI as string;
 
 const scope = [
   "profile_nickname",
   "profile_image",
   "talk_message", // 카카오 메시지 동의 항목 추가
+  "talk_calendar",
 ].join(",");
 
 export default function KakaoLogin() {
@@ -23,12 +25,12 @@ export default function KakaoLogin() {
       window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
       console.log("after Init: ", window.Kakao.isInitialized());
     }
-  }, [isKakaoReady]);
+  }, [isKakaoReady]); 
 
   const kakaoLoginHandler = () => {
     if (globalUserId !== null) {
       // globalUserId를 세션 스토리지에 저장
-      sessionStorage.setItem('globalUserId', globalUserId.toString()); // 문자열로 변환하여 저장
+      sessionStorage.setItem("globalUserId", globalUserId.toString()); // 문자열로 변환하여 저장
     }
     if (window.Kakao && window.Kakao.Auth) {
       window.Kakao.Auth.authorize({
@@ -64,7 +66,7 @@ export default function KakaoLogin() {
             <span className="font-pretendard font-[600] text-[32px] mb-4">
               간편로그인 후 <br /> 내 일정을 한번에 확인해보세요!
             </span>
-            
+
             <div className="mb-[157px]">
               <span className="text-[#6161CE] font-pretendard font-[600] text-[20px]">
                 10초
@@ -74,10 +76,11 @@ export default function KakaoLogin() {
               </span>
             </div>
           </div>
-          <div 
-            onClick={kakaoLoginHandler} 
+          <div
+            onClick={kakaoLoginHandler}
             className="py-5 px-[30px] cursor-pointer hover:bg-[#E5C900]
-            rounded-[10px] bg-[#FDE500] text-[#3B1D04] text-[26px] font-semibold">
+            rounded-[10px] bg-[#FDE500] text-[#3B1D04] text-[26px] font-semibold"
+          >
             <div className="flex items-center gap-5">
               <Image
                 src="/images/KakaoLogo.png"
@@ -85,7 +88,7 @@ export default function KakaoLogin() {
                 width={36}
                 height={33}
               />
-                카카오로 로그인하기
+              카카오로 로그인하기
             </div>
           </div>
         </div>

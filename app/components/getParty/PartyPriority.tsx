@@ -28,11 +28,10 @@ interface TimeSlot {
   end: string;
   locationName?: string;
   dateId: number;
-  users: string[]; // 사용자 이름 배열
-  usersId: number[]; // 사용자 ID 배열
+  users: string[];
+  usersId: number[];
 }
 
-// AvailableTimesResponse를 TimeSlot으로 변환하는 함수
 const convertAvailableTimeToTimeSlot = (
   availableTime: AvailableTimesResponse,
   dateId: number,
@@ -42,9 +41,9 @@ const convertAvailableTimeToTimeSlot = (
     start: availableTime.start,
     end: availableTime.end,
     locationName: locationName || "Default Location",
-    dateId,
-    users: availableTime.users.map((user) => user.userName), // 사용자 이름 배열 추출
-    usersId: availableTime.users.map((user) => user.userId), // 사용자 ID 배열 추출
+    dateId: dateId,
+    users: availableTime.users.map((user) => user.userName),
+    usersId: availableTime.users.map((user) => user.userId),
   };
 };
 
@@ -64,7 +63,6 @@ export default function PartyPriority() {
       getTable({ table_id: hash as string })
         .then((data) => {
           setPriorityData(data);
-          console.log(data);
         })
         .catch((error) => {
           console.error("에러 발생: ", error);
@@ -76,12 +74,30 @@ export default function PartyPriority() {
   const handleComplete = async (timeSlot: TimeSlot) => {
     if (!hash) return;
 
+    const selectedDate = new Date(timeSlot.start).toISOString().split("T")[0];
+
+    console.log("Selected Date:", selectedDate);
+    console.log("Priority Data Dates:", priorityData?.party.dates);
+
+    // dates에서 해당 날짜에 맞는 dateId를 찾기
+    const matchingDate = priorityData?.party.dates.find((date) => {
+      const dateOnly = new Date(date.selected_date).toISOString().split("T")[0];
+      return dateOnly === selectedDate;
+    });
+
+    console.log(matchingDate);
+
+    if (!matchingDate) {
+      console.error("해당 날짜와 일치하는 dateId를 찾을 수 없습니다.");
+      return;
+    }
+
     const completeData: CompleteData = {
       userId: userId as number,
       completeTime: new Date(timeSlot.start),
       endTime: new Date(timeSlot.end),
       locationName: timeSlot.locationName || "Default Location",
-      dateId: timeSlot.dateId,
+      dateId: matchingDate.dateId,
       users: timeSlot.users,
       usersId: timeSlot.usersId,
     };
@@ -110,7 +126,7 @@ export default function PartyPriority() {
   // 모달 닫기 및 페이지 이동
   const closeModalAndNavigate = () => {
     setShowModal(false);
-    router.push(`/meeting/${hash}`);
+    router.refresh(); // 페이지 새로고침
   };
 
   return (
