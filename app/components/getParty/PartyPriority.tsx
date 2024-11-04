@@ -5,9 +5,9 @@ import {
   GetTableResponse,
   AvailableTimesResponse,
 } from "@/app/api/getTableAPI";
-import { completeTime } from "@/app/api/partyCompleteAPI";
+import { CompleteData, completeTime } from "@/app/api/partyCompleteAPI";
 import { useRecoilValue } from "recoil";
-import { userIdValue } from "@/app/recoil/atom";
+import { userIdValue, tableRefreshTrigger } from "@/app/recoil/atom";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { CheckFat } from "@phosphor-icons/react";
@@ -24,11 +24,12 @@ const formatDateTime = (dateTime: string, includeDate: boolean = true) => {
 };
 
 interface TimeSlot {
-  start: string; // 시작 시간, string 형식
-  end: string; // 종료 시간, string 형식
-  locationName?: string; // 장소 이름 (optional)
-  dateId: number; // 날짜 ID
-  users: string[]; // 참여자 이름 리스트
+  start: string;
+  end: string;
+  locationName?: string;
+  dateId: number;
+  users: string[]; // 사용자 이름 배열
+  usersId: number[]; // 사용자 ID 배열
 }
 
 // AvailableTimesResponse를 TimeSlot으로 변환하는 함수
@@ -42,22 +43,24 @@ const convertAvailableTimeToTimeSlot = (
     end: availableTime.end,
     locationName: locationName || "Default Location",
     dateId,
-    users: availableTime.users,
+    users: availableTime.users.map((user) => user.userName), // 사용자 이름 배열 추출
+    usersId: availableTime.users.map((user) => user.userId), // 사용자 ID 배열 추출
   };
 };
 
 export default function PartyPriority() {
   const { hash } = useParams();
-  const router = useRouter(); // router 객체 생성
+  const router = useRouter();
   const [priorityData, setPriorityData] = useState<GetTableResponse | null>(
     null
   );
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
   const userId = useRecoilValue(userIdValue);
+  const refreshTrigger = useRecoilValue(tableRefreshTrigger);
 
   useEffect(() => {
-    if (hash) {
+    if (hash && refreshTrigger >= 0) {
       getTable({ table_id: hash as string })
         .then((data) => {
           setPriorityData(data);
@@ -67,23 +70,24 @@ export default function PartyPriority() {
           console.error("에러 발생: ", error);
         });
     }
-  }, [hash]);
+  }, [hash, refreshTrigger]);
 
   // 확정하기 버튼 클릭 이벤트 핸들러
   const handleComplete = async (timeSlot: TimeSlot) => {
     if (!hash) return;
 
-    const completeData = {
+    const completeData: CompleteData = {
       userId: userId as number,
       completeTime: new Date(timeSlot.start),
       endTime: new Date(timeSlot.end),
       locationName: timeSlot.locationName || "Default Location",
       dateId: timeSlot.dateId,
+      users: timeSlot.users,
+      usersId: timeSlot.usersId,
     };
 
     try {
       const response = await completeTime(hash as string, completeData);
-      console.log(response);
       if (response.status === 200) {
         const title = priorityData?.party.partyName || "모임";
         const subtitle = priorityData?.party.partyDescription || "모임 설명";
@@ -106,14 +110,14 @@ export default function PartyPriority() {
   // 모달 닫기 및 페이지 이동
   const closeModalAndNavigate = () => {
     setShowModal(false);
-    router.refresh();
+    router.push(`/meeting/${hash}`);
   };
 
   return (
     <>
       <div
-        className="py-[13px] px-[15px] w-full overflow-y-auto max-h-[40%] 
-      flex flex-col gap-2 items-center mb-[10%] rounded-[10px]  "
+        className="py-[13px] px-[15px] w-full overflow-y-auto h-[40%] 
+      flex flex-col gap-2 items-center mb-[10%] rounded-[10px]"
       >
         {priorityData ? (
           Array.isArray(priorityData.availableTime) &&
@@ -121,14 +125,13 @@ export default function PartyPriority() {
             priorityData.availableTime.map((availableTime, index) => {
               const timeSlot = convertAvailableTimeToTimeSlot(
                 availableTime,
-                index + 1, // dateId를 인덱스 값으로 설정
+                index + 1,
                 priorityData.party.locationName
               );
               return (
                 <div
                   key={index}
-                  className=" priorList px-2 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px]
-                  flex flex-col gap-2"
+                  className="priorList px-2 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px] flex flex-col gap-2"
                 >
                   <div className="flex flex-row justify-between">
                     <p className="font-pretendard text-[15px] font-[500]">
@@ -174,7 +177,7 @@ export default function PartyPriority() {
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-[10001]">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-lg font-bold mb-4 flex flex-row items-center">
+            <h2 className="text-lg font-bold mb-4 flex flex-row items-center font-pretendard">
               모임이 확정되었습니다! 🎉
               <CopyToClipboard text={message}>
                 <button
@@ -187,11 +190,13 @@ export default function PartyPriority() {
                 </button>
               </CopyToClipboard>
             </h2>
-            <p className="mb-4 whitespace-pre-wrap">{message}</p>
+            <p className="mb-4 whitespace-pre-wrap font-pretendard">
+              {message}
+            </p>
             <div className="flex space-x-2">
               <button
                 onClick={closeModalAndNavigate}
-                className="bg-[#6161CE] text-white py-2 px-4 rounded-lg w-full"
+                className="bg-[#6161CE] text-white py-2 px-4 rounded-lg w-full font-pretendard"
               >
                 확정하기
               </button>

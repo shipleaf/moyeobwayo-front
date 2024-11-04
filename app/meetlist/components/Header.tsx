@@ -13,7 +13,7 @@ export default function Header() {
   const searchParams = useSearchParams()
   const partyId = searchParams.get('partyId')
   const kakaoUser = useRecoilValue(kakaoUserState);
-  const [alarm, setAlarm] = useState<boolean>(true);
+  const [alarm, ] = useState<boolean>(true);
   const [globalKakaoUserState, setKakaoUserState] = useRecoilState(kakaoUserState);
   const router = useRouter()
   console.log('partyId', partyId); // partyId 로그 확인

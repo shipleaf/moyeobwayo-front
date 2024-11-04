@@ -111,7 +111,7 @@ export default function UserTimeTable() {
                   (time, index) => (
                     <TimeBlock
                       key={index}
-                      time={time}
+                      time={time.toISOString()}
                       style={{
                         backgroundColor: selectedTimes.some(
                           (t) => t.getTime() === time.getTime()

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { userIdValue } from "@/app/recoil/atom";
-import { useRecoilValue } from "recoil";
-import { voteData, voteTime, getMyVote, userInfo } from "@/app/api/timeslotAPI";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { voteData, voteTime, getMyVote } from "@/app/api/timeslotAPI";
 import { useParams } from "next/navigation";
+import { tableRefreshTrigger } from "@/app/recoil/atom";
 
 // 1시간 간격으로 시간 표시, 마지막 시간 포함
 const generateDisplaySlots = (startHour: number, endHour: number): string[] => {
@@ -21,7 +22,9 @@ const generateTimeSlots = (startHour: number, endHour: number): string[] => {
   for (let hour = startHour; hour < endHour; hour++) {
     for (let minute = 0; minute < 60; minute += 30) {
       slots.push(
-        `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`
+        `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`
       );
     }
   }
@@ -31,7 +34,9 @@ const generateTimeSlots = (startHour: number, endHour: number): string[] => {
 // 요일과 날짜를 개별적으로 포맷팅
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  const weekday = date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
+  const weekday = date
+    .toLocaleDateString("en-US", { weekday: "short" })
+    .toUpperCase();
   const day = date.getDate();
   return { weekday, day };
 };
@@ -58,17 +63,18 @@ type TimeSelectorProps = {
     startDate: string;
     locationName: string | null;
     endDate: string;
-    decisionDate: string;
+    decisionDate: boolean;
     userId: string;
     alarms: boolean[];
-    dates: Array<{
+    dates: {
       dateId: number;
       selected_date: string;
-      timeslots: Array<{
-        slotId: number;
+      convertedTimeslots: {
+        userId: number;
+        userName: string;
         byteString: string;
-      }>;
-    }>;
+      }[];
+    }[];
   };
 };
 
@@ -76,6 +82,7 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
   const { hash } = useParams();
   const { dates, startDate, endDate } = party;
   const userId = useRecoilValue(userIdValue);
+  const setRefreshTrigger = useSetRecoilState(tableRefreshTrigger);
 
   const startHour = new Date(startDate).getHours();
   const endHour = new Date(endDate).getHours();
@@ -104,18 +111,20 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
         const updatedSlots = [...selectedSlots];
         const updatedTable = { ...binaryTable };
 
-        response.dates.forEach((vote) => {
-          const { dateId, binaryString } = vote;
-          updatedTable[dateId] = binaryString;
+        response.dates.forEach(
+          (vote: { dateId: number; binaryString: string }) => {
+            const { dateId, binaryString } = vote;
+            updatedTable[dateId] = binaryString;
 
-          const dateIndex = dates.findIndex((date) => date.dateId === dateId);
-          if (dateIndex !== -1) {
-            for (let i = 0; i < binaryString.length; i++) {
-              const slotIndex = dateIndex * timeSlots.length + i;
-              updatedSlots[slotIndex] = binaryString[i] === "1";
+            const dateIndex = dates.findIndex((date) => date.dateId === dateId);
+            if (dateIndex !== -1) {
+              for (let i = 0; i < binaryString.length; i++) {
+                const slotIndex = dateIndex * timeSlots.length + i;
+                updatedSlots[slotIndex] = binaryString[i] === "1";
+              }
             }
           }
-        });
+        );
 
         setBinaryTable(updatedTable);
         setSelectedSlots(updatedSlots);
@@ -130,7 +139,9 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
   const [isSelecting, setIsSelecting] = useState(false);
   const [isDeselecting, setIsDeselecting] = useState(false);
   const [startIndex, setStartIndex] = useState<number | null>(null);
-  const [lastDraggedDateId, setLastDraggedDateId] = useState<number | null>(null);
+  const [lastDraggedDateId, setLastDraggedDateId] = useState<number | null>(
+    null
+  );
 
   const updateBinaryTable = (
     dateId: number,
@@ -162,10 +173,13 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
 
       console.log("Updated data:", updatedData);
 
-      voteTime(updatedData).catch((error) =>
-        console.error("Error posting vote data:", error)
-      );
+      voteTime(updatedData)
+        .then(() => {
+          setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
+        })
+        .catch((error) => console.error("Error posting vote data:", error));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSelecting, lastDraggedDateId, binaryTable, userId]);
 
   const handleMouseDown = (index: number, event: React.MouseEvent) => {
@@ -214,16 +228,18 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
     };
     console.log("Updated data on click:", updatedData);
 
-    voteTime(updatedData).catch((error) =>
-      console.error("Error posting vote data:", error)
-    );
+    voteTime(updatedData)
+      .then(() => {
+        setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
+      })
+      .catch((error) => console.error("Error posting vote data:", error));
   };
 
   return (
     <div
       onMouseUp={handleMouseUp}
       style={{ userSelect: "none" }}
-      className="w-[90%] mr-[5%] bg-[#fff] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] pt-[5%]"
+      className="w-[90%] mr-[5%] bg-[#fff] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] p-[5%] overflow-auto"
     >
       <div
         className="grid items-start justify-center"
@@ -253,14 +269,17 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
               .map((_, innerIndex) => {
                 const cellIndex = displayIndex * 2 + innerIndex;
                 return dates.map((date, dateIndex) => {
-                  const fullCellIndex = cellIndex + dateIndex * timeSlots.length;
+                  const fullCellIndex =
+                    cellIndex + dateIndex * timeSlots.length;
                   return (
                     <div
                       key={`${date.dateId}-${fullCellIndex}`}
                       data-dateid={date.dateId}
                       className={`block w-[50px] h-[20px] cursor-pointer ${
-                        selectedSlots[fullCellIndex] ? "bg-[#A1A1FF]" : "bg-white"
-                      } border-l border-r border-gray-300`}
+                        selectedSlots[fullCellIndex]
+                          ? "bg-[#A1A1FF]"
+                          : "bg-white"
+                      } border-l border-r border-b border-b-dashed border-gray-300`}
                       onMouseDown={(e) => handleMouseDown(fullCellIndex, e)}
                       onMouseOver={() => handleMouseOver(fullCellIndex)}
                       onClick={() => handleCellClick(fullCellIndex)}

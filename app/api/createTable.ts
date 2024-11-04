@@ -7,7 +7,7 @@ export interface SubmitData {
     startTime: Date,
     endTime: Date,
     dates: Date[],
-    decisionDate: Date,
+    decisionDate: boolean,
     user_id: string
 }
 

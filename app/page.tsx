@@ -22,30 +22,21 @@ export default function Home() {
               className="mb-[50%]"
             />
             <div className="flex flex-col items-center">
-              <Link href={'/meetlist'}
-                 // content 버튼 클릭 핸들러
+              <Link
+                href={"/meetlist"}
+                // content 버튼 클릭 핸들러
                 className={`content w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer mb-[50%] focus:outline-none
-                    bg-[rgba(255,255,255,0.1)] border-none`
-                }
+                    bg-[rgba(255,255,255,0.1)] border-none`}
               >
-                <Clipboard
-                  size={30}
-                  className=
-                      "text-white opacity-100"
-                />
+                <Clipboard size={30} className="text-white opacity-100" />
               </Link>
               <Link
-                href={'/'}
-                className={`calendar w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer ${
-                    "bg-white text-black"
-                }`}
+                href={"/"}
+                className={`calendar w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer ${"bg-white text-black"}`}
               >
-                <CalendarBlank
-                  size={30}
-                  className="text-black"
-                />
+                <CalendarBlank size={30} className="text-black" />
               </Link>
-              <SampleAvatarList/>
+              <SampleAvatarList />
             </div>
           </div>
         </div>
@@ -53,14 +44,14 @@ export default function Home() {
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] overflow-auto">
           <div className="flex flex-row h-[100%]">
             <CalendarComp />
-            <SampleTimeTable/>
+            <SampleTimeTable />
           </div>
           <Footer></Footer>
         </div>
         <div
           className={`absolute transition-all duration-300 z-0 ${
-              "top-[31%] left-[10.5%]"
-              // : "top-[18%] left-[10.5%]"
+            "top-[31%] left-[10.5%]"
+            // : "top-[18%] left-[10.5%]"
           }`}
         >
           <div className="w-16 h-16 bg-white rounded-[20%] transform rotate-45 shadow-lg"></div>

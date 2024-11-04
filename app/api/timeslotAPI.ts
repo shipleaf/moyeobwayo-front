@@ -18,8 +18,11 @@ export interface voteTimeReponse {
   success: boolean;
 }
 
-export interface getMyVoteReponse {
-  success: boolean;
+export interface GetMyVoteResponse {
+  dates: {
+    dateId: number;
+    binaryString: string;
+  }[];
 }
 
 export const voteTime = async (data: voteData): Promise<voteTimeReponse> => {
@@ -36,7 +39,7 @@ export const voteTime = async (data: voteData): Promise<voteTimeReponse> => {
   }
 };
 
-export const getMyVote = async (data: userInfo): Promise<getMyVoteReponse> => {
+export const getMyVote = async (data: userInfo): Promise<GetMyVoteResponse> => {
   try {
     const response = await axiosInstance.post("/timeslots/user-timeslots", data, {
       headers: {

@@ -45,7 +45,11 @@ export default function Page() {
               className="calendar w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer
                     bg-[rgba(255,255,255,0.1)] border-none"
             >
-              <CalendarBlank size={30} weight="bold" className="text-white opacity-100" />
+              <CalendarBlank
+                size={30}
+                weight="bold"
+                className="text-white opacity-100"
+              />
             </Link>
             <div className="relative flex flex-col mt-8">
               {users.map((user, index) => (
@@ -75,8 +79,10 @@ export default function Page() {
         </div>
       </div>
       <div className="page w-[90%] flex flex-col h-full bg-white rounded-[20px] z-50 p-[2%]">
-        <Header />
-        
+        <Suspense>
+          <Header />
+        </Suspense>
+
         {/* Content */}
         <section className="flex gap-6">
           {/* List with Suspense */}
@@ -94,11 +100,9 @@ export default function Page() {
           </div>
         </section>
       </div>
-      
+
       <div
-        className={`absolute transition-all duration-300 z-0 ${
-          "top-[18%] left-[10.5%]"
-        }`}
+        className={`absolute transition-all duration-300 z-0 ${"top-[18%] left-[10.5%]"}`}
       >
         <div className="w-16 h-16 bg-white rounded-[20%] transform rotate-45 shadow-lg"></div>
       </div>

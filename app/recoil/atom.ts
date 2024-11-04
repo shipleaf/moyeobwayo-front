@@ -36,7 +36,7 @@ export const kakaoLoginState = atom({
 
 export const kakaoIDState = atom({
   key: "kakaoIDState",
-  default: 3720994926,
+  default: null,
 });
 
 // 카카오 사용자 정보 상태 (프로필 이미지, 닉네임)
@@ -74,4 +74,9 @@ export const selectedAvatarState = atom<null | { id: number; }>({
 export const avatarVotesState = atom({
   key: 'avatarVotesState',
   default: {},
+});
+
+export const tableRefreshTrigger = atom({
+  key: "tableRefreshTrigger",
+  default: 0,
 });
