@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import {LoginData } from "@/app/api/tableLogin";
 import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
 import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
-import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
+// import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 // import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 
 export default function CalendarComp() {
@@ -164,7 +164,7 @@ export default function CalendarComp() {
       return;
     }
 
-    // startHour와 endHour는 AM/PM 계산을 통해 얻어짐
+    // startHour와 endHour는 AM/PM 계산을 통해 얻어짐 
     const startHour = calculateTime(startTime, isStartToggled);
     const endHour = calculateTime(endTime, isEndToggled);
 
@@ -201,7 +201,7 @@ export default function CalendarComp() {
       startTime: startDateTime as Date, // Date 형식으로 전송
       endTime: endDateTime as Date, // Date 형식으로 전송
       dates: sortedDates,
-      decisionDate: new Date(), // 버튼을 누른 시점의 시간 기록
+      decisionDate: false,
       user_id: userName.userId,
     };
     // 카카오 유저라면 카카오 정보로 갱신

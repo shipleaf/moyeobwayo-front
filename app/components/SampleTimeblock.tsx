@@ -5,6 +5,7 @@ interface TimeBlockProps {
   onMouseEnter?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseDown?: () => void;
   onMouseUp?: () => void; // onMouseUp 추가
+  onMouseLeave?: () => void;
 }
 
 const SampleTimeBlock: React.FC<TimeBlockProps> = ({ style, className, onMouseEnter, onMouseLeave }) => {

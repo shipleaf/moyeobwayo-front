@@ -1,4 +1,5 @@
 import axiosInstance from "./axiosInstance";
+import { TableId } from "./getTableAPI";
 
 export interface CompleteData {
   userId: number;
@@ -6,6 +7,8 @@ export interface CompleteData {
   endTime: Date;
   locationName: string;
   dateId: number;
+  users: string[];
+  usersId: number[];  
 }
 
 export interface CompleteResponse {
@@ -22,6 +25,15 @@ export interface CompleteResponse {
   };
 }
 
+export interface GetCompleteResponse {
+  partyId: string,
+  startTime: Date,
+  endTime: Date,
+  possibleUsers: string[],
+  impossibleUsers: string[]
+}
+
+
 export const completeTime = async (
   partyId: string,
   data: CompleteData
@@ -37,6 +49,20 @@ export const completeTime = async (
       }
     );
     return response;
+  } catch (error) {
+    console.error("에러 발생: ", error);
+    throw error;
+  }
+};
+
+export const getDecision = async (data: TableId): Promise<GetCompleteResponse> => {
+  try {
+    const response = await axiosInstance.get(`/decision/${data.table_id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
   } catch (error) {
     console.error("에러 발생: ", error);
     throw error;

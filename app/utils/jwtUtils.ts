@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 import { decode } from "js-base64";
 export interface KakaoUserPayload extends JwtPayload {
   kakao_user_id: number; // 카카오 사용자 ID
@@ -7,7 +7,7 @@ export interface KakaoUserPayload extends JwtPayload {
 }
 
 // secretKey를 환경 변수에서 가져옵니다.
-const secretKey = Buffer.from(process.env.NEXT_PUBLIC_JWT_SECRET as string, 'utf-8');
+// const secretKey = Buffer.from(process.env.NEXT_PUBLIC_JWT_SECRET as string, 'utf-8');
 
 
 export const decodeJWT = (token: string): JwtPayload | null => {

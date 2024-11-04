@@ -1,39 +1,59 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // App Router에서 useParams 사용
 import { getTable } from "@/app/api/getTableAPI"; // API 호출 주석 처리
-import { useRecoilValue, useRecoilState } from "recoil";
-import { selectedAvatarState } from "@/app/recoil/atom";
+import { GoShareAndroid } from "react-icons/go";
+import { useRecoilState } from "recoil";
+// import { selectedAvatarState } from "@/app/recoil/atom";
 import { MdContentPaste } from "react-icons/md";
-import { HiUserCircle } from "react-icons/hi2";
+// import { HiUserCircle } from "react-icons/hi2";
 import TimeTable from "@/app/components/createParty/TimeTable";
 import Image from "next/image";
 import { FiCalendar } from "react-icons/fi";
 import Modal from "react-modal";
-import {kakaoUserState, userIdValue } from "@/app/recoil/atom";
+import { kakaoUserState, userIdValue } from "@/app/recoil/atom";
 import KakaoLogin from "@/app/components/login/KakaoLogin";
 import TimeSelector from "@/app/components/getParty/VoteTable";
 import PartyPriority from "@/app/components/getParty/PartyPriority";
 import TableLogin from "@/app/components/login/TableLogin";
 import { Party } from "@/app/api/getTableAPI"; // interfaces 파일의 경로
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  getUserAvatar,
+  GetUserAvatarResponse,
+} from "@/app/api/getUserAvatarAPI";
+import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
+import { decodeJWT } from "@/app/utils/jwtUtils";
+import { LoginData } from "@/app/api/tableLogin";
+import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
+// import { Router } from "next/router";
+import { GetCompleteResponse, getDecision } from "@/app/api/partyCompleteAPI";
+// import { tableRefreshTrigger } from "@/app/recoil/atom";
 
-interface TableData {
+export interface TableData {
   party: Party;
   formattedDates: string[];
   startTime: string;
   endTime: string;
-  convertedTimeslots: {
-    userId: number;
-    username: string;
-    byteString: string;
+  dates: {
+    dateId: number;
+    selected_date: string;
+    convertedTimeslots: {
+      userId: number;
+      userName: string;
+      byteString: string;
+    }[];
   }[];
 }
 
+
 export default function MeetingPage() {
+  const router = useRouter();
   const { hash } = useParams(); // meetingId를 URL에서 추출
   const [tableData, setTableData] = useState<TableData | null>(null);
-  const isLoggedIn = useRecoilValue(loginState);
+  // const isLoggedIn = useRecoilValue(loginState);
   const [, setLoading] = useState(false);
   const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
   const [selectedAvatar, setSelectedAvatar] =
@@ -43,15 +63,19 @@ export default function MeetingPage() {
     "calendar"
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [globalKakaoState, setGlobalKakaoState] = useRecoilState(kakaoUserState); // Recoil 상태 사용
-  const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue)
+  const [globalKakaoState, setGlobalKakaoState] =
+    useRecoilState(kakaoUserState); // Recoil 상태 사용
+  const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue);
+  // const refreshValue = useRecoilValue(tableRefreshTrigger);
+
+  const handleLogoClick = () => {
+    router.push(`/`);
+  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-  useEffect(()=>{
-    
-  })
+  useEffect(() => {});
   useEffect(() => {
     const fetchKakaoData = async () => {
       const jwt = await loadFromLocalStorage("kakaoUserJWT");
@@ -61,20 +85,20 @@ export default function MeetingPage() {
           nickname: kakaoData?.nickname as string,
           kakaoUserId: kakaoData?.kakao_user_id as number,
           profile_image: kakaoData?.profile_image as string,
-        }
+        };
 
-        const loginDate:LoginData = {
+        const loginDate: LoginData = {
           userName: KakaoData_obj.nickname,
           password: null,
           partyId: hash as string,
           isKakao: true,
-          kakaoUserId: KakaoData_obj.kakaoUserId
-        }
-        await tableLoginHandler(loginDate ,setGlobalUserId)
-        
-        setGlobalKakaoState(KakaoData_obj)
+          kakaoUserId: KakaoData_obj.kakaoUserId,
+        };
+        await tableLoginHandler(loginDate, setGlobalUserId);
+
+        setGlobalKakaoState(KakaoData_obj);
       }
-    }
+    };
     if (hash) {
       setLoading(true);
 
@@ -89,12 +113,14 @@ export default function MeetingPage() {
             const localDate = new Date(date.selected_date);
             return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식으로 변환
           });
+
           const timeslots = tableDataResponse.party.dates.map((date) => ({
-            dateId: date.dateId,
-            timeslots: (date.convertedTimeslots || []).map((slot) => ({
-              userId: slot.userId,
-              username: slot.username,
-              byteString: slot.byteString,
+            dateId: date.dateId as number,
+            selected_date: date.selected_date as string,
+            convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
+              userId: slot.userId as number,
+              userName: slot.userName as string,
+              byteString: slot.byteString as string,
             })),
           }));
 
@@ -114,17 +140,18 @@ export default function MeetingPage() {
 
           // 두 번째 API 응답 처리
           setUsers(userAvatarResponse);
-          console.log(users);
+          console.log(userAvatarResponse);
           // 상태 업데이트
           setTableData({
             ...tableDataResponse,
             formattedDates: dates,
             startTime: startTime,
             endTime: endTime,
-            timeslots: timeslots,
+            dates: timeslots,
           });
+
           console.log(tableData);
-          fetchKakaoData()
+          fetchKakaoData();
           setLoading(false); // API 호출이 끝나면 loading 해제
         })
         .catch((error) => {
@@ -134,7 +161,21 @@ export default function MeetingPage() {
           setLoading(false); // 모든 API 호출이 끝나면 loading 해제
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash]);
+
+  useEffect(() => {
+    if (tableData?.party.decisionDate && hash) {
+      getDecision({ table_id: hash as string})
+        .then((decisionData: GetCompleteResponse) => {
+          console.log("possibleUsers:", decisionData.possibleUsers);
+          console.log("impossibleUsers:", decisionData.impossibleUsers);
+        })
+        .catch((error) => {
+          console.error("getDecision API 호출 에러:", error);
+        });
+    }
+  }, [tableData?.party.decisionDate, hash]);
 
   return (
     <>
@@ -147,11 +188,11 @@ export default function MeetingPage() {
               width={80}
               height={80}
               className="mb-[50%] cursor-pointer"
-              onClick={handleLogoCLick}
+              onClick={handleLogoClick}
             />
             <div className="flex flex-col items-center">
               <Link
-                href={'/meetlist'}
+                href={"/meetlist"}
                 className={`content w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer mb-[50%] ${
                   selectedButton === "content"
                     ? "bg-white text-black"
@@ -219,12 +260,12 @@ export default function MeetingPage() {
                       )}
                       <div className="inset-0 rounded-full bg-[#6161CE] backdrop-blur-[2px]"></div>
                     </div>
-                    {/* 선택된 아바타의 이름 표시 */}
                     {selectedAvatar?.userId === user.userId && (
                       <div
                         className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-md shadow-md text-xs text-gray-700"
                         style={{ whiteSpace: "nowrap" }}
                       >
+                        {/* {user.userName.match(/\((\d+)\)/)?.[1] === 1} */}
                         {user.userName}
                       </div>
                     )}
@@ -234,35 +275,104 @@ export default function MeetingPage() {
             </div>
           </div>
         </div>
-        <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
-          <div className="flex flex-col mr-[2%] basis-1/4 items-center">
-            <div className="w-full flex flex-col mb-[10px]">
-              <span className="font-pretendard font-[600] text-[30px] text-[#6161CE]">
-                {tableData?.party.partyName}
-              </span>
-              <span className="font-pretendard font-[400] text-[15px] text-[#aaa] pl-[2%]">
+        {tableData?.party.decisionDate ? (
+          // decisionDate가 true일 때 보여줄 내용
+          <div className="w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-col gap-[2%]">
+            <div className="w-[65%] rounded-[10px] h-[10%] box-border">
+              <div className="Title font-pretendard text-[25px] font-[600] flex flex-row box-border items-center justify-between">
+                <div className="font-pretendard text-[25px] font-[600] flex flex-row">
+                  {tableData?.party.partyName}
+                </div>
+                <div className="ml-[2%] font-pretendard text-[15px] rounded-[50px] border-1 flex items-center justify-center bg-[#6161CE] text-white w-[6%]">
+                  확정
+                </div>
+                <div
+                  className="flex items-center justify-center rounded-full border w-[4%] aspect-square bg-white cursor-pointer"
+                  style={{
+                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // 원하는 그림자 값
+                  }}
+                >
+                  <GoShareAndroid size={18} />
+                </div>
+              </div>
+              <div className="font-pretendard text-[18px] font-[400] text-[#5E5E5E] pl-2">
                 {tableData?.party.partyDescription}
-              </span>
+              </div>
             </div>
-            <PartyPriority />
-            {( globalKakaoState.kakaoUserId !== null || globalUserId) && tableData ? (
-              <TimeSelector party={tableData.party} />
-            ) : (
-              <TableLogin />
-            )}
+            <div className="flex flex-row w-full h-[90%] gap-[5%]">
+              <div className="w-[65%] h-full">
+                <TimeTable />
+              </div>
+              <div className="president w-[30%] h-full flex flex-col items-center justify-between">
+                <div className="relative flex flex-col gap-[10%] w-full items-center">
+                  <div className="w-full font-pretendard text-[20px] font-[600] text-[#ccc]">
+                    대표자
+                  </div>
+                  {users
+                    .filter((user) => user.userName === tableData?.party.userId)
+                    .map((user, index) => (
+                      <div
+                        key={user.userId}
+                        className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center transition-transform duration-300`}
+                        style={{
+                          top: `${index * -45}px`,
+                          zIndex: 10 + index,
+                        }}
+                      >
+                        <div className="relative w-full h-full rounded-full overflow-hidden">
+                          {user.profileImage == null ? (
+                            <Image
+                              src={`/images/sample_avatar${index + 1}.png`}
+                              alt={user.userName}
+                              width={79}
+                              height={79}
+                              className="rounded-full"
+                            />
+                          ) : (
+                            <Image
+                              src={user.profileImage}
+                              alt={user.userName}
+                              width={79}
+                              height={79}
+                              className="rounded-full"
+                            />
+                          )}
+                          <div className="inset-0 rounded-full bg-[#6161CE] backdrop-blur-[2px]"></div>
+                        </div>
+                      </div>
+                    ))}
+                  <div className="text-center font-pretendard font-[600]">
+                    {tableData?.party.userId}
+                  </div>
+                </div>
+                <PartyPriority />
+              </div>
+            </div>
           </div>
-          {/* TimeTable 컴포넌트에 변환된 날짜와 시간 전달 */}
-          {tableData !== null && (
-            <TimeTable
-              Dates={tableData.formattedDates}
-              startTime={tableData.startTime}
-              endTime={tableData.endTime}
-              voteTimeslots={tableData.timeslots}
-            />
-          )}
-        </div>
+        ) : (
+          <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
+            <div className="flex flex-col mr-[2%] items-center">
+              <div className="w-full flex flex-col mb-[10px]">
+                <span className="font-pretendard font-[600] text-[30px] text-[#6161CE]">
+                  {tableData?.party.partyName}
+                </span>
+                <span className="font-pretendard font-[400] text-[15px] text-[#aaa] pl-[2%]">
+                  {tableData?.party.partyDescription}
+                </span>
+              </div>
+              <PartyPriority />
+              {(globalKakaoState.kakaoUserId !== null || globalUserId) &&
+              tableData ? (
+                <TimeSelector party={tableData.party} />
+              ) : (
+                <TableLogin />
+              )}
+            </div>
+            {tableData !== null && <TimeTable />}
+          </div>
+        )}
         <div
-          className={`absolute transition-all duration-300 z-0 ${
+          className={`toggle absolute transition-all duration-300 z-0 ${
             selectedButton === "calendar"
               ? "top-[31%] left-[10.5%]"
               : "top-[18%] left-[10.5%]"

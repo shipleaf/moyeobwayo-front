@@ -13,7 +13,7 @@ const TimeBlock: React.FC<TimeBlockProps> = ({ style, className }) => {
       style={{
         ...style, // 전달받은 style을 적용
       }}
-      className={`${className} p-[5px] border border-solid border-[#EBEBEB]`}
+      className={`${className} p-[5px] border border-solid border-[#EBEBEB] box-border`}
     ></div>
   );
 };

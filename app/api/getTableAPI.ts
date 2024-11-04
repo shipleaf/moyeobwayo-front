@@ -13,7 +13,7 @@ export interface UserEntity {
 // Timeslot representing each time slot with user entity information
 export interface Timeslot {
   userId: number,
-  username: string,
+  userName: string,
   byteString: string;
 }
 
@@ -32,17 +32,20 @@ export interface Party {
   partyDescription: string;
   startDate: string;
   endDate: string;
-  decisionDate: string;
+  decisionDate: boolean;
   userId: string;
   locationName: string;
-  alarms: boolean[]; // 알람 배열
+  alarms: boolean[];
   dates: PartyDate[]; // 날짜 배열
 }
 
 export interface AvailableTimesResponse {
   start: string;
   end: string;
-  users: string[];
+  users: {
+    userName: string;
+    userId: number;
+  }[];
 }
 
 // Response structure for getTable API
