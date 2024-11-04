@@ -16,7 +16,7 @@ export default function Header() {
   const [alarm, ] = useState<boolean>(true);
   const [globalKakaoUserState, setKakaoUserState] = useRecoilState(kakaoUserState);
   const router = useRouter()
-  console.log('partyId', partyId); // partyId 로그 확인
+  console.log('partyId', partyId);
 
   useEffect(() => {
     const checkUserStatus = async () => {

@@ -82,7 +82,6 @@ export default function Page() {
         <Suspense>
           <Header />
         </Suspense>
-
         {/* Content */}
         <section className="flex gap-6">
           {/* List with Suspense */}
