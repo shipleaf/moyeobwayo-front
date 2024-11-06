@@ -66,7 +66,6 @@ export default function KakaoLogin() {
             <span className="font-pretendard font-[600] text-[32px] mb-4">
               간편로그인 후 <br /> 내 일정을 한번에 확인해보세요!
             </span>
-
             <div className="mb-[157px]">
               <span className="text-[#6161CE] font-pretendard font-[600] text-[20px]">
                 10초

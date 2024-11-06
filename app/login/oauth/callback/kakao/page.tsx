@@ -62,6 +62,7 @@ function KakaoCallback() {
     };
 
     handleLogin();
+    //eslint-disable-next-line
   }, [code]);
 
   return (
