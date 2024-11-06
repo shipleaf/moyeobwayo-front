@@ -11,6 +11,7 @@ import { userIdValue, tableRefreshTrigger } from "@/app/recoil/atom";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { CheckFat } from "@phosphor-icons/react";
+import Image from "next/image";
 
 // 날짜 포맷 함수
 const formatDateTime = (dateTime: string, includeDate: boolean = true) => {
@@ -74,16 +75,17 @@ export default function PartyPriority() {
   const handleComplete = async (timeSlot: TimeSlot) => {
     if (!hash) return;
 
-    const selectedDate = new Date(timeSlot.start).toISOString().split("T")[0];
-
+    const selectedDate = timeSlot.start.split("T")[0]; // "2024-11-22"
     console.log("Selected Date:", selectedDate);
     console.log("Priority Data Dates:", priorityData?.party.dates);
 
     // dates에서 해당 날짜에 맞는 dateId를 찾기
     const matchingDate = priorityData?.party.dates.find((date) => {
-      const dateOnly = new Date(date.selected_date).toISOString().split("T")[0];
+      const dateOnly = date.selected_date.split("T")[0]; // "2024-11-22"
       return dateOnly === selectedDate;
     });
+
+    console.log(matchingDate);
 
     console.log(matchingDate);
 
@@ -119,14 +121,14 @@ export default function PartyPriority() {
       }
     } catch (error) {
       console.error("확정 요청 에러: ", error);
-      alert("확정하는 중 오류가 발생했습니다.");
+      alert("일정을 확정하려면 로그인이 필요합니다!");
     }
   };
 
   // 모달 닫기 및 페이지 이동
   const closeModalAndNavigate = () => {
     setShowModal(false);
-    router.refresh(); // 페이지 새로고침
+    window.location.reload();
   };
 
   return (
@@ -173,9 +175,24 @@ export default function PartyPriority() {
                     {timeSlot.users.map((user, idx) => (
                       <div
                         key={idx}
-                        className="username text-[#8E8E8E] border-1 rounded-[10px] px-[8px] py-[4px] m-[2px] max-w-[80px] overflow-hidden text-ellipsis whitespace-nowrap"
+                        className="username text-[#8E8E8E] border-1 rounded-[10px] px-[8px] py-[4px] m-[2px] max-w-[80px] overflow-hidden text-ellipsis whitespace-nowrap relative group"
                       >
-                        <p>{user}</p>
+                        <p className="flex flex-row items-center justify-between">
+                          {user.replace(/\(\d+\)$/, "")}
+                          {/\(\d+\)$/.test(user) && (
+                            <Image
+                              src="/images/kakaotalk_sharing_btn_small_ov.png"
+                              alt="Exclamation Icon"
+                              width={10}
+                              height={10}
+                              className="inline-block w-4 h-4"
+                            />
+                          )}
+                        </p>
+                        {/* 툴팁 */}
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-700 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
+                          {user}
+                        </div>
                       </div>
                     ))}
                   </div>

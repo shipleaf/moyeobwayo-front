@@ -90,8 +90,6 @@ export default function Page() {
               <MeetList />
             </Suspense>
           </div>
-
-          {/* Detail with Suspense */}
           <div className="w-full relative">
             <Suspense fallback={<MeetDetailFallback />}>
               <MeetDetail />
@@ -99,7 +97,6 @@ export default function Page() {
           </div>
         </section>
       </div>
-
       <div
         className={`absolute transition-all duration-300 z-0 ${"top-[18%] left-[10.5%]"}`}
       >

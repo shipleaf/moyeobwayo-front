@@ -48,7 +48,6 @@ export interface TableData {
   }[];
 }
 
-
 export default function MeetingPage() {
   const router = useRouter();
   const { hash } = useParams(); // meetingId를 URL에서 추출
@@ -166,7 +165,7 @@ export default function MeetingPage() {
 
   useEffect(() => {
     if (tableData?.party.decisionDate && hash) {
-      getDecision({ table_id: hash as string})
+      getDecision({ table_id: hash as string })
         .then((decisionData: GetCompleteResponse) => {
           console.log("possibleUsers:", decisionData.possibleUsers);
           console.log("impossibleUsers:", decisionData.impossibleUsers);
@@ -351,7 +350,7 @@ export default function MeetingPage() {
           </div>
         ) : (
           <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-row">
-            <div className="flex flex-col mr-[2%] items-center">
+            <div className="flex flex-col mr-[2%] items-center w-[25%]">
               <div className="w-full flex flex-col mb-[10px]">
                 <span className="font-pretendard font-[600] text-[30px] text-[#6161CE]">
                   {tableData?.party.partyName}
@@ -368,7 +367,7 @@ export default function MeetingPage() {
                 <TableLogin />
               )}
             </div>
-            {tableData !== null && <TimeTable />}
+            <div className="w-[75%]">{tableData !== null && <TimeTable />}</div>
           </div>
         )}
         <div
