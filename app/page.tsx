@@ -6,11 +6,13 @@ import { CalendarBlank, Clipboard } from "@phosphor-icons/react/dist/ssr";
 import SampleAvatarList from "./components/SampleAvatarList";
 import SampleTimeTable from "./components/SampleTimeTable";
 import Footer from "./components/common/Footer";
+import MeetPageRedirectHandler from "./components/MeetPageRedirectHandler";
 
 // 예시 사용자 데이터
 export default function Home() {
   return (
     <>
+      <MeetPageRedirectHandler></MeetPageRedirectHandler>
       <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
         <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
           <div className="flex flex-col items-center">
