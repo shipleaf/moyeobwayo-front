@@ -5,6 +5,7 @@ import { LoginData } from "@/app/api/tableLogin";
 import { useParams } from "next/navigation"; // useParams를 import
 import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
+import Image from "next/image";
 
 export default function TableLogin() {
   const { hash } = useParams() as { hash: string }; // hash를 string으로 단언
@@ -68,12 +69,32 @@ export default function TableLogin() {
             className="p-[10px] border-1 bg-[#f9fbfc] rounded-[10px] focus:outline-none focus:border-[#285cc4] focus:bg-[#fff]"
           />
         </div>
-        <button
-          type="submit"
-          className="bg-[#6161cE] mt-[10%] w-[80%] h-[5vh] text-white rounded-[10px]"
-        >
-          로그인하기
-        </button>
+        {/* Button Groups */}
+        <div className="w-full flex flex-col items-center mt-[10%] space-y-4">
+          <button
+            type="submit"
+            className="p-3  rounded-lg w-4/5 bg-[#6161cE] text-white"
+          >
+            로그인하기
+          </button>
+
+          <button
+            type="button"
+            className="p-3  rounded-lg w-4/5 bg-[#FDE500] text-[#3B1D04] hover:bg-[#E5C900] flex items-center justify-center gap-2"
+            onClick={() => {
+              // Add your Kakao login functionality here
+            }}
+          >
+            <Image
+              src="/images/KakaoLogo.png"
+              alt="Kakao Logo"
+              width={20}
+              height={20}
+            />
+            카카오로 시작
+          </button>
+        </div>
+         
       </form>
     </div>
   );
