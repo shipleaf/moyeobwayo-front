@@ -231,7 +231,7 @@ export default function MeetingPage() {
                     onClick={() => setSelectedAvatar(user)}
                     className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 ${
                       selectedAvatar?.userId === user.userId
-                        ? "translate-y-[-20px] ring-4 ring-blue-500"
+                        ? "translate-y-[-20px] ring-2 ring-purple-400"
                         : ""
                     }`}
                     style={{
@@ -278,11 +278,11 @@ export default function MeetingPage() {
           // decisionDate가 true일 때 보여줄 내용
           <div className="w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-col gap-[2%]">
             <div className="w-[65%] rounded-[10px] h-[10%] box-border">
-              <div className="Title font-pretendard text-[25px] font-[600] flex flex-row box-border items-center justify-between">
+              <div className="Title font-pretendard text-[25px] font-[600] flex flex-row box-border items-center justify-start gap-2">
                 <div className="font-pretendard text-[25px] font-[600] flex flex-row">
                   {tableData?.party.partyName}
                 </div>
-                <div className="ml-[2%] font-pretendard text-[15px] rounded-[50px] border-1 flex items-center justify-center bg-[#6161CE] text-white w-[6%]">
+                <div className="ml-[2%] py-[6px] px-3 font-pretendard text-[15px] rounded-[50px] border-1  bg-[#6161CE] text-white ">
                   확정
                 </div>
                 <div
@@ -304,8 +304,8 @@ export default function MeetingPage() {
               </div>
               <div className="president w-[30%] h-full flex flex-col items-center justify-between">
                 <div className="relative flex flex-col gap-[10%] w-full items-center">
-                  <div className="w-full font-pretendard text-[20px] font-[600] text-[#ccc]">
-                    대표자
+                  <div className="w-full font-pretendard text-[24px] font-[600] text-[#686868] text-center">
+                    {"모임장"} 
                   </div>
                   {users
                     .filter((user) => user.userName === tableData?.party.userId)
