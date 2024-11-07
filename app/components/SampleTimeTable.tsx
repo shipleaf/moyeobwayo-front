@@ -79,7 +79,7 @@ function generateDummyData(): PartyDate[] {
     timeslots: [
       { userId: 1, dateId: 2, byteString: "100000101111", userName: "제시카" },
       { userId: 2, dateId: 2, byteString: "111111000111", userName: "존" },
-      { userId: 3, dateId: 2, byteString: "000101111111", userName: "사라" },
+      { userId: 3, dateId: 2, byteString: "000101111000", userName: "사라" },
     ],
   });
 
@@ -87,15 +87,13 @@ function generateDummyData(): PartyDate[] {
     dateId: 3,
     timeslots: [
       { userId: 1, dateId: 3, byteString: "100000000111", userName: "제시카" },
-      { userId: 2, dateId: 3, byteString: "000111111111", userName: "존" },
-      { userId: 3, dateId: 3, byteString: "110110000111", userName: "사라" },
+      { userId: 3, dateId: 3, byteString: "110110000000", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 4,
     timeslots: [
-      { userId: 1, dateId: 4, byteString: "101010101111", userName: "제시카" },
       { userId: 2, dateId: 4, byteString: "010101010111", userName: "존" },
       { userId: 3, dateId: 4, byteString: "111111111111", userName: "사라" },
     ],
@@ -104,7 +102,6 @@ function generateDummyData(): PartyDate[] {
   dummyData.push({
     dateId: 5,
     timeslots: [
-      { userId: 1, dateId: 5, byteString: "000000111111", userName: "제시카" },
       { userId: 2, dateId: 5, byteString: "111111111111", userName: "존" },
       { userId: 3, dateId: 5, byteString: "101010101111", userName: "사라" },
     ],
