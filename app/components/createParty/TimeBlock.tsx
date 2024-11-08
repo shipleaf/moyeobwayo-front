@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MemberStatusPopup from '../getParty/MemberStatusPopup';
-
+import { VotedUser } from './TimeTable';
 interface TimeBlockProps {
   time: string;
   style?: React.CSSProperties;
@@ -8,25 +8,31 @@ interface TimeBlockProps {
   startTime?: Date
   targetDate?: Date
   hourlyLabels?: string
+  dateLength?: number  // timeSlot의 길이임
   slotIndex?: number
-  dateLength?: number
+  dayLength?: number
+  dayIndex?:number
   maxVotes? : number
+  votes? : number
+  votedUsersData?:VotedUser[] 
 }
 
 const TimeBlock: React.FC<TimeBlockProps> = ({
   time,
   style,
   className,
-  startTime = new Date(), // 기본값으로 현재 시간을 설정
   targetDate,
-  hourlyLabels = '',
   slotIndex,
   dateLength,
-  maxVotes
+  maxVotes,
+  votes,
+  votedUsersData,
+  dayIndex,
+  dayLength
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  console.log('rbrbrbr', dateLength, slotIndex)
   const popupTopPosition = slotIndex && dateLength && dateLength - slotIndex <= 5 ? '-500%' : '10%';
+  const popupSidePosition = dayIndex && dayLength &&  dayLength - dayIndex <= 2 ? '-240px' : '0' 
   return (
     <div
       style={{
@@ -43,7 +49,7 @@ const TimeBlock: React.FC<TimeBlockProps> = ({
         style={{
           position: 'absolute',
           top: popupTopPosition,
-          left: '0',
+          left: popupSidePosition,
           pointerEvents: 'none',
         }}
       >
@@ -51,6 +57,8 @@ const TimeBlock: React.FC<TimeBlockProps> = ({
           time={time}
           targetDate={targetDate}
           maxVotes={maxVotes}
+          votes={votes}
+          votedUsersData={votedUsersData}
         />
       </div>
       )}

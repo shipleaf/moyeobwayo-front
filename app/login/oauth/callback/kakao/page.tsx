@@ -7,8 +7,8 @@ import {
   linkKakaoAndPartyUser,
   sendAuthCodeToBackend,
 } from "@/app/api/kakaoLoginAPI";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { kakaoUserState, userIdValue } from "@/app/recoil/atom";
+import { useSetRecoilState } from "recoil";
+import { kakaoUserState } from "@/app/recoil/atom";
 import { saveToLocalStorage } from "@/app/recoil/recoilUtils";
 import { decodeJWT } from "@/app/utils/jwtUtils";
 
@@ -22,7 +22,7 @@ function KakaoCallback() {
   const redirectUri: string = process.env
     .NEXT_PUBLIC_KAKAO_LOGIN_REDIRECT_URI as string;
   const [isKakaoReady, setIsKakaoReady] = useState(false);
-  const globalUserId = useRecoilValue(userIdValue);
+  // const globalUserId = useRecoilValue(userIdValue);
 
   const scope = [
     "profile_nickname",
