@@ -187,9 +187,9 @@ export default function SampleTimeTable() {
           ))}
         </div>
         <div className="flex flex-grow gap-[10px]">
-          {dummyData.map((day, dateIndex) => (
+          {dummyData.map((day, dateIndex, dayArray) => (
             <div key={dateIndex} className="flex-grow">
-              {timeSlots.map((timeSlot, slotIndex) => {
+              {timeSlots.map((timeSlot, slotIndex, timeSlotArray) => {
                 let votes = 0;
 
                 if (selectedAvatar) {
@@ -209,10 +209,13 @@ export default function SampleTimeTable() {
                   );
                 }
                 const colorLevel = getGradationNum(votes, maxVotes);
-
                 return (
                   <TimeBlock
                     key={`${dateIndex}-${slotIndex}`}
+                    dayLength={dayArray.length}
+                    dayIndex={dateIndex}
+                    dateLength={timeSlotArray.length}
+                    maxVotes={maxVotes}
                     time={`${getWeekday(dates[dateIndex])} ${dates[
                       dateIndex
                     ].getDate()} ${timeSlot}`}

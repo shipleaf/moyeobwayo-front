@@ -1,6 +1,7 @@
 import { CalendarBlank, Clock } from '@phosphor-icons/react/dist/ssr';
 import React from 'react'
 import AvatarList from './AvatarList';
+import { VotedUser } from '../createParty/TimeTable';
 
 interface MemberStatusPopupProps {
   time?: string;
@@ -9,17 +10,10 @@ interface MemberStatusPopupProps {
   maxNum?: number;
   avatarSources?: string[];
   targetDate?: Date;
+  maxVotes?:number
+  votes?:number
+  votedUsersData?:VotedUser[];
 }
-const possibleUsers:string[] = [
-  '규성',
-  '시현',
-  '형석'
-]
-const dummyAvatarList:string[] = [
-  '/images/sample_avatar1.png',
-  '/images/sample_avatar2.png',
-  '/images/sample_avatar3.png',
-]
 
 const parseTimeWithEnd = (time: string): { startTime: string; endTime: string } => {
   // time 형식: "SUN 10 11:30"
@@ -54,11 +48,19 @@ const formatKoreanDate = (date: Date): string => {
     day: 'numeric',
   });
 };
-export default function MemberStatusPopup({time, targetDate}:MemberStatusPopupProps) {
+export default function MemberStatusPopup({
+  time, 
+  targetDate, 
+  maxVotes,
+  votedUsersData,
+  votes
+}:MemberStatusPopupProps) {
   // target Date가 한국 표준시 기준인데... 여기서 2024년 10월 15일 이런format으로 바꿔주는 함수좀 알려줘
   const { startTime, endTime } = time ? parseTimeWithEnd(time) : { startTime: '', endTime: '' };
   const formattedDate = targetDate ? formatKoreanDate(targetDate) : '';
-  
+  const maxUsers =  maxVotes?  `${maxVotes}` : '?'
+  const currentUsers =  votes !== undefined ?  `${votes}` : '?'
+  const finalVotedUsersData = votedUsersData? votedUsersData : [];
   return (
     <div className='py-[15px] px-6 bg-white bg-opacity-80 absolute z-10 w-[240px] rounded-[6px]'>
       <h1 className='text-[24px] font-bold mb-5'>
@@ -93,8 +95,8 @@ export default function MemberStatusPopup({time, targetDate}:MemberStatusPopupPr
         </div>
       </div>
 
-      <p className='font-semibold text-[14px] mb-1'>2/5 명</p>
-      <AvatarList possibleUsers={possibleUsers} srcList={dummyAvatarList}/>
+      <p className='font-semibold text-[14px] mb-1'>{currentUsers}/{maxUsers} 명</p>
+      <AvatarList votedUsers={finalVotedUsersData}/>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation"; // useRouter 추가
+import { useParams } from "next/navigation"; // useRouter 추가
 import { getTable } from "@/app/api/getTableAPI";
 import {
   GetTableResponse,
@@ -50,7 +50,6 @@ const convertAvailableTimeToTimeSlot = (
 
 export default function PartyPriority() {
   const { hash } = useParams();
-  const router = useRouter();
   const [priorityData, setPriorityData] = useState<GetTableResponse | null>(
     null
   );

@@ -300,7 +300,7 @@ export default function MeetingPage() {
             </div>
             <div className="flex flex-row w-full h-[90%] gap-[5%]">
               <div className="w-[65%] h-full">
-                <TimeTable />
+                <TimeTable userList={users}/>
               </div>
               <div className="president w-[30%] h-full flex flex-col items-center justify-between">
                 <div className="relative flex flex-col gap-[10%] w-full items-center">
@@ -321,7 +321,7 @@ export default function MeetingPage() {
                         <div className="relative w-full h-full rounded-full overflow-hidden">
                           {user.profileImage == null ? (
                             <Image
-                              src={`/images/sample_avatar${index + 1}.png`}
+                              src={`/images/sample_avatar${(index + 1)%3}.png`}
                               alt={user.userName}
                               width={79}
                               height={79}
@@ -367,7 +367,7 @@ export default function MeetingPage() {
                 <TableLogin />
               )}
             </div>
-            <div className="w-[75%]">{tableData !== null && <TimeTable />}</div>
+            <div className="w-[75%]">{tableData !== null && <TimeTable userList={users} />}</div>
           </div>
         )}
         <div
