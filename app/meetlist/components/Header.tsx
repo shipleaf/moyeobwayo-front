@@ -13,7 +13,7 @@ export default function Header() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const partyId = searchParams.get('partyId')
-
+  const [alarmID, setAlarmID] = useState<number | null>(null)
   const [alarm, setAlarm] = useState<boolean>(true);
   const [globalKakaoUserState, setGloabalKakaoUserState] = useRecoilState(kakaoUserState);
   
@@ -58,6 +58,8 @@ export default function Header() {
           });
           if (res) {
             console.log(res);
+            setAlarm(res.alarm_on)
+            setAlarmID(res.alarmId)
           }
         } catch (error) {
           console.error("Error fetching alarm state:", error);
@@ -98,7 +100,7 @@ export default function Header() {
           로그아웃
         </button>
 
-        <AlarmHandler alarm={alarm} setAlarm={setAlarm}></AlarmHandler>
+        <AlarmHandler alarm={alarm} setAlarm={setAlarm} alarmID={alarmID}></AlarmHandler>
       </div>
     </header>
   );

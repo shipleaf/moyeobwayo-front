@@ -2,13 +2,15 @@ import React from 'react';
 
 interface ToggleProps {
   isToggled: boolean;
-  setAlarm: React.Dispatch<React.SetStateAction<boolean>>
+  handleAlarmToggle: () => Promise<void>
 }
 
-const Toggle: React.FC<ToggleProps> = ({ isToggled, setAlarm}) => {
+const Toggle: React.FC<ToggleProps> = ({ isToggled, handleAlarmToggle}) => {
   return (
     <div
-      onClick={()=>{setAlarm(!isToggled)}}
+    onClick={async () => {
+      await handleAlarmToggle();
+    }}
       className={`w-10 h-5 rounded-full cursor-pointer flex items-center transition-colors py-1
       duration-300 ${isToggled ? 'bg-[#4A4ACC]' : 'bg-[#5F5F5F]'}`}
     >
