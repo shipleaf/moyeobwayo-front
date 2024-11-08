@@ -61,7 +61,7 @@ export default function MeetList() {
           const hours = date.getHours();
           const minutes = date.getMinutes().toString().padStart(2, "0");
 
-          let TimeLabel = `${month}월 ${day}일 ${hours}:${minutes}`;
+          const TimeLabel = `${month}월 ${day}일 ${hours}:${minutes}`;
 
           // // 확정 상태의 TimeLabel 계산(2차출시때 고려)
           // if (meet.decisionDate !== null && meet.decisionDate === true) {

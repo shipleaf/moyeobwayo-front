@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // App Router에서 useParams 사용
 import { getTable } from "@/app/api/getTableAPI"; // API 호출 주석 처리
 import { GoShareAndroid } from "react-icons/go";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 // import { selectedAvatarState } from "@/app/recoil/atom";
 import { MdContentPaste } from "react-icons/md";
 // import { HiUserCircle } from "react-icons/hi2";
@@ -12,7 +12,11 @@ import TimeTable from "@/app/components/createParty/TimeTable";
 import Image from "next/image";
 import { FiCalendar } from "react-icons/fi";
 import Modal from "react-modal";
-import { kakaoUserState, userIdValue } from "@/app/recoil/atom";
+import {
+  kakaoUserState,
+  userIdValue,
+  userNumberState,
+} from "@/app/recoil/atom";
 import KakaoLogin from "@/app/components/login/KakaoLogin";
 import TimeSelector from "@/app/components/getParty/VoteTable";
 import PartyPriority from "@/app/components/getParty/PartyPriority";
@@ -57,6 +61,7 @@ export default function MeetingPage() {
   const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
   const [selectedAvatar, setSelectedAvatar] =
     useState<GetUserAvatarResponse | null>(null);
+  const setGlobalTotalNum = useSetRecoilState(userNumberState);
 
   const [selectedButton, setSelectedButton] = useState<"calendar" | "content">(
     "calendar"
@@ -68,7 +73,7 @@ export default function MeetingPage() {
   // const refreshValue = useRecoilValue(tableRefreshTrigger);
 
   const handleLogoClick = () => {
-    router.push(`/`); 
+    router.push(`/`);
   };
 
   const handleCloseModal = () => {
@@ -139,7 +144,8 @@ export default function MeetingPage() {
 
           // 두 번째 API 응답 처리
           setUsers(userAvatarResponse);
-          console.log(userAvatarResponse);
+          setGlobalTotalNum(userAvatarResponse.length);
+
           // 상태 업데이트
           setTableData({
             ...tableDataResponse,
@@ -148,8 +154,6 @@ export default function MeetingPage() {
             endTime: endTime,
             dates: timeslots,
           });
-
-          console.log(tableData);
           fetchKakaoData();
           setLoading(false); // API 호출이 끝나면 loading 해제
         })
@@ -264,8 +268,8 @@ export default function MeetingPage() {
                         className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-md shadow-md text-xs text-gray-700"
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        {/* {user.userName.match(/\((\d+)\)/)?.[1] === 1} */}
-                        {user.userName}
+                        {user.userName.split('(')[0]}
+                        {/* {user.userName} */}
                       </div>
                     )}
                   </div>
@@ -300,7 +304,7 @@ export default function MeetingPage() {
             </div>
             <div className="flex flex-row w-full h-[90%] gap-[5%]">
               <div className="w-[65%] h-full">
-                <TimeTable userList={users}/>
+                <TimeTable userList={users} />
               </div>
               <div className="president w-[30%] h-full flex flex-col items-center justify-between">
                 <div className="relative flex flex-col gap-[10%] w-full items-center">
@@ -321,7 +325,9 @@ export default function MeetingPage() {
                         <div className="relative w-full h-full rounded-full overflow-hidden">
                           {user.profileImage == null ? (
                             <Image
-                              src={`/images/sample_avatar${(index + 1)%3}.png`}
+                              src={`/images/sample_avatar${
+                                (index + 1) % 3
+                              }.png`}
                               alt={user.userName}
                               width={79}
                               height={79}
@@ -341,7 +347,7 @@ export default function MeetingPage() {
                       </div>
                     ))}
                   <div className="text-center font-pretendard font-[600]">
-                    {tableData?.party.userId}
+                    {tableData?.party.userId.split("(")[0]}
                   </div>
                 </div>
                 <PartyPriority />
@@ -367,7 +373,9 @@ export default function MeetingPage() {
                 <TableLogin />
               )}
             </div>
-            <div className="w-[75%]">{tableData !== null && <TimeTable userList={users} />}</div>
+            <div className="w-[75%]">
+              {tableData !== null && <TimeTable userList={users} />}
+            </div>
           </div>
         )}
         <div

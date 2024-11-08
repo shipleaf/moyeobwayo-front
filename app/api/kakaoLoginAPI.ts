@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 
 interface KakaoUserResponse {
   token: string;
+  talkCalendarOn: boolean;
 }
 
 interface ApiError {

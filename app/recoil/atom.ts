@@ -80,3 +80,8 @@ export const tableRefreshTrigger = atom({
   key: "tableRefreshTrigger",
   default: 0,
 });
+
+export const userNumberState = atom({
+  key: 'userNumberState',
+  default: 0,
+});

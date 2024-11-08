@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { CheckFat } from "@phosphor-icons/react/dist/ssr";
 import { useSearchParams } from "next/navigation"; // useRouter를 가져옵니다
 import TimeTable from "./TimeTable";
-import { getTable, Party, AvailableTimesResponse } from "@/app/api/getTableAPI";
+import { getTable, Party, AvailableTimesResponse, PartyDate } from "@/app/api/getTableAPI";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
@@ -126,7 +126,7 @@ const MeetDetail = () => {
           <TimeTable
             startDate={targetMeet.startDate}
             endDate={targetMeet.endDate}
-            dates={targetMeet.dates}
+            dates={targetMeet.dates as PartyDate[]} // 또는 필요한 타입으로 명시적 변환
           />
         </section>
         {/* Candidate */}
