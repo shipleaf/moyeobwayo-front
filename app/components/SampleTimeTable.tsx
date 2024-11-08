@@ -186,7 +186,7 @@ export default function SampleTimeTable() {
         <div className="flex flex-grow gap-[10px]">
           {dummyData.map((day, dateIndex) => (
             <div key={dateIndex} className="flex-grow">
-              {timeSlots.map((timeSlot, slotIndex) => {
+              {timeSlots.map((timeSlot, slotIndex, timeSlotArray) => {
                 let votes = 0;
 
                 if (selectedAvatar) {
@@ -210,6 +210,8 @@ export default function SampleTimeTable() {
                 return (
                   <TimeBlock
                     key={`${dateIndex}-${slotIndex}`}
+                    dateLength={timeSlotArray.length}
+                    maxVotes={maxVotes}
                     time={`${getWeekday(dates[dateIndex])} ${dates[
                       dateIndex
                     ].getDate()} ${timeSlot}`}

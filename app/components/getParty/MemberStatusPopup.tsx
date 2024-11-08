@@ -9,6 +9,7 @@ interface MemberStatusPopupProps {
   maxNum?: number;
   avatarSources?: string[];
   targetDate?: Date;
+  maxVotes?:number
 }
 const possibleUsers:string[] = [
   '규성',
@@ -54,11 +55,11 @@ const formatKoreanDate = (date: Date): string => {
     day: 'numeric',
   });
 };
-export default function MemberStatusPopup({time, targetDate}:MemberStatusPopupProps) {
+export default function MemberStatusPopup({time, targetDate, maxVotes}:MemberStatusPopupProps) {
   // target Date가 한국 표준시 기준인데... 여기서 2024년 10월 15일 이런format으로 바꿔주는 함수좀 알려줘
   const { startTime, endTime } = time ? parseTimeWithEnd(time) : { startTime: '', endTime: '' };
   const formattedDate = targetDate ? formatKoreanDate(targetDate) : '';
-  
+  const maxUsers =  maxVotes?  `${maxVotes}` : '?'
   return (
     <div className='py-[15px] px-6 bg-white bg-opacity-80 absolute z-10 w-[240px] rounded-[6px]'>
       <h1 className='text-[24px] font-bold mb-5'>
@@ -93,7 +94,7 @@ export default function MemberStatusPopup({time, targetDate}:MemberStatusPopupPr
         </div>
       </div>
 
-      <p className='font-semibold text-[14px] mb-1'>2/5 명</p>
+      <p className='font-semibold text-[14px] mb-1'>2/{maxUsers} 명</p>
       <AvatarList possibleUsers={possibleUsers} srcList={dummyAvatarList}/>
     </div>
   )
