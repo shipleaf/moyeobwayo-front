@@ -216,6 +216,9 @@ export default function SampleTimeTable() {
                     time={`${getWeekday(dates[dateIndex])} ${dates[
                       dateIndex
                     ].getDate()} ${timeSlot}`}
+                    targetDate={dates[dateIndex]}
+                    hourlyLabels={hourlyLabels[slotIndex]}
+                    slotIndex={slotIndex}
                     className={
                       colorLevel === "0" ? "bg-white" : `bg-MO${colorLevel}`
                     }

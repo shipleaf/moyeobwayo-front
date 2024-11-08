@@ -1,19 +1,21 @@
 import axiosInstance from "./axiosInstance";
-import { getMeetListResponse } from "./getMeetListAPI";
 
-export interface MeetData {
+export interface getServerAlarmStateRequest {
   kakaoId: number;
   partyId: string;
 }
-
+export interface getServerAlarmStateResponse{
+  alarmId: number;
+  alarm_on: boolean;
+}
 
 // getMeetList 함수
 export const getAlarmState = async (
-  data: MeetData
-): Promise<getMeetListResponse> => {
+  data: getServerAlarmStateRequest
+): Promise<getServerAlarmStateResponse> => {
   try {
     // 쿼리 매개변수로 kakaoId와 partyId를 전달
-    const response = await axiosInstance.get<getMeetListResponse>("/alarm/", {
+    const response = await axiosInstance.get<getServerAlarmStateResponse>("/alarm/", {
       params: {
         kakaoId: data.kakaoId,
         partyId: data.partyId,
