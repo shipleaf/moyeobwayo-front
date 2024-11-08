@@ -4,6 +4,7 @@ import { useRecoilValue } from "recoil";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
 import TimeBlock from "./TimeBlock";
+import { GetUserAvatarResponse } from "@/app/api/getUserAvatarAPI";
 // import { PartyDate } from "@/app/api/getTableAPI";
 import { selectedAvatarState, tableRefreshTrigger } from "@/app/recoil/atom";
 import { useEffect, useState } from "react";
@@ -18,7 +19,9 @@ const roboto = Roboto({
   weight: ["400", "500", "700"],
   subsets: ["latin"],
 });
-
+interface timeTableProps{
+  userList:GetUserAvatarResponse[]
+}
 export interface Table {
   party: Party;
   formattedDates: string[];
@@ -34,6 +37,10 @@ export interface Table {
   }[];
 }
 
+export interface VotedUser {
+  src: string;
+  name: string;
+}
 export const getGradationNum = (currentVal: number, maxNum: number): string => {
   if (maxNum === 0) {
     return "0";
@@ -43,14 +50,42 @@ export const getGradationNum = (currentVal: number, maxNum: number): string => {
   return rounded.toString();
 };
 
-export default function TimeTable() {
+function getSrcMap(userList: GetUserAvatarResponse[]): Record<number, string> {
+  return userList.reduce((acc, user, index) => {
+    acc[user.userId] = user.profileImage ? user.profileImage : `/images/sample_avatar${index + 1}.png`;
+    return acc;
+  }, {} as Record<number, string>);
+}
+interface convertedTimeslot{
+  userId: number;
+  userName: string, 
+  byteString: string;
+}
+function getVotedUsers(
+  users: convertedTimeslot[],
+  srcMap: Record<number, string>,
+  slotIndex: number
+): VotedUser[] {
+  return users
+    .filter(user => user.byteString[slotIndex] === '1') // byteString[slotIndex]가 '1'인 경우만 포함
+    .map(user => ({
+      src: srcMap[user.userId] || '/images/default_avatar.png', // srcMap에서 찾지 못하면 기본 이미지 사용
+      name: user.userName,
+    }));
+}
+export default function TimeTable({userList}:timeTableProps) {
+  console.log('in timeTable', userList)
+  
+  
+  const srcMap = getSrcMap(userList);
+  console.log('srcMap', srcMap)
+  
   const searchParams = useSearchParams();
   const { hash } = useParams();
   const partyId = searchParams.get("partyId")
   const [tableData, setTableData] = useState<Table | null>(null); // 테이블 데이터 상태 관리
   const selectedAvatar = useRecoilValue(selectedAvatarState);
   const maxVotes = 3;
-  // eslint-
   const refreshValue = useRecoilValue(tableRefreshTrigger);
 
   useEffect(() => {
@@ -186,9 +221,9 @@ export default function TimeTable() {
           ))}
         </div>
         <div className="flex flex-grow gap-[10px]">
-          {tableData.dates.map((day, dateIndex: number) => (
+          {tableData.dates.map((day, dateIndex: number, dayArray) => (
             <div key={dateIndex} className="flex-grow">
-              {timeSlots.map((timeSlot, slotIndex) => {
+              {timeSlots.map((timeSlot, slotIndex, timeSlotArray) => {
                 let votes = 0;
 
                 if (selectedAvatar) {
@@ -206,13 +241,25 @@ export default function TimeTable() {
                   );
                 }
                 const colorLevel = getGradationNum(votes, maxVotes);
-
+                const votedUsersData = getVotedUsers(
+                  day.convertedTimeslots, srcMap, slotIndex);
+                // 여기서 timeslot.byteString[slotIndex]이 1일때 votedUserDate가 될수있다는 추가조건 넣어줘
+                console.log('실마리',day.convertedTimeslots)
                 return (
                   <TimeBlock
                     key={`${dateIndex}-${slotIndex}`}
+                    dayLength={dayArray.length}
+                    dayIndex={dateIndex}
+                    dateLength={timeSlotArray.length}
+                    slotIndex={slotIndex}
                     time={`${getWeekday(dates[dateIndex])} ${dates[
                       dateIndex
                     ].getDate()} ${timeSlot}`}
+                    targetDate={dates[dateIndex]}
+                    hourlyLabels={hourlyLabels[slotIndex]}
+                    votes={votes}
+                    votedUsersData={votedUsersData}
+                    maxVotes={maxVotes}
                     className={
                       colorLevel === "0" ? "bg-white" : `bg-MO${colorLevel}`
                     }

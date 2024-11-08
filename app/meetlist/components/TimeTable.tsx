@@ -3,9 +3,6 @@
 import TimeBlock from "./TimeBlock";
 import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
-import { Timeslot, PartyDate } from "@/app/api/getTableAPI";
-import { timeRange } from "./MeetDetail";
-import { useEffect, useState } from "react";
 import { getGradationNum } from "@/app/utils/timeslotUtils";
 
 // Roboto 폰트 불러오기
