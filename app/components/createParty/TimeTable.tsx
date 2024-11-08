@@ -11,6 +11,7 @@ import { getTable } from "@/app/api/getTableAPI";
 import { useParams } from "next/navigation";
 // import { TableData } from "@/app/meeting/[hash]/page";
 import { Party } from "@/app/api/getTableAPI";
+import { useSearchParams } from "next/navigation";
 
 // Roboto 폰트 불러오기
 const roboto = Roboto({
@@ -18,7 +19,7 @@ const roboto = Roboto({
   subsets: ["latin"],
 });
 
-interface Table {
+export interface Table {
   party: Party;
   formattedDates: string[];
   startTime: string;
@@ -42,10 +43,10 @@ export const getGradationNum = (currentVal: number, maxNum: number): string => {
   return rounded.toString();
 };
 
-// 시간 슬롯을 30분 간격으로 생성하는 함수
-
 export default function TimeTable() {
+  const searchParams = useSearchParams();
   const { hash } = useParams();
+  const partyId = searchParams.get("partyId")
   const [tableData, setTableData] = useState<Table | null>(null); // 테이블 데이터 상태 관리
   const selectedAvatar = useRecoilValue(selectedAvatarState);
   const maxVotes = 3;
@@ -53,55 +54,59 @@ export default function TimeTable() {
   const refreshValue = useRecoilValue(tableRefreshTrigger);
 
   useEffect(() => {
-    if (hash && refreshValue >= 0) {
-      const fetchTableData = async () => {
-        try {
-          const tableDataResponse = await getTable({
-            table_id: hash as string,
-          });
-          const dates = tableDataResponse.party.dates.map((date) => {
-            const localDate = new Date(date.selected_date);
-            return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식
-          });
+    const fetchTableData = async () => {
+      try {
+        const tableId = hash || partyId; // hash가 없으면 partyId를 사용
+        if (!tableId) return;
 
-          const timeslots = tableDataResponse.party.dates.map((date) => ({
-            dateId: date.dateId,
-            convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
-              userId: slot.userId,
-              userName: slot.userName,
-              byteString: slot.byteString,
-            })),
-          }));
+        const tableDataResponse = await getTable({
+          table_id: tableId as string,
+        });
 
-          const startTime = new Date(
-            tableDataResponse.party.startDate
-          ).toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
+        const dates = tableDataResponse.party.dates.map((date) => {
+          const localDate = new Date(date.selected_date);
+          return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식
+        });
 
-          const endTime = new Date(
-            tableDataResponse.party.endDate
-          ).toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
+        const timeslots = tableDataResponse.party.dates.map((date) => ({
+          dateId: date.dateId,
+          convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
+            userId: slot.userId,
+            userName: slot.userName,
+            byteString: slot.byteString,
+          })),
+        }));
 
-          setTableData({
-            party: tableDataResponse.party,
-            formattedDates: dates,
-            startTime: startTime,
-            endTime: endTime,
-            dates: timeslots,
-          });
-        } catch (error) {
-          console.error("데이터 불러오기 실패: ", error);
-        }
-      };
+        const startTime = new Date(
+          tableDataResponse.party.startDate
+        ).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
 
-      if (hash) fetchTableData();
+        const endTime = new Date(
+          tableDataResponse.party.endDate
+        ).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        setTableData({
+          party: tableDataResponse.party,
+          formattedDates: dates,
+          startTime: startTime,
+          endTime: endTime,
+          dates: timeslots,
+        });
+      } catch (error) {
+        console.error("데이터 불러오기 실패: ", error);
+      }
+    };
+
+    if ((hash || partyId) && refreshValue >= 0) {
+      fetchTableData();
     }
-  }, [hash, refreshValue]);
+  }, [hash, partyId, refreshValue]);
 
   if (!tableData) {
     return <div>Loading...</div>;
