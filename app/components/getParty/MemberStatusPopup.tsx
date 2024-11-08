@@ -94,7 +94,6 @@ export default function MemberStatusPopup({
           </div>
         </div>
       </div>
-
       <p className='font-semibold text-[14px] mb-1'>{currentUsers}/{maxUsers} 명</p>
       <AvatarList votedUsers={finalVotedUsersData}/>
     </div>

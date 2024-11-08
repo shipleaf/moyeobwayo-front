@@ -6,7 +6,7 @@ import { Roboto } from "next/font/google";
 import TimeBlock from "./TimeBlock";
 import { GetUserAvatarResponse } from "@/app/api/getUserAvatarAPI";
 // import { PartyDate } from "@/app/api/getTableAPI";
-import { selectedAvatarState, tableRefreshTrigger } from "@/app/recoil/atom";
+import { selectedAvatarState, tableRefreshTrigger, userNumberState } from "@/app/recoil/atom";
 import { useEffect, useState } from "react";
 import { getTable } from "@/app/api/getTableAPI";
 import { useParams } from "next/navigation";
@@ -85,8 +85,8 @@ export default function TimeTable({userList}:timeTableProps) {
   const partyId = searchParams.get("partyId")
   const [tableData, setTableData] = useState<Table | null>(null); // 테이블 데이터 상태 관리
   const selectedAvatar = useRecoilValue(selectedAvatarState);
-  const maxVotes = 3;
   const refreshValue = useRecoilValue(tableRefreshTrigger);
+  const globalTotalNum = useRecoilValue(userNumberState);
 
   useEffect(() => {
     const fetchTableData = async () => {
@@ -133,6 +133,7 @@ export default function TimeTable({userList}:timeTableProps) {
           endTime: endTime,
           dates: timeslots,
         });
+
       } catch (error) {
         console.error("데이터 불러오기 실패: ", error);
       }
@@ -180,6 +181,7 @@ export default function TimeTable({userList}:timeTableProps) {
   const hourlyLabels = generateHourlyLabels(); // 시간 라벨
 
   const timeSlots = generateTimeSlots(); // 30분 간격의 시간 슬롯 생성
+  const maxVotes = globalTotalNum;
 
   return (
     <div className="flex flex-col gap-[2%] h-full">

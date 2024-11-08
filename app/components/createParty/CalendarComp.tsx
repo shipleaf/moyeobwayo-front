@@ -171,12 +171,13 @@ export default function CalendarComp() {
     const startHour = calculateTime(startTime, isStartToggled);
     const endHour = calculateTime(endTime, isEndToggled);
 
-    // 첫 번째 선택된 날짜에 startHour 추가
-    const firstSelectedDate =
-      selectedDates.length > 0 ? selectedDates[0] : null;
-    // 마지막 선택된 날짜에 endHour 추가
-    const lastSelectedDate =
-      selectedDates.length > 0 ? selectedDates[selectedDates.length - 1] : null;
+    // 날짜를 빠른 날짜순으로 정렬
+    const sortedDates = [...selectedDates].sort(
+      (a, b) => a.getTime() - b.getTime()
+    );
+
+    const firstSelectedDate = sortedDates[0];
+    const lastSelectedDate = sortedDates[sortedDates.length - 1];
 
     let startDateTime: Date | null = null;
     let endDateTime: Date | null = null;
@@ -190,12 +191,6 @@ export default function CalendarComp() {
       endDateTime = new Date(lastSelectedDate);
       endDateTime.setHours(endHour, 0, 0, 0); // 종료 시간 적용
     }
-
-    // 날짜를 빠른 날짜순으로 정렬
-    const sortedDates = [...selectedDates].sort(
-      (a, b) => a.getTime() - b.getTime()
-    );
-
     // 인터페이스 SubmitData에 맞게 데이터를 매핑
     const dataToSubmit: SubmitData = {
       participants: totalPeople,
@@ -448,7 +443,7 @@ export default function CalendarComp() {
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
         shouldCloseOnOverlayClick={true}
-        className="z-[9999] fixed inset-0 flex items-center justify-center"
+        className="z-[9999] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fixed flex items-center justify-center"
         overlayClassName="fixed inset-0 bg-black bg-opacity-30 z-[9998]"
       >
         <CreateTableLogin

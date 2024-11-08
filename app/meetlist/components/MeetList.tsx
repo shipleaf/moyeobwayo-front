@@ -1,15 +1,15 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
-import { getMeetList } from '@/app/api/getMeetListAPI';
-import { Party } from '@/app/api/getMeetListAPI';
-import { loadFromLocalStorage } from '@/app/recoil/recoilUtils';
-import { decodeJWT } from '@/app/utils/jwtUtils';
+"use client";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { getMeetList } from "@/app/api/getMeetListAPI";
+import { Party } from "@/app/api/getMeetListAPI";
+import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
+import { decodeJWT } from "@/app/utils/jwtUtils";
 
 export default function MeetList() {
   const searchParams = useSearchParams();
-  const currentPartyId: string | null = searchParams.get('partyId');
+  const currentPartyId: string | null = searchParams.get("partyId");
   const [parties, setParties] = useState<Party[]>([]);
   const router = useRouter();
 
@@ -29,8 +29,9 @@ export default function MeetList() {
 
             // 첫 번째 파티로 라우터 이동 (partyId 추가)
             if (response.parties && response.parties.length > 0) {
-              const firstPartyId = response.parties[0].partyId;
-              if (typeof window !== 'undefined') {
+              const firstPartyId =
+                response.parties[response.parties.length - 1].partyId;
+              if (typeof window !== "undefined") {
                 router.push(`/meetlist?partyId=${firstPartyId}`);
               }
             }
@@ -49,20 +50,20 @@ export default function MeetList() {
   };
 
   return (
-    <section className='w-full'>
+    <section className="w-full">
       {/* parties가 존재하고 배열이 비어있지 않을 경우에만 map을 실행 */}
       {parties.length > 0 ? (
-        parties.map((meet, idx) => {
+        [...parties].reverse().map((meet, idx) => {
           const partyID = meet.partyId;
           const date = new Date(meet.startDate);
           const month = date.getMonth() + 1;
           const day = date.getDate();
           const hours = date.getHours();
-          const minutes = date.getMinutes().toString().padStart(2, '0');
+          const minutes = date.getMinutes().toString().padStart(2, "0");
 
-          let TimeLabel = `${month}월 ${day}일 ${hours}:${minutes}`;
+          const TimeLabel = `${month}월 ${day}일 ${hours}:${minutes}`;
 
-          // // 확정 상태의 TimeLabel 계산
+          // // 확정 상태의 TimeLabel 계산(2차출시때 고려)
           // if (meet.decisionDate !== null && meet.decisionDate === true) {
           //   const decisionDate = new Date(meet.decisionDate);
           //   TimeLabel += ` (확정: ${decisionDate.toLocaleDateString()})`;
@@ -71,29 +72,34 @@ export default function MeetList() {
           return (
             <div
               key={idx}
-              className='border p-4 mb-2.5 rounded-[5px] shadow-md cursor-pointer'
+              className="border p-4 mb-2.5 rounded-[5px] shadow-md cursor-pointer"
               onClick={() => handlePartyClick(partyID)} // 클릭 시 해당 파티 ID로 URL 쿼리 변경
               style={
                 partyID === String(currentPartyId)
                   ? {
-                      borderColor: 'var(--mo-50, #6161CE)',
-                      background: 'rgba(97, 97, 206, 0.10)',
-                      boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.15)',
+                      borderColor: "var(--mo-50, #6161CE)",
+                      background: "rgba(97, 97, 206, 0.10)",
+                      boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.15)",
                     }
                   : {}
               }
             >
-              <header className='flex justify-between items-center'>
-                <h1 className='text-[16px] font-normal mb-2'>{meet.partyName}</h1>
-                <p className='text-[14px] font-medium'>모임 날짜: {TimeLabel}</p>
+              <header className="flex justify-between items-center">
+                <h1 className="text-[16px] font-normal mb-2">
+                  {meet.partyName}
+                </h1>
+                <p className="text-[14px] font-medium">
+                  모임 날짜: {TimeLabel}
+                </p>
               </header>
-              <div className='flex justify-between'>
-                <p className='text-[#8E8E8E]'>
+              <div className="flex justify-between">
+                <p className="text-[#8E8E8E]">
                   {`${month}월 ${day}일 ${hours}:${minutes} ~`}
                 </p>
-                <div className='bg-[#6161CE] rounded-[50px] py-[3px] px-[9px] text-white font-semibold text-[12px]'>
+                {meet.decisionDate ? <div className="bg-[#6161CE] rounded-[50px] py-[3px] px-[9px] text-white font-semibold text-[12px]">
                   확정
-                </div>
+                </div> : ""}
+                
               </div>
             </div>
           );

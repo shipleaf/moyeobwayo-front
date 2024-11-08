@@ -14,7 +14,7 @@ const roboto = Roboto({
 interface PartyDate {
   dateId: number;
   selected_date: string;
-  timeslots: null;
+  timeslots?: null;
   convertedTimeslots: {
     userId: number;
     userName: string;
@@ -33,15 +33,15 @@ export default function TimeTable({
   endDate,
   dates,
 }: {
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: string | null;
+  endDate: string | null;
   dates: PartyDate[];
 }) {
   const dateObjects = dates?.map((date) => new Date(date.selected_date));
 
-  const startHour = startDate ? new Date(startDate).getHours() : null;
+  const startHour = startDate ? new Date(startDate).getHours().toString() : "";
   console.log(startHour);
-  const endHour = endDate ? new Date(endDate).getHours() : null;
+  const endHour = endDate ? new Date(endDate).getHours().toString() : "";
 
   const timeslots = dates?.map((date) => ({
     dateId: date.dateId,
@@ -68,15 +68,18 @@ export default function TimeTable({
   console.log(timeslots, startHour, endHour);
   return (
     <div className="">
-      <div className="Head gap-[10px] h-[10%] flex w-full">
+      <div className="Head gap-[10px] h-[10%] w-full grid grid-cols-[8%_1fr]">
+        {/* 시간 열 */}
         <div
-          className={`${roboto.className} w-[8%] h-full flex-shrink-0 flex justify-center items-center font-[500] text-[17px]`}
+          className={`${roboto.className} flex justify-center items-center font-[500] text-[17px]`}
         ></div>
-        <div className="flex flex-grow">
+
+        {/* 날짜 열 */}
+        <div className="grid grid-cols-7 gap-1">
           {dateObjects?.map((day, index) => (
             <div
               key={index}
-              className="flex-grow h-full w-[14.2%] flex-shrink-0 flex flex-col justify-center items-center gap-[0px]"
+              className="flex flex-col justify-center items-center"
             >
               <span
                 className={`${roboto.className} font-[500] text-[15px] leading-3`}
@@ -92,26 +95,20 @@ export default function TimeTable({
           ))}
         </div>
       </div>
-      <div className="Table flex gap-[10px] w-full h-full">
-        <div className="flex flex-col justify-between w-[8%] flex-shrink-0">
-          <span
-            className={`${roboto.className} font-[500] text-[15px] text-center`}
-          >
-            {startHour}:00
-          </span>
-          <span
-            className={`${roboto.className} font-[500] text-[15px] text-center`}
-          >
-            {endHour}:00
-          </span>
+
+      <div className="Table w-full h-full grid grid-cols-[8%_1fr] gap-[10px]">
+        <div className="flex flex-col justify-between items-center">
+          <span className="font-[500] text-[15px]">{startHour}:00</span>
+          <span className="font-[500] text-[15px]">{endHour}:00</span>
         </div>
-        <div className="TimeTable flex flex-grow">
+        <div className="grid grid-cols-7 gap-1">
           {timeslots?.map((day, dayIndex) => (
-            <div
-              key={dayIndex}
-              className="flex-grow flex flex-col h-full w-[14.2%] flex-shrink-0"
-            >
-              {timeSlots.map((_, slotIndex) => {
+            <div key={dayIndex} className="flex flex-col">
+              {timeSlots.map((timeSlot, slotIndex) => {
+                const dateTime = new Date(dateObjects[dayIndex]);
+                const [hour, minute] = timeSlot.split(":").map(Number);
+                dateTime.setHours(hour, minute);
+
                 // 투표 수 계산
                 const votes = day.convertedTimeslots.reduce(
                   (acc, slot) =>
@@ -128,6 +125,7 @@ export default function TimeTable({
                 return (
                   <TimeBlock
                     key={slotIndex}
+                    time={dateTime} // Date 객체 전달
                     className={
                       colorLevel === "0" ? "bg-white" : `bg-MO${colorLevel}`
                     }
@@ -147,6 +145,7 @@ export default function TimeTable({
                           : slotIndex % 2 === 0
                           ? "0.572px dashed #EBEBEB"
                           : "0.572px solid #EBEBEB",
+                      maxWidth: "100px",
                     }}
                   />
                 );

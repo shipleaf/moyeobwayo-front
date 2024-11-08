@@ -36,7 +36,7 @@ export interface Party {
   userId: string;
   locationName: string;
   alarms: boolean[];
-  dates: PartyDate[]; // 날짜 배열
+  dates: PartyDate[];
 }
 
 export interface AvailableTimesResponse {

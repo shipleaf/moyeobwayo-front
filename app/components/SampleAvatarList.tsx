@@ -2,7 +2,7 @@
 import { UserCircle } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { kakaoUserState, selectedAvatarState } from "../recoil/atom";
 import { decodeJWT } from "../utils/jwtUtils";
 import { loadFromLocalStorage } from "../recoil/recoilUtils";

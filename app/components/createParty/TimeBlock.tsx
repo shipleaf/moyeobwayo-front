@@ -15,6 +15,8 @@ interface TimeBlockProps {
   maxVotes? : number
   votes? : number
   votedUsersData?:VotedUser[] 
+  onMouseEnter?: () => void
+  onMouseDown?: () => void
 }
 
 const TimeBlock: React.FC<TimeBlockProps> = ({
