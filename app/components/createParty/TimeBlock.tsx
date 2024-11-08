@@ -9,6 +9,8 @@ interface TimeBlockProps {
   targetDate?: Date
   hourlyLabels?: string
   slotIndex?: number
+  dateLength?: number
+  maxVotes? : number
 }
 
 const TimeBlock: React.FC<TimeBlockProps> = ({
@@ -18,10 +20,13 @@ const TimeBlock: React.FC<TimeBlockProps> = ({
   startTime = new Date(), // 기본값으로 현재 시간을 설정
   targetDate,
   hourlyLabels = '',
-  slotIndex = 0
+  slotIndex,
+  dateLength,
+  maxVotes
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-
+  console.log('rbrbrbr', dateLength, slotIndex)
+  const popupTopPosition = slotIndex && dateLength && dateLength - slotIndex <= 5 ? '-500%' : '10%';
   return (
     <div
       style={{
@@ -33,12 +38,21 @@ const TimeBlock: React.FC<TimeBlockProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {isHovered && (
-        <div style={{ position: 'absolute', top: '10%', left: '0', pointerEvents: 'none' }}>
-          <MemberStatusPopup 
-            time={time}
-            targetDate={targetDate}
-          />
-        </div>
+        // slotIndex와 dateLength의 차이가 6이하라면 top + 100%로 되게 해줘
+        <div
+        style={{
+          position: 'absolute',
+          top: popupTopPosition,
+          left: '0',
+          pointerEvents: 'none',
+        }}
+      >
+        <MemberStatusPopup 
+          time={time}
+          targetDate={targetDate}
+          maxVotes={maxVotes}
+        />
+      </div>
       )}
     </div>
   );
