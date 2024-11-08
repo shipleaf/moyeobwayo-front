@@ -447,8 +447,9 @@ export default function CalendarComp() {
       <Modal
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
+        shouldCloseOnOverlayClick={true}
         className="z-[9999] fixed inset-0 flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-30 z-[9998]" // 배경을 어둡게 하면서 z-index 설정
+        overlayClassName="fixed inset-0 bg-black bg-opacity-30 z-[9998]"
       >
         <CreateTableLogin
           closeModal={handleCloseModal}
