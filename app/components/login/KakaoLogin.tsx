@@ -15,6 +15,7 @@ const scope = [
   "profile_image",
   "talk_message", // 카카오 메시지 동의 항목 추가
   "talk_calendar",
+  "phone_number",
 ].join(",");
 
 export default function KakaoLogin() {

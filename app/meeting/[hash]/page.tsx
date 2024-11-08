@@ -68,7 +68,7 @@ export default function MeetingPage() {
   // const refreshValue = useRecoilValue(tableRefreshTrigger);
 
   const handleLogoClick = () => {
-    router.push(`/`);
+    router.push(`/`); 
   };
 
   const handleCloseModal = () => {
@@ -305,7 +305,7 @@ export default function MeetingPage() {
               <div className="president w-[30%] h-full flex flex-col items-center justify-between">
                 <div className="relative flex flex-col gap-[10%] w-full items-center">
                   <div className="w-full font-pretendard text-[24px] font-[600] text-[#686868] text-center">
-                    {"모임장"} 
+                    {"모임장"}
                   </div>
                   {users
                     .filter((user) => user.userName === tableData?.party.userId)

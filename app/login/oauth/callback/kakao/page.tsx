@@ -29,6 +29,7 @@ function KakaoCallback() {
     "profile_image",
     "talk_message",
     "talk_calendar",
+    "phone_number",
   ].join(",");
 
   // SDK 초기화 후 인증 진행
