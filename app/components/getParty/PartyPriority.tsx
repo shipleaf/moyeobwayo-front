@@ -149,7 +149,7 @@ export default function PartyPriority() {
               return (
                 <div
                   key={index}
-                  className="priorList px-2 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px] flex flex-col gap-2"
+                  className="priorList px-4 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px] flex flex-col gap-2"
                 >
                   <div className="flex flex-row justify-between">
                     <p className="font-pretendard text-[15px] font-[500]">
@@ -158,7 +158,7 @@ export default function PartyPriority() {
                     </p>
                     <button
                       onClick={() => handleComplete(timeSlot)}
-                      className="border-1 rounded-[50px] w-[18%] text-[13px] font-pretendard bg-[#6161CE] text-white"
+                      className="border-1 rounded-[50px] px-4 py-1 text-[13px]  font-bold font-pretendard bg-[#6161CE] text-white"
                     >
                       확정
                     </button>
@@ -185,7 +185,7 @@ export default function PartyPriority() {
                               alt="Exclamation Icon"
                               width={10}
                               height={10}
-                              className="inline-block w-4 h-4"
+                              className="ml-1 inline-block w-4 h-4 rounded-2xl"
                             />
                           )}
                         </p>

@@ -26,7 +26,7 @@ export default function CalendarComp() {
   const [startTime, setStartTime] = useState<number>(9); // 시작 시간 (1 ~ 12)
   const [endTime, setEndTime] = useState<number>(15); // 종료 시간 (1 ~ 12)
   const [isEndToggled, setIsEndToggled] = useState(endTime >= 12); // 초기값에 따라 AM/PM 토글 설정
-  const [totalPeople, setTotalPeople] = useState<number>(1); // 총 인원수 상태
+  const [totalPeople, setTotalPeople] = useState<number>(0); // 총 인원수 상태
   const [isTotalPeopleUnset, setIsTotalPeopleUnset] = useState<boolean>(false); // 총 인원 미정 상태
   const [title, setTitle] = useState<string>(""); // 제목
   const [subTitle, setSubTitle] = useState<string>(""); // 부제
@@ -75,11 +75,9 @@ export default function CalendarComp() {
     // AM/PM 토글 상태를 변경
     setIsEndToggled(!isEndToggled);
 
-    // AM에서 PM으로 변경할 경우
     if (!isEndToggled && endTime < 12) {
       setEndTime(endTime + 12); // 12를 더해서 PM으로 변환
     }
-    // PM에서 AM으로 변경할 경우
     else if (isEndToggled && endTime >= 12) {
       setEndTime(endTime - 12); // 12를 빼서 AM으로 변환
     }
@@ -106,7 +104,7 @@ export default function CalendarComp() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 1) {
+    if (!isNaN(value) && value >= 0) {
       setTotalPeople(value);
     }
   };
@@ -146,6 +144,10 @@ export default function CalendarComp() {
 
   // 제출 시 JSON 객체를 console.log
   const handleSubmit = async () => {
+    if(totalPeople <= 0){
+      alert("인원 수를 설정해주세요 설정인원이 모두 투표완료 시 알림 메시지가 발송돼요!")
+      return
+    }
     if (selectedDates.length === 0) {
       alert("날짜를 선택해 주세요.");
       return;
@@ -205,8 +207,9 @@ export default function CalendarComp() {
       user_id: userName.userId,
     };
     // 카카오 유저라면 카카오 정보로 갱신
+    // 여기서 문제가 발생함!
     if (kakaoUser.kakaoUserId !== null) {
-      dataToSubmit.user_id = kakaoUser.nickname; // 올바른 속성 접근 방식
+      dataToSubmit.user_id = kakaoUser.nickname + "(" + kakaoUser.kakaoUserId + ")"; // 올바른 속성 접근 방식
     }
 
     try {
@@ -221,7 +224,7 @@ export default function CalendarComp() {
         kakaoUserId: null,
       };
       if (kakaoUser.kakaoUserId !== null) {
-        loginData.userName = kakaoUser.nickname; // 올바른 속성 접근 방식
+        loginData.userName = kakaoUser.nickname
         loginData.isKakao = true;
         loginData.password = "";
         loginData.kakaoUserId = kakaoUser.kakaoUserId;
@@ -371,7 +374,8 @@ export default function CalendarComp() {
         </div>
       </div>
 
-      <div className="number flex flex-col items-start justify-center bg-custom-bg border border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom mt-[5%] p-[4%] pl-[2%]">
+      <div className="number flex flex-col items-start justify-center bg-custom-bg border 
+        border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom mt-[5%] p-[4%] pl-[2%]">
         <div className="w-[100%] mb-[5%] pl-[8%] flex flex-row justify-between">
           <span className="text-[18px] font-bold font-pretendard">총 인원</span>
           <div className="flex flex-row items-center">
@@ -431,8 +435,9 @@ export default function CalendarComp() {
       {/* 제출 버튼 */}
       <button
         onClick={handleSubmit}
-        className="mt-[5%] w-[100%] bg-[#6161CE] text-white font-bold py-2 px-4 rounded-[32.988px] hover:bg-blue-600"
-      >
+        className="mt-[5%] w-[100%] bg-[#6161CE] text-white font-bold py-2 px-4 rounded-[32.988px] 
+                  hover:bg-[#4e4ecb] transition duration-300 ease-in-out"
+        >
         일정 생성하기
       </button>
       <Modal
