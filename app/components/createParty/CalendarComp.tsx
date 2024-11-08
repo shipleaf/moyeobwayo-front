@@ -12,7 +12,7 @@ import { loginValue } from "@/app/recoil/atom";
 import CreateTableLogin from "@/app/components/login/CreateTableLogin";
 import Modal from "react-modal";
 import { useRouter } from "next/navigation";
-import {LoginData } from "@/app/api/tableLogin";
+import { LoginData } from "@/app/api/tableLogin";
 import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
 import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 // import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
@@ -35,7 +35,7 @@ export default function CalendarComp() {
   const userName = useRecoilValue(loginValue);
   const kakaoUser = useRecoilValue(kakaoUserState);
   const setKakaoUserState = useSetRecoilState(kakaoUserState);
-  
+
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
@@ -77,8 +77,7 @@ export default function CalendarComp() {
 
     if (!isEndToggled && endTime < 12) {
       setEndTime(endTime + 12); // 12를 더해서 PM으로 변환
-    }
-    else if (isEndToggled && endTime >= 12) {
+    } else if (isEndToggled && endTime >= 12) {
       setEndTime(endTime - 12); // 12를 빼서 AM으로 변환
     }
   };
@@ -144,9 +143,11 @@ export default function CalendarComp() {
 
   // 제출 시 JSON 객체를 console.log
   const handleSubmit = async () => {
-    if(totalPeople <= 0){
-      alert("인원 수를 설정해주세요 설정인원이 모두 투표완료 시 알림 메시지가 발송돼요!")
-      return
+    if (totalPeople <= 0) {
+      alert(
+        "인원 수를 설정해주세요 설정인원이 모두 투표완료 시 알림 메시지가 발송돼요!"
+      );
+      return;
     }
     if (selectedDates.length === 0) {
       alert("날짜를 선택해 주세요.");
@@ -166,7 +167,7 @@ export default function CalendarComp() {
       return;
     }
 
-    // startHour와 endHour는 AM/PM 계산을 통해 얻어짐 
+    // startHour와 endHour는 AM/PM 계산을 통해 얻어짐
     const startHour = calculateTime(startTime, isStartToggled);
     const endHour = calculateTime(endTime, isEndToggled);
 
@@ -209,7 +210,8 @@ export default function CalendarComp() {
     // 카카오 유저라면 카카오 정보로 갱신
     // 여기서 문제가 발생함!
     if (kakaoUser.kakaoUserId !== null) {
-      dataToSubmit.user_id = kakaoUser.nickname + "(" + kakaoUser.kakaoUserId + ")"; // 올바른 속성 접근 방식
+      dataToSubmit.user_id =
+        kakaoUser.nickname + "(" + kakaoUser.kakaoUserId + ")"; // 올바른 속성 접근 방식
     }
 
     try {
@@ -224,13 +226,13 @@ export default function CalendarComp() {
         kakaoUserId: null,
       };
       if (kakaoUser.kakaoUserId !== null) {
-        loginData.userName = kakaoUser.nickname
+        loginData.userName = kakaoUser.nickname;
         loginData.isKakao = true;
         loginData.password = "";
         loginData.kakaoUserId = kakaoUser.kakaoUserId;
       }
       await tableLoginHandler(loginData, setUserId);
-      
+
       router.push(`/meeting/${hash}`);
     } catch (error) {
       console.error("제출 실패: ", error);
@@ -374,8 +376,10 @@ export default function CalendarComp() {
         </div>
       </div>
 
-      <div className="number flex flex-col items-start justify-center bg-custom-bg border 
-        border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom mt-[5%] p-[4%] pl-[2%]">
+      <div
+        className="number flex flex-col items-start justify-center bg-custom-bg border 
+        border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom mt-[5%] p-[4%] pl-[2%]"
+      >
         <div className="w-[100%] mb-[5%] pl-[8%] flex flex-row justify-between">
           <span className="text-[18px] font-bold font-pretendard">총 인원</span>
           <div className="flex flex-row items-center">
@@ -437,14 +441,15 @@ export default function CalendarComp() {
         onClick={handleSubmit}
         className="mt-[5%] w-[100%] bg-[#6161CE] text-white font-bold py-2 px-4 rounded-[32.988px] 
                   hover:bg-[#4e4ecb] transition duration-300 ease-in-out"
-        >
+      >
         일정 생성하기
       </button>
       <Modal
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
+        shouldCloseOnOverlayClick={true}
         className="z-[9999] fixed inset-0 flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-30 z-[9998]" // 배경을 어둡게 하면서 z-index 설정
+        overlayClassName="fixed inset-0 bg-black bg-opacity-30 z-[9998]"
       >
         <CreateTableLogin
           closeModal={handleCloseModal}

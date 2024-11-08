@@ -68,7 +68,7 @@ function generateDummyData(): PartyDate[] {
   dummyData.push({
     dateId: 1,
     timeslots: [
-      { userId: 1, dateId: 1, byteString: "100000010111", userName: "제시카" },
+      { userId: 1, dateId: 1, byteString: "000000011111", userName: "제시카" },
       { userId: 2, dateId: 1, byteString: "000000000111", userName: "존" },
       { userId: 3, dateId: 1, byteString: "000000000111", userName: "사라" },
     ],
@@ -77,51 +77,54 @@ function generateDummyData(): PartyDate[] {
   dummyData.push({
     dateId: 2,
     timeslots: [
-      { userId: 1, dateId: 2, byteString: "100000101111", userName: "제시카" },
-      { userId: 2, dateId: 2, byteString: "111111000111", userName: "존" },
-      { userId: 3, dateId: 2, byteString: "000101111000", userName: "사라" },
+      { userId: 1, dateId: 2, byteString: "000000011111", userName: "제시카" },
+      { userId: 2, dateId: 2, byteString: "111111111111", userName: "존" },
+      { userId: 3, dateId: 2, byteString: "000001111100", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 3,
     timeslots: [
-      { userId: 1, dateId: 3, byteString: "100000000111", userName: "제시카" },
-      { userId: 3, dateId: 3, byteString: "110110000000", userName: "사라" },
+      { userId: 1, dateId: 3, byteString: "000000001111", userName: "제시카" },
+      { userId: 2, dateId: 3, byteString: "000000000000", userName: "존" },
+      { userId: 3, dateId: 3, byteString: "000000000000", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 4,
     timeslots: [
-      { userId: 2, dateId: 4, byteString: "010101010111", userName: "존" },
-      { userId: 3, dateId: 4, byteString: "111111111111", userName: "사라" },
+      { userId: 2, dateId: 4, byteString: "111111110000", userName: "존" },
+      { userId: 1, dateId: 4, byteString: "111111111111", userName: "제시카" },
+      { userId: 3, dateId: 4, byteString: "000000000000", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 5,
     timeslots: [
+      { userId: 1, dateId: 5, byteString: "111111111111", userName: "제시카" },
       { userId: 2, dateId: 5, byteString: "111111111111", userName: "존" },
-      { userId: 3, dateId: 5, byteString: "101010101111", userName: "사라" },
+      { userId: 3, dateId: 5, byteString: "111111111111", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 6,
     timeslots: [
-      { userId: 1, dateId: 6, byteString: "001001001111", userName: "제시카" },
-      { userId: 2, dateId: 6, byteString: "110110110111", userName: "존" },
-      { userId: 3, dateId: 6, byteString: "101010101111", userName: "사라" },
+      { userId: 1, dateId: 6, byteString: "111111111111", userName: "제시카" },
+      { userId: 2, dateId: 6, byteString: "111111111111", userName: "존" },
+      { userId: 3, dateId: 6, byteString: "111111111111", userName: "사라" },
     ],
   });
 
   dummyData.push({
     dateId: 7,
     timeslots: [
-      { userId: 1, dateId: 7, byteString: "111111000011", userName: "제시카" },
-      { userId: 2, dateId: 7, byteString: "000111000111", userName: "존" },
-      { userId: 3, dateId: 7, byteString: "101101010111", userName: "사라" },
+      { userId: 1, dateId: 7, byteString: "111111111111", userName: "제시카" },
+      { userId: 2, dateId: 7, byteString: "000000000000", userName: "존" },
+      { userId: 3, dateId: 7, byteString: "000000000000", userName: "사라" },
     ],
   });
 
@@ -160,7 +163,7 @@ export default function SampleTimeTable() {
           {dates.map((date, index) => (
             <div
               key={index}
-              className="flex-grow rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] h-full flex justify-center items-center gap-[10px]"
+              className="flex-1 rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] h-full flex justify-center items-center gap-[10px]"
             >
               <span className={`${roboto.className} font-[500] text-[17px]`}>
                 {getWeekday(date)}

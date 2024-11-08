@@ -40,6 +40,7 @@ const MeetDetail = () => {
           // startTime: response.party.startDate,
           // endTime: response.party.endDate,
           // });
+          console.log(avariableTime);
         } catch (error) {
           console.error("Failed to fetch table detail:", error); // 에러 처리
         }
@@ -131,7 +132,8 @@ const MeetDetail = () => {
         {/* Candidate */}
         <section className="w-1/3 max-h-[61vh] overflow-auto">
           {avariableTime?.map((candi, idx) => {
-            const people = candi.users;
+            const people = candi.users.map((user) => user.userName);
+            console.log(people);
             const date = new Date(candi.start);
             const endDate = new Date(candi.end);
             const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줌
@@ -142,6 +144,7 @@ const MeetDetail = () => {
             const endMinutes = endDate.getMinutes().toString().padStart(2, "0");
             const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
             const dayOfWeek = dayNames[date.getDay()]; // getDay()는 0~6 사이의 값을 반환함
+            console.log(people);
             return (
               <div
                 key={idx}
@@ -162,7 +165,7 @@ const MeetDetail = () => {
                   <p className="text-black text-[15px] font-medium">가능인원</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {people.map((user, index) => (
+                  {people?.map((user, index) => (
                     <div
                       key={index} // map을 사용할 때 key prop을 추가해 React 경고 방지
                       className="py-1.5 px-[14px] text-[#474747] text-[15px] font-medium rounded-lg"
@@ -170,7 +173,16 @@ const MeetDetail = () => {
                         boxShadow: "0px 0px 2px 0px rgba(0, 0, 0, 0.15)",
                       }}
                     >
-                      {/* {user} */}
+                      {user.replace(/\(\d+\)$/, "")}
+                      {/\(\d+\)$/.test(user) && (
+                        <Image
+                          src="/images/kakaotalk_sharing_btn_small_ov.png"
+                          alt="Exclamation Icon"
+                          width={10}
+                          height={10}
+                          className="ml-1 inline-block w-4 h-4 rounded-2xl"
+                        />
+                      )}
                     </div>
                   ))}
                 </div>
