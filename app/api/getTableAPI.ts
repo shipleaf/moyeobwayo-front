@@ -17,9 +17,9 @@ export interface Timeslot {
   byteString: string;
 }
 
-// PartyDate representing each date with timeslots
 export interface PartyDate {
   dateId: number;
+  timeslots?: null;
   selected_date: string;
   convertedTimeslots: Timeslot[];
 }

@@ -2,46 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { CheckFat } from "@phosphor-icons/react/dist/ssr";
 import { useSearchParams } from "next/navigation"; // useRouter를 가져옵니다
-// import TimeTable from "./TimeTable";
+import TimeTable from "./TimeTable";
 import { getTable, Party, AvailableTimesResponse } from "@/app/api/getTableAPI";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
+// import TimeTable from "@/app/components/createParty/TimeTable";
 // import { PartyDate } from "@/app/api/getTableAPI";
-
-// Dummies
-// export const availableTimes: AvailableTimesResponse[] = [
-//   {
-//     start: "2024-10-16T09:00:00",
-//     end: "2024-10-16T10:00:00",
-//     users: ["김선엽", "이수민", "박지훈"],
-//   },
-//   {
-//     start: "2024-10-16T11:00:00",
-//     end: "2024-10-16T12:00:00",
-//     users: ["정은지", "최현우", "김선엽"],
-//   },
-//   {
-//     start: "2024-10-16T14:00:00",
-//     end: "2024-10-16T15:00:00",
-//     users: ["박지훈", "이수민", "김나영", "김나영", "김나영", "김나영"],
-//   },
-//   {
-//     start: "2024-10-16T16:30:00",
-//     end: "2024-10-16T17:30:00",
-//     users: ["김선엽", "최현우"],
-//   },
-//   {
-//     start: "2024-10-16T18:00:00",
-//     end: "2024-10-16T19:00:00",
-//     users: ["정은지", "박지훈", "이수민"],
-//   },
-//   {
-//     start: "2024-10-16T18:00:00",
-//     end: "2024-10-16T19:00:00",
-//     users: ["정은지", "박지훈", "이수민"],
-//   },
-// ];
 
 export interface timeRange {
   startTime: string;
@@ -70,8 +37,8 @@ const MeetDetail = () => {
           // setTimeblocks(response.party.dates);
           // setCurrentNum(response.party.currentNum);
           // setPartyRange({
-            // startTime: response.party.startDate,
-            // endTime: response.party.endDate,
+          // startTime: response.party.startDate,
+          // endTime: response.party.endDate,
           // });
         } catch (error) {
           console.error("Failed to fetch table detail:", error); // 에러 처리
@@ -146,8 +113,7 @@ const MeetDetail = () => {
           </p>
           {/* Button */}
           <Link href={`/meeting/${table_id}`}>
-            <div 
-              className="py-[7px] px-4 text-white rounded-[50px] font-bold bg-[var(--mo-50,#6161CE)] hover:bg-[#4949A0]">
+            <div className="py-[7px] px-4 text-white rounded-[50px] font-bold bg-[var(--mo-50,#6161CE)] hover:bg-[#4949A0]">
               보러 가기
             </div>
           </Link>
@@ -156,11 +122,11 @@ const MeetDetail = () => {
       <div className="flex gap-4">
         {/* TimeTable */}
         <section className="w-2/3 max-h-[61vh] overflow-auto bg-[#F7F7F7] py-3 px-2 rounded-[10px]">
-          {/* <TimeTable
-            timeblocks={timeblocks}
-            currentNum={currentNum}
-            partyRange={partyRange}
-          ></TimeTable> */}
+          <TimeTable
+            startDate={targetMeet.startDate}
+            endDate={targetMeet.endDate}
+            dates={targetMeet.dates}
+          />
         </section>
         {/* Candidate */}
         <section className="w-1/3 max-h-[61vh] overflow-auto">
