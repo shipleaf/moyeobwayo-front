@@ -26,7 +26,6 @@ export default function Home() {
             <div className="flex flex-col items-center">
               <Link
                 href={"/meetlist"}
-                // content 버튼 클릭 핸들러
                 className={`content w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer mb-[50%] focus:outline-none
                     bg-[rgba(255,255,255,0.1)] border-none`}
               >
@@ -42,7 +41,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {/* page 영역 */}
         <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] overflow-auto">
           <div className="flex flex-row h-[100%]">
             <CalendarComp />

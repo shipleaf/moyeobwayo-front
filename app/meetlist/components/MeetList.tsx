@@ -62,11 +62,11 @@ export default function MeetList() {
 
           let TimeLabel = `${month}월 ${day}일 ${hours}:${minutes}`;
 
-          // 확정 상태의 TimeLabel 계산
-          if (meet.decisionDate !== null) {
-            const decisionDate = new Date(meet.decisionDate);
-            TimeLabel += ` (확정: ${decisionDate.toLocaleDateString()})`;
-          }
+          // // 확정 상태의 TimeLabel 계산
+          // if (meet.decisionDate !== null && meet.decisionDate === true) {
+          //   const decisionDate = new Date(meet.decisionDate);
+          //   TimeLabel += ` (확정: ${decisionDate.toLocaleDateString()})`;
+          // }
 
           return (
             <div
@@ -85,7 +85,7 @@ export default function MeetList() {
             >
               <header className='flex justify-between items-center'>
                 <h1 className='text-[16px] font-normal mb-2'>{meet.partyName}</h1>
-                <p className='text-[14px] font-medium'>{TimeLabel}</p>
+                <p className='text-[14px] font-medium'>모임 날짜: {TimeLabel}</p>
               </header>
               <div className='flex justify-between'>
                 <p className='text-[#8E8E8E]'>

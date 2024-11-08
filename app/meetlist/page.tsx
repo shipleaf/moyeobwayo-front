@@ -10,13 +10,6 @@ import MeetDetail from "./components/MeetDetail";
 import Header from "./components/Header";
 import Link from "next/link";
 
-// Example user data
-const users = [
-  { id: 1, username: "Alice", profileImage: "" },
-  { id: 2, username: "Bob", profileImage: "" },
-  { id: 3, username: "Charlie", profileImage: "" },
-];
-
 // Loading fallback components
 const MeetListFallback = () => <div>Loading Meet List...</div>;
 const MeetDetailFallback = () => <div>Loading Meet Detail...</div>;
@@ -51,30 +44,6 @@ export default function Page() {
                 className="text-white opacity-100"
               />
             </Link>
-            <div className="relative flex flex-col mt-8">
-              {users.map((user, index) => (
-                <div
-                  key={user.id}
-                  className="relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer bg-white"
-                  style={{
-                    top: `${index * -45}px`,
-                    zIndex: 10 + index,
-                  }}
-                >
-                  {user.profileImage ? (
-                    <Image
-                      src={user.profileImage}
-                      alt={user.username}
-                      width={80}
-                      height={80}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <UserCircle size={80} className="text-[#ced4da]" />
-                  )}
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

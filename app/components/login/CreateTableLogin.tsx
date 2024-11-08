@@ -38,6 +38,16 @@ export default function CreateTableLogin({
     closeModal();
   };
 
+  const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9ㄱ-ㅎ가-힣\s]/g, ""); // 특수문자 제거
+
+    if (value !== sanitizedValue) {
+      alert("특수문자는 입력할 수 없습니다."); // 특수문자 입력 시 alert 표시
+    }
+    setUserNameInput(sanitizedValue); // 특수문자가 제거된 값으로 업데이트
+  };
+
   return (
     <>
       <div className="bg-white rounded-[10px] flex flex-row w-[360px] h-[60vh] overflow-hidden items-center justify-center">
@@ -63,7 +73,7 @@ export default function CreateTableLogin({
               id="userId"
               value={userNameInput}
               placeholder="성함"
-              onChange={(e) => setUserNameInput(e.target.value)}
+              onChange={handleUserNameChange}
               required
               className="p-[10px] border-1 bg-[#f9fbfc] rounded-[10px] focus:outline-none focus:border-[#285cc4] focus:bg-[#fff]"
             />
