@@ -11,7 +11,15 @@ interface TimeBlockProps {
   slotIndex?: number
 }
 
-const TimeBlock: React.FC<TimeBlockProps> = ({time, style, className }) => {
+const TimeBlock: React.FC<TimeBlockProps> = ({
+  time,
+  style,
+  className,
+  startTime = new Date(), // 기본값으로 현재 시간을 설정
+  targetDate,
+  hourlyLabels = '',
+  slotIndex = 0
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -26,7 +34,10 @@ const TimeBlock: React.FC<TimeBlockProps> = ({time, style, className }) => {
     >
       {isHovered && (
         <div style={{ position: 'absolute', top: '10%', left: '0', pointerEvents: 'none' }}>
-          <MemberStatusPopup />
+          <MemberStatusPopup 
+            time={time}
+            targetDate={targetDate}
+          />
         </div>
       )}
     </div>
