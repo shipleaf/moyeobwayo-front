@@ -124,7 +124,7 @@ export default function SampleAvatarList() {
           <div className="relative w-full h-full rounded-full overflow-hidden">
             {user.profileImage !== null ? (
               <Image
-                src={`/images/sample_avatar${index + 1}.png`}
+                src={`/images/sample_avatar${(index % 3) + 1}.png`} // 1, 2, 3 반복
                 alt={user.username}
                 width={79}
                 height={79}
