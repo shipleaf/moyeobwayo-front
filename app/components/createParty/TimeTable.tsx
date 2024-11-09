@@ -52,7 +52,7 @@ export const getGradationNum = (currentVal: number, maxNum: number): string => {
 
 function getSrcMap(userList: GetUserAvatarResponse[]): Record<number, string> {
   return userList.reduce((acc, user, index) => {
-    acc[user.userId] = user.profileImage ? user.profileImage : `/images/sample_avatar${index + 1}.png`;
+    acc[user.userId] = user.profileImage ? user.profileImage : `/images/sample_avatar${(index % 3) + 1}.png`;
     return acc;
   }, {} as Record<number, string>);
 }

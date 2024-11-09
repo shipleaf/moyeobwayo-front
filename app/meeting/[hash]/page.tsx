@@ -246,7 +246,7 @@ export default function MeetingPage() {
                     <div className="relative w-full h-full rounded-full overflow-hidden">
                       {user.profileImage == null ? (
                         <Image
-                          src={`/images/sample_avatar${index + 1}.png`}
+                          src={`/images/sample_avatar${(index % 3) + 1}.png`} // 1, 2, 3 반복
                           alt={user.userName}
                           width={79}
                           height={79}
@@ -268,7 +268,7 @@ export default function MeetingPage() {
                         className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-md shadow-md text-xs text-gray-700"
                         style={{ whiteSpace: "nowrap" }}
                       >
-                        {user.userName.split('(')[0]}
+                        {user.userName.split("(")[0]}
                         {/* {user.userName} */}
                       </div>
                     )}
@@ -326,8 +326,8 @@ export default function MeetingPage() {
                           {user.profileImage == null ? (
                             <Image
                               src={`/images/sample_avatar${
-                                (index + 1) % 3
-                              }.png`}
+                                (index % 3) + 1
+                              }.png`} // 1, 2, 3 반복
                               alt={user.userName}
                               width={79}
                               height={79}
