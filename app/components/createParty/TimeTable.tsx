@@ -56,7 +56,7 @@ function getSrcMap(userList: GetUserAvatarResponse[]): Record<number, string> {
     return acc;
   }, {} as Record<number, string>);
 }
-interface convertedTimeslot{
+export interface convertedTimeslot{
   userId: number;
   userName: string, 
   byteString: string;
@@ -74,11 +74,8 @@ function getVotedUsers(
     }));
 }
 export default function TimeTable({userList}:timeTableProps) {
-  console.log('in timeTable', userList)
-  
   
   const srcMap = getSrcMap(userList);
-  console.log('srcMap', srcMap)
   
   const searchParams = useSearchParams();
   const { hash } = useParams();
@@ -87,7 +84,7 @@ export default function TimeTable({userList}:timeTableProps) {
   const selectedAvatar = useRecoilValue(selectedAvatarState);
   const refreshValue = useRecoilValue(tableRefreshTrigger);
   const globalTotalNum = useRecoilValue(userNumberState);
-
+  console.log('tibleData format 확인',tableData)
   useEffect(() => {
     const fetchTableData = async () => {
       try {
@@ -246,7 +243,6 @@ export default function TimeTable({userList}:timeTableProps) {
                 const votedUsersData = getVotedUsers(
                   day.convertedTimeslots, srcMap, slotIndex);
                 // 여기서 timeslot.byteString[slotIndex]이 1일때 votedUserDate가 될수있다는 추가조건 넣어줘
-                console.log('실마리',day.convertedTimeslots)
                 return (
                   <TimeBlock
                     key={`${dateIndex}-${slotIndex}`}
