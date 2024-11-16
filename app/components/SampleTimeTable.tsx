@@ -5,7 +5,6 @@ import { Roboto } from "next/font/google";
 import TimeBlock from "./createParty/TimeBlock";
 import { selectedAvatarState } from "../recoil/atom";
 import { VotedUser, convertedTimeslot } from "./createParty/TimeTable";
-import { GetUserAvatarResponse } from "../api/getUserAvatarAPI";
 
 // Roboto 폰트 불러오기
 const roboto = Roboto({
