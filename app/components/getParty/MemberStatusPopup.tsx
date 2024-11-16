@@ -1,7 +1,7 @@
 import { CalendarBlank, Clock } from '@phosphor-icons/react/dist/ssr';
 import React from 'react'
 import AvatarList from './AvatarList';
-import { VotedUser } from '../createParty/TimeTable';
+import { VotedUser } from '@/app/interfaces/VotedUser';
 
 interface MemberStatusPopupProps {
   time?: string;
