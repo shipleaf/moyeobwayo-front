@@ -79,7 +79,7 @@ export default function MeetingPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-  useEffect(() => {});
+  //초기 랜더링시 작동 callback
   useEffect(() => {
     const fetchKakaoData = async () => {
       const jwt = await loadFromLocalStorage("kakaoUserJWT");
@@ -304,7 +304,7 @@ export default function MeetingPage() {
             </div>
             <div className="flex flex-row w-full h-[90%] gap-[5%]">
               <div className="w-[65%] h-full">
-                <TimeTable userList={users} />
+                <TimeTable userList={users} setUserList={setUsers}/>
               </div>
               <div className="president w-[30%] h-full flex flex-col items-center justify-between">
                 <div className="relative flex flex-col gap-[10%] w-full items-center">
@@ -374,7 +374,7 @@ export default function MeetingPage() {
               )}
             </div>
             <div className="w-[75%]">
-              {tableData !== null && <TimeTable userList={users} />}
+              {tableData !== null && <TimeTable userList={users} setUserList={setUsers}/>}
             </div>
           </div>
         )}
