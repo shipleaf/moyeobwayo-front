@@ -55,7 +55,6 @@ export default function MemberStatusPopup({
   votedUsersData,
   votes
 }:MemberStatusPopupProps) {
-  // target Date가 한국 표준시 기준인데... 여기서 2024년 10월 15일 이런format으로 바꿔주는 함수좀 알려줘
   const { startTime, endTime } = time ? parseTimeWithEnd(time) : { startTime: '', endTime: '' };
   const formattedDate = targetDate ? formatKoreanDate(targetDate) : '';
   const maxUsers =  maxVotes?  `${maxVotes}` : '?'

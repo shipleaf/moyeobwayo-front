@@ -4,6 +4,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Roboto } from "next/font/google";
 import TimeBlock from "./createParty/TimeBlock";
 import { selectedAvatarState } from "../recoil/atom";
+import { VotedUser, convertedTimeslot } from "./createParty/TimeTable";
+import { GetUserAvatarResponse } from "../api/getUserAvatarAPI";
 
 // Roboto 폰트 불러오기
 const roboto = Roboto({
@@ -22,7 +24,11 @@ export interface Timeslot {
   dateId: number;
   userName: string;
 }
-
+export interface GetSampleUserAvatarResponse {
+  userId: number,
+  userName: string,
+  profileImage?: string,
+}
 // 1시간 단위로 시간을 반환하는 함수
 const generateHourlyLabels = () => {
   const labels = [];
@@ -126,6 +132,7 @@ function generateDummyData(): PartyDate[] {
       { userId: 2, dateId: 7, byteString: "000000000000", userName: "존" },
       { userId: 3, dateId: 7, byteString: "000000000000", userName: "사라" },
     ],
+    
   });
 
   return dummyData;
@@ -133,6 +140,18 @@ function generateDummyData(): PartyDate[] {
 
 const dummyData = generateDummyData();
 
+function getVotedUsers(
+  users: convertedTimeslot[],
+  srcMap: Record<number, string>,
+  slotIndex: number
+): VotedUser[] {
+  return users
+    .filter(user => user.byteString[slotIndex] === '1') // byteString[slotIndex]가 '1'인 경우만 포함
+    .map(user => ({
+      src: srcMap[user.userId] || '/images/default_avatar.png', // srcMap에서 찾지 못하면 기본 이미지 사용
+      name: user.userName,
+    }));
+}
 // 시간 슬롯을 30분 간격으로 생성하는 함수
 const generateTimeSlots = () => {
   const slots = [];
@@ -142,11 +161,36 @@ const generateTimeSlots = () => {
   }
   return slots;
 };
-
+function getSrcMap(userList: GetSampleUserAvatarResponse[]): Record<number, string> {
+  return userList.reduce((acc, user, index) => {
+    acc[user.userId] = user.profileImage ? user.profileImage : `/images/sample_avatar${(index % 3) + 1}.png`;
+    return acc;
+  }, {} as Record<number, string>);
+}
 const dates = generateDatesFromToday(); // 화면에 보여줄 dates
 const timeSlots = generateTimeSlots(); // 30분 간격의 시간 슬롯 생성
+const userList: GetSampleUserAvatarResponse[] = [
+  {
+    userId: 1,
+    userName: "제시카",
+    profileImage: undefined
+
+  },
+  {
+    userId: 2,
+    userName: "존",
+    profileImage: undefined
+  },
+  {
+    userId: 3,
+    userName: "사라",
+    profileImage: undefined
+
+  },
+];
 
 export default function SampleTimeTable() {
+  const srcMap = getSrcMap(userList);
   const selectedAvatar = useRecoilValue(selectedAvatarState);
   const maxVotes = 3;
   const hourlyLabels = generateHourlyLabels(); // 시간 라벨
@@ -209,6 +253,9 @@ export default function SampleTimeTable() {
                   );
                 }
                 const colorLevel = getGradationNum(votes, maxVotes);
+                
+                const votedUsersData = getVotedUsers(
+                  day.timeslots, srcMap, slotIndex);
                 return (
                   <TimeBlock
                     key={`${dateIndex}-${slotIndex}`}
@@ -219,6 +266,8 @@ export default function SampleTimeTable() {
                     time={`${getWeekday(dates[dateIndex])} ${dates[
                       dateIndex
                     ].getDate()} ${timeSlot}`}
+                    votedUsersData={votedUsersData}
+                    votes={votes}
                     targetDate={dates[dateIndex]}
                     hourlyLabels={hourlyLabels[slotIndex]}
                     slotIndex={slotIndex}
