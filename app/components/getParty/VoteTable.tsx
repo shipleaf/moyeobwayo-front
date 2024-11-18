@@ -226,7 +226,6 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
       userId: userId as number,
       dateId: dateId,
     };
-    console.log("Updated data on click:", updatedData);
 
     voteTime(updatedData)
       .then(() => {
@@ -239,7 +238,7 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
     <div
       onMouseUp={handleMouseUp}
       style={{ userSelect: "none" }}
-      className="w-[90%] mr-[5%] bg-[#fff] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] p-[5%] overflow-auto"
+      className="w-[90%] mr-[5%] flex justify-start items-start bg-[#fff] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] overflow-auto"
     >
       <div
         className="grid items-start justify-center"
@@ -252,7 +251,15 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
         {dates.map((date, index) => {
           const { weekday, day } = formatDate(date.selected_date);
           return (
-            <div key={index} className="text-center border-b border-gray-300">
+            <div 
+            key={index} 
+            className="text-center border-b border-gray-300"
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+            }}
+            >
               <div className="text-xs font-semibold">{weekday}</div>
               <div className="text-lg font-bold">{day}</div>
             </div>
@@ -261,7 +268,16 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
 
         {displaySlots.map((displayTime, displayIndex) => (
           <React.Fragment key={`display-${displayIndex}`}>
-            <div className="flex flex-col items-start text-right pr-2 row-span-2 border-gray-300 text-[10px] relative top-[-5px]">
+            <div 
+            className="flex flex-col text-right row-span-2 border-gray-300 text-[10px]"
+            style={{
+              position: "sticky",
+              left: 0,
+              zIndex: 10,
+              backgroundColor: "#fff",
+              transform: "translateY(-7px)", // 위로 5px 이동
+            }}
+            >
               {displayTime}
             </div>
             {timeSlots

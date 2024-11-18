@@ -19,6 +19,7 @@ const formatDateTime = (dateTime: string, includeDate: boolean = true) => {
   return date.toLocaleString("ko-KR", {
     month: includeDate ? "long" : undefined,
     day: includeDate ? "numeric" : undefined,
+    weekday: includeDate ? "short" : undefined,
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -150,14 +151,14 @@ export default function PartyPriority() {
                   key={index}
                   className="priorList px-4 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px] flex flex-col gap-2"
                 >
-                  <div className="flex flex-row justify-between">
-                    <p className="font-pretendard text-[15px] font-[500]">
+                  <div className="flex flex-row justify-between gap-1">
+                    <p className="font-pretendard text-sm font-[500]">
                       {formatDateTime(timeSlot.start)} ~{" "}
                       {formatDateTime(timeSlot.end, false)}
                     </p>
                     <button
                       onClick={() => handleComplete(timeSlot)}
-                      className="border-1 rounded-[50px] px-4 py-1 text-[13px]  font-bold font-pretendard bg-[#6161CE] text-white"
+                      className="border-1 rounded-[50px] w-[25%] h-[80%] text-[12px] md:text-[13px] lg:text-[14px] whitespace-nowrap font-bold font-pretendard bg-[#6161CE] text-white"
                     >
                       확정
                     </button>

@@ -370,7 +370,7 @@ export default function MeetingPage() {
               tableData ? (
                 <TimeSelector party={tableData.party} />
               ) : (
-                <TableLogin />
+                <TableLogin /> 
               )}
             </div>
             <div className="w-[75%]">
