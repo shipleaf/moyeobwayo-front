@@ -32,16 +32,21 @@ export default function TimeTable({
   startDate,
   endDate,
   dates,
+  currentNum,
 }: {
   startDate: string | null;
   endDate: string | null;
   dates: PartyDate[];
+  currentNum: number | null;
 }) {
   const dateObjects = dates?.map((date) => new Date(date.selected_date));
 
   const startHour = startDate ? new Date(startDate).getHours().toString() : "";
-  console.log(startHour);
-  const endHour = endDate ? new Date(endDate).getHours().toString() : "";
+  const endHour = endDate
+    ? new Date(endDate).getHours() === 0
+      ? "24"
+      : new Date(endDate).getHours().toString()
+    : "";
 
   const timeslots = dates?.map((date) => ({
     dateId: date.dateId,
@@ -63,9 +68,20 @@ export default function TimeTable({
     return slots;
   };
 
+  const generateHourlySlots = () => {
+    const slots = [];
+    const start = parseInt(startHour, 10);
+    const end = parseInt(endHour, 10);
+    for (let hour = start; hour <= end; hour++) {
+      // 종료 시간 포함
+      slots.push(`${hour}:00`); // 1시간 단위로 생성
+    }
+    return slots;
+  };
+
+  const hourlySlots = generateHourlySlots();
   const timeSlots = generateTimeSlots(); // 30분 간격의 시간 슬롯 생성
 
-  console.log(timeslots, startHour, endHour);
   return (
     <div className="">
       <div className="Head gap-[10px] h-[10%] w-full grid grid-cols-[8%_1fr]">
@@ -97,10 +113,23 @@ export default function TimeTable({
       </div>
 
       <div className="Table w-full h-full grid grid-cols-[8%_1fr] gap-[10px]">
-        <div className="flex flex-col justify-between items-center">
-          <span className="font-[500] text-[15px]">{startHour}:00</span>
-          <span className="font-[500] text-[15px]">{endHour}:00</span>
+        {/* 시간 열 */}
+        <div className="flex flex-col items-center relative">
+          {hourlySlots.map((hourlySlot, index) => (
+            <span
+              key={index}
+              className="font-[500] text-sm absolute"
+              style={{
+                top: `${30 * index * 2}px`, // 1시간 단위로 위치 계산 (30px * 2)
+                transform: "translateY(-50%)", // 텍스트를 정확히 경계 중앙에 정렬
+              }}
+            >
+              {hourlySlot}
+            </span>
+          ))}
         </div>
+
+        {/* TimeBlock */}
         <div className="grid grid-cols-7 gap-1">
           {timeslots?.map((day, dayIndex) => (
             <div key={dayIndex} className="flex flex-col">
@@ -109,7 +138,6 @@ export default function TimeTable({
                 const [hour, minute] = timeSlot.split(":").map(Number);
                 dateTime.setHours(hour, minute);
 
-                // 투표 수 계산
                 const votes = day.convertedTimeslots.reduce(
                   (acc, slot) =>
                     acc +
@@ -119,13 +147,12 @@ export default function TimeTable({
                   0
                 );
 
-                // 색상 등급 계산
-                const colorLevel = getGradationNum(votes, 3); // 예: maxVotes = 3
+                const colorLevel = getGradationNum(votes, currentNum);
 
                 return (
                   <TimeBlock
                     key={slotIndex}
-                    time={dateTime} // Date 객체 전달
+                    time={dateTime}
                     className={
                       colorLevel === "0" ? "bg-white" : `bg-MO${colorLevel}`
                     }

@@ -19,37 +19,29 @@ const MeetDetail = () => {
   const searchParams = useSearchParams(); // 검색 파라미터 가져오기
   const table_id = searchParams.get("partyId"); // table_id 가져오기
   const [targetMeet, setTargetMeet] = useState<Party | null>(null); // 상태 초기화
-  const [avariableTime, setAvariableTime] = useState<
-    AvailableTimesResponse[] | null
-  >(null);
-  // const [timeblocks, setTimeblocks] = useState<PartyDate[] | null>(null);
-  // const [currentNum, setCurrentNum] = useState<number | null>(null);
-  // const [partyRange, setPartyRange] = useState<timeRange | null>(null);
+  const [avariableTime, setAvariableTime] = useState<AvailableTimesResponse[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const fetchMeetDetail = async () => {
       if (table_id) {
-        // table_id가 존재할 경우에만 호출
         try {
+          setIsLoading(true)
           const response = await getTable({ table_id: table_id }); // API 호출
           setTargetMeet(response.party); // API로부터 받은 데이터로 상태 업데이트
           setAvariableTime(response.availableTime);
-          // setTimeblocks(response.party.dates);
-          // setCurrentNum(response.party.currentNum);
-          // setPartyRange({
-          // startTime: response.party.startDate,
-          // endTime: response.party.endDate,
-          // });
-          console.log(avariableTime);
+          
         } catch (error) {
           console.error("Failed to fetch table detail:", error); // 에러 처리
+        } finally{
+          setIsLoading(false);
         }
       }
     };
 
     fetchMeetDetail(); // 비동기 함수 호출
   }, [table_id]); // table_id가 변경될 때마다 호출
-
+  console.log('targetting', targetMeet)
   if (!targetMeet) {
     return (
       <div className="absolute top-[25vh] left-[10vw]">
@@ -92,7 +84,14 @@ const MeetDetail = () => {
 
   return (
     <div>
-      {/* HEADER */}
+      {isLoading && (
+          <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50'>
+            <div className='flex flex-col items-center'>
+              <div className="loader"></div>
+              <p className="mt-4 text-lg">로딩 중입니다...</p>
+            </div>
+          </div>
+        )}
       <div
         className="w-full py-[18px] px-5 mb-2.5 text-[#5E5E5E] text-[14px] font-normal rounded-[5px] border border-solid"
         style={{
@@ -127,13 +126,13 @@ const MeetDetail = () => {
             startDate={targetMeet.startDate}
             endDate={targetMeet.endDate}
             dates={targetMeet.dates as PartyDate[]} // 또는 필요한 타입으로 명시적 변환
+            currentNum={targetMeet.currentNum}
           />
         </section>
         {/* Candidate */}
         <section className="w-1/3 max-h-[61vh] overflow-auto">
           {avariableTime?.map((candi, idx) => {
             const people = candi.users.map((user) => user.userName);
-            console.log(people);
             const date = new Date(candi.start);
             const endDate = new Date(candi.end);
             const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줌
@@ -144,7 +143,6 @@ const MeetDetail = () => {
             const endMinutes = endDate.getMinutes().toString().padStart(2, "0");
             const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
             const dayOfWeek = dayNames[date.getDay()]; // getDay()는 0~6 사이의 값을 반환함
-            console.log(people);
             return (
               <div
                 key={idx}

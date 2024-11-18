@@ -8,11 +8,13 @@ import Image from "next/image";
 interface TableLoginProps {
   closeModal: () => void; // 모달 닫기 함수
   onLoginSuccess: () => void; // 로그인 성공 후 호출되는 함수
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function CreateTableLogin({
   closeModal,
   onLoginSuccess,
+  setIsLoading
 }: TableLoginProps) {
   const [loginInfo, setLoginInfo] = useRecoilState(loginValue);
   const setIsLoggedIn = useSetRecoilState(loginState);
@@ -29,11 +31,13 @@ export default function CreateTableLogin({
   }, [loginInfo, isLoginSubmitted, onLoginSuccess]);
 
   const handleSubmit = (e: React.FormEvent) => {
+    setIsLoading(true)
     e.preventDefault();
     const newLoginInfo = { userId: userNameInput, userPassword: passwordInput };
     setLoginInfo(newLoginInfo);
     setIsLoggedIn(true);
     setIsLoginSubmitted(true); // 로그인 제출 상태로 설정
+    setIsLoading(false)
 
     closeModal();
   };

@@ -85,7 +85,8 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
   const setRefreshTrigger = useSetRecoilState(tableRefreshTrigger);
 
   const startHour = new Date(startDate).getHours();
-  const endHour = new Date(endDate).getHours();
+  const prevEndHour = new Date(endDate).getHours();
+  const endHour = prevEndHour === 0? 24: prevEndHour;
   const timeSlots = generateTimeSlots(startHour, endHour);
   const displaySlots = generateDisplaySlots(startHour, endHour);
 
@@ -170,8 +171,6 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
         userId: userId as number,
         dateId: lastDraggedDateId,
       };
-
-      console.log("Updated data:", updatedData);
 
       voteTime(updatedData)
         .then(() => {

@@ -32,6 +32,8 @@ export default function CalendarComp() {
   const [subTitle, setSubTitle] = useState<string>(""); // 부제
   const [userId, setUserId] = useRecoilState(userIdValue);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
+  const [isLoading, setIsLoading] = useState(false)
+
   const userName = useRecoilValue(loginValue);
   const kakaoUser = useRecoilValue(kakaoUserState);
   const setKakaoUserState = useSetRecoilState(kakaoUserState);
@@ -40,11 +42,12 @@ export default function CalendarComp() {
   const handleCloseModal = () => setIsModalOpen(false);
 
   useEffect(() => {
+    
     const checkUserStatus = async () => {
       if (kakaoUser.kakaoUserId !== null) {
         return; // 이미 로그인된 상태
       }
-
+      setIsLoading(true);
       // 카카오 로그인이 되어 있지 않다면, 로컬 스토리지 확인
       const kakaoUserDataByStorage = await loadFromLocalStorage(
         "kakaoUserDataByStorage"
@@ -65,6 +68,8 @@ export default function CalendarComp() {
           });
         }
       }
+
+      setIsLoading(false);
     };
 
     checkUserStatus();
@@ -133,7 +138,7 @@ export default function CalendarComp() {
   };
 
   const calculateTime = (time: number, isPM: boolean) => {
-    if (isPM && time < 12) {
+    if (isPM && time <= 12) {
       return time + 12; // PM일 때 12시간을 더함
     } else if (!isPM && time === 12) {
       return 0; // AM 12시일 때는 0시로 변경
@@ -143,7 +148,7 @@ export default function CalendarComp() {
 
   // 제출 시 JSON 객체를 console.log
   const handleSubmit = async () => {
-    if (totalPeople <= 0) {
+    if (totalPeople <= 0 && isTotalPeopleUnset === false) {
       alert(
         "인원 수를 설정해주세요 설정인원이 모두 투표완료 시 알림 메시지가 발송돼요!"
       );
@@ -189,8 +194,14 @@ export default function CalendarComp() {
 
     if (lastSelectedDate) {
       endDateTime = new Date(lastSelectedDate);
-      endDateTime.setHours(endHour, 0, 0, 0); // 종료 시간 적용
+      if (endHour === 24) {
+        endDateTime.setDate(endDateTime.getDate() + 1); // 날짜를 하루 증가
+        endDateTime.setHours(0, 0, 0, 0); // 다음 날 자정 (00:00)
+      } else {
+        endDateTime.setHours(endHour, 0, 0, 0); // 일반적인 종료 시간
+      }
     }
+    console.log('final endTime', endDateTime)
     // 인터페이스 SubmitData에 맞게 데이터를 매핑
     const dataToSubmit: SubmitData = {
       participants: totalPeople,
@@ -210,6 +221,7 @@ export default function CalendarComp() {
     }
 
     try {
+      setIsLoading(true);
       const result = await createTable(dataToSubmit);
       const hash = result.partyId;
 
@@ -231,6 +243,8 @@ export default function CalendarComp() {
       router.push(`/meeting/${hash}`);
     } catch (error) {
       console.error("제출 실패: ", error);
+    } finally{
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -257,6 +271,15 @@ export default function CalendarComp() {
 
   return (
     <div className="mr-[2%] basis-1/4 overflow-auto">
+      {/* Loading Indicator */}
+      {isLoading && (
+          <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50'>
+            <div className='flex flex-col items-center'>
+              <div className="loader"></div>
+              <p className="mt-4 text-lg">로딩 중입니다...</p>
+            </div>
+          </div>
+        )}
       <div className="flex flex-col flex-none items-center justify-center bg-custom-bg border border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom">
         <DatePicker
           key={selectedDates.toString()} // 선택된 날짜 배열이 변경될 때마다 재렌더링
@@ -285,9 +308,9 @@ export default function CalendarComp() {
               onChange={handleStartTimeChange}
               className="w-[55%] pr-[5px] mr-[5%] focus:outline-none rounded-[4.216px] bg-[rgba(120,120,128,0.12)] text-right font-pretendard font-[500]"
             >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i} value={i + 1}>
-                  {i + 1}:00
+              {Array.from({ length: 13}, (_, i) => (
+                <option key={i} value={i}>
+                  {i}:00
                 </option>
               ))}
             </select>
@@ -449,6 +472,7 @@ export default function CalendarComp() {
         <CreateTableLogin
           closeModal={handleCloseModal}
           onLoginSuccess={handleLoginSuccess}
+          setIsLoading={setIsLoading}
         />
       </Modal>
     </div>

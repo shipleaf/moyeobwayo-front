@@ -1,26 +1,21 @@
 "use client";
 
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import "react-datepicker/dist/react-datepicker.css";
-import { Roboto } from "next/font/google";
 import TimeBlock from "./TimeBlock";
-import { GetUserAvatarResponse } from "@/app/api/getUserAvatarAPI";
-// import { PartyDate } from "@/app/api/getTableAPI";
+import { GetUserAvatarResponse, getUserAvatar } from "@/app/api/getUserAvatarAPI";
 import { selectedAvatarState, tableRefreshTrigger, userNumberState } from "@/app/recoil/atom";
 import { useEffect, useState } from "react";
 import { getTable } from "@/app/api/getTableAPI";
 import { useParams } from "next/navigation";
-// import { TableData } from "@/app/meeting/[hash]/page";
 import { Party } from "@/app/api/getTableAPI";
 import { useSearchParams } from "next/navigation";
+import { roboto } from "@/app/utils/getRobot";
+import { VotedUser } from "@/app/interfaces/VotedUser";
 
-// Roboto 폰트 불러오기
-const roboto = Roboto({
-  weight: ["400", "500", "700"],
-  subsets: ["latin"],
-});
 interface timeTableProps{
   userList:GetUserAvatarResponse[]
+  setUserList:React.Dispatch<React.SetStateAction<GetUserAvatarResponse[]>>;
 }
 export interface Table {
   party: Party;
@@ -37,10 +32,7 @@ export interface Table {
   }[];
 }
 
-export interface VotedUser {
-  src: string;
-  name: string;
-}
+
 export const getGradationNum = (currentVal: number, maxNum: number): string => {
   if (maxNum === 0) {
     return "0";
@@ -56,7 +48,7 @@ function getSrcMap(userList: GetUserAvatarResponse[]): Record<number, string> {
     return acc;
   }, {} as Record<number, string>);
 }
-interface convertedTimeslot{
+export interface convertedTimeslot{
   userId: number;
   userName: string, 
   byteString: string;
@@ -73,12 +65,12 @@ function getVotedUsers(
       name: user.userName,
     }));
 }
-export default function TimeTable({userList}:timeTableProps) {
-  console.log('in timeTable', userList)
-  
+export default function TimeTable({
+  userList,
+  setUserList
+  }:timeTableProps) {
   
   const srcMap = getSrcMap(userList);
-  console.log('srcMap', srcMap)
   
   const searchParams = useSearchParams();
   const { hash } = useParams();
@@ -86,56 +78,62 @@ export default function TimeTable({userList}:timeTableProps) {
   const [tableData, setTableData] = useState<Table | null>(null); // 테이블 데이터 상태 관리
   const selectedAvatar = useRecoilValue(selectedAvatarState);
   const refreshValue = useRecoilValue(tableRefreshTrigger);
-  const globalTotalNum = useRecoilValue(userNumberState);
-
+  const [globalTotalNum, setGlobalTotalNum] = useRecoilState(userNumberState);
+  
   useEffect(() => {
     const fetchTableData = async () => {
       try {
         const tableId = hash || partyId; // hash가 없으면 partyId를 사용
         if (!tableId) return;
 
-        const tableDataResponse = await getTable({
-          table_id: tableId as string,
-        });
+        // 두 개의 API 요청을 동시에 호출
+        Promise.all([
+          getTable({ table_id: hash as string }),
+          getUserAvatar({ table_id: hash as string }),
+        ])
+          .then(([tableDataResponse, userAvatarResponse]) => {
+            const dates = tableDataResponse.party.dates.map((date) => {
+              const localDate = new Date(date.selected_date);
+              return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식
+            });
+    
+            const timeslots = tableDataResponse.party.dates.map((date) => ({
+              dateId: date.dateId,
+              convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
+                userId: slot.userId,
+                userName: slot.userName,
+                byteString: slot.byteString,
+              })),
+            }));
+    
+            const startTime = new Date(
+              tableDataResponse.party.startDate
+            ).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+    
+            const endTime = new Date(
+              tableDataResponse.party.endDate
+            ).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+    
+            setTableData({
+              party: tableDataResponse.party,
+              formattedDates: dates,
+              startTime: startTime,
+              endTime: endTime,
+              dates: timeslots,
+            });
 
-        const dates = tableDataResponse.party.dates.map((date) => {
-          const localDate = new Date(date.selected_date);
-          return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식
-        });
-
-        const timeslots = tableDataResponse.party.dates.map((date) => ({
-          dateId: date.dateId,
-          convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
-            userId: slot.userId,
-            userName: slot.userName,
-            byteString: slot.byteString,
-          })),
-        }));
-
-        const startTime = new Date(
-          tableDataResponse.party.startDate
-        ).toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-
-        const endTime = new Date(
-          tableDataResponse.party.endDate
-        ).toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-
-        setTableData({
-          party: tableDataResponse.party,
-          formattedDates: dates,
-          startTime: startTime,
-          endTime: endTime,
-          dates: timeslots,
-        });
+          setUserList(userAvatarResponse);
+          setGlobalTotalNum(userAvatarResponse.length);
+        })
 
       } catch (error) {
-        console.error("데이터 불러오기 실패: ", error);
+        throw error
       }
     };
 
@@ -160,8 +158,10 @@ export default function TimeTable({userList}:timeTableProps) {
 
   const generateTimeSlots = () => {
     const slots = [];
-    const start = parseInt(tableData.startTime.split(":")[0], 10);
-    const end = parseInt(tableData.endTime.split(":")[0], 10);
+    const start = parseInt(tableData.startTime.split(":")[0], 10) || 0;
+    const prevEnd = parseInt(tableData.endTime.split(":")[0], 10) || 0;
+
+    const end = prevEnd === 0 ? 24 : prevEnd;
     for (let hour = start; hour < end; hour++) {
       slots.push(`${hour}:00`);
       slots.push(`${hour}:30`);
@@ -172,7 +172,8 @@ export default function TimeTable({userList}:timeTableProps) {
   const generateHourlyLabels = () => {
     const labels = [];
     const start = parseInt(tableData.startTime.split(":")[0], 10);
-    const end = parseInt(tableData.endTime.split(":")[0], 10);
+    const prevEnd = parseInt(tableData.endTime.split(":")[0], 10);
+    const end = prevEnd === 0 ? 24 : prevEnd; 
     for (let hour = start; hour <= end; hour++) {
       labels.push(`${hour}:00`);
     }
@@ -246,7 +247,6 @@ export default function TimeTable({userList}:timeTableProps) {
                 const votedUsersData = getVotedUsers(
                   day.convertedTimeslots, srcMap, slotIndex);
                 // 여기서 timeslot.byteString[slotIndex]이 1일때 votedUserDate가 될수있다는 추가조건 넣어줘
-                console.log('실마리',day.convertedTimeslots)
                 return (
                   <TimeBlock
                     key={`${dateIndex}-${slotIndex}`}

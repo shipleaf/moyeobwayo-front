@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MemberStatusPopup from '../getParty/MemberStatusPopup';
-import { VotedUser } from './TimeTable';
+import { VotedUser } from '@/app/interfaces/VotedUser';
 interface TimeBlockProps {
   time: string;
   style?: React.CSSProperties;

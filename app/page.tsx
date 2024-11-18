@@ -7,6 +7,8 @@ import SampleAvatarList from "./components/SampleAvatarList";
 import SampleTimeTable from "./components/SampleTimeTable";
 import Footer from "./components/common/Footer";
 import MeetPageRedirectHandler from "./components/MeetPageRedirectHandler";
+import { FaRegCalendarCheck } from "react-icons/fa";
+
 
 // 예시 사용자 데이터
 export default function Home() {
@@ -35,7 +37,7 @@ export default function Home() {
                 href={"/"}
                 className={`calendar w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer ${"bg-white text-black"}`}
               >
-                <CalendarBlank size={30} className="text-black" />
+                <FaRegCalendarCheck size={30} className="text-[#777]" />
               </Link>
               <SampleAvatarList />
             </div>
