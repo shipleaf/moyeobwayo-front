@@ -138,7 +138,7 @@ export default function CalendarComp() {
   };
 
   const calculateTime = (time: number, isPM: boolean) => {
-    if (isPM && time < 12) {
+    if (isPM && time <= 12) {
       return time + 12; // PM일 때 12시간을 더함
     } else if (!isPM && time === 12) {
       return 0; // AM 12시일 때는 0시로 변경
@@ -194,8 +194,14 @@ export default function CalendarComp() {
 
     if (lastSelectedDate) {
       endDateTime = new Date(lastSelectedDate);
-      endDateTime.setHours(endHour, 0, 0, 0); // 종료 시간 적용
+      if (endHour === 24) {
+        endDateTime.setDate(endDateTime.getDate() + 1); // 날짜를 하루 증가
+        endDateTime.setHours(0, 0, 0, 0); // 다음 날 자정 (00:00)
+      } else {
+        endDateTime.setHours(endHour, 0, 0, 0); // 일반적인 종료 시간
+      }
     }
+    console.log('final endTime', endDateTime)
     // 인터페이스 SubmitData에 맞게 데이터를 매핑
     const dataToSubmit: SubmitData = {
       participants: totalPeople,
@@ -302,9 +308,9 @@ export default function CalendarComp() {
               onChange={handleStartTimeChange}
               className="w-[55%] pr-[5px] mr-[5%] focus:outline-none rounded-[4.216px] bg-[rgba(120,120,128,0.12)] text-right font-pretendard font-[500]"
             >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i} value={i + 1}>
-                  {i + 1}:00
+              {Array.from({ length: 13}, (_, i) => (
+                <option key={i} value={i}>
+                  {i}:00
                 </option>
               ))}
             </select>

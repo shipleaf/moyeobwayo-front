@@ -40,8 +40,9 @@ export default function TimeTable({
   const dateObjects = dates?.map((date) => new Date(date.selected_date));
 
   const startHour = startDate ? new Date(startDate).getHours().toString() : "";
-  console.log(startHour);
-  const endHour = endDate ? new Date(endDate).getHours().toString() : "";
+  const endHour = endDate
+    ? (new Date(endDate).getHours() === 0 ? "24" : new Date(endDate).getHours().toString())
+  : "";
 
   const timeslots = dates?.map((date) => ({
     dateId: date.dateId,
@@ -65,7 +66,6 @@ export default function TimeTable({
 
   const timeSlots = generateTimeSlots(); // 30분 간격의 시간 슬롯 생성
 
-  console.log(timeslots, startHour, endHour);
   return (
     <div className="">
       <div className="Head gap-[10px] h-[10%] w-full grid grid-cols-[8%_1fr]">
