@@ -6,16 +6,16 @@
 :root {
   --background: #ffffff; /* 필요에 맞게 색상 지정 */
   --foreground: #000000;
-  
+
   /* HeatMap 색상 */
-  --MO10: #A1A1FF;
-  --MO20: #8D8DF4;
-  --MO30: #8181E8;
-  --MO40: #7272D9;
-  --MO50: #6161CE;
-  --MO60: #5555BF;
-  --MO70: #4A4AAE;
-  --MO80: #3D3D97;
+  --MO10: #a1a1ff;
+  --MO20: #8d8df4;
+  --MO30: #8181e8;
+  --MO40: #7272d9;
+  --MO50: #6161ce;
+  --MO60: #5555bf;
+  --MO70: #4a4aae;
+  --MO80: #3d3d97;
   --MO90: #313183;
   --MO100: #262669;
 }
@@ -104,7 +104,7 @@
   right: 10% !important;
 }
 
-.react-datepicker__day--keyboard-selected{
+.react-datepicker__day--keyboard-selected {
   background-color: transparent !important;
   color: inherit !important;
   font-weight: inherit !important;
@@ -116,9 +116,27 @@
   font-weight: inherit !important;
 }
 
-.react-datepicker__day--highlighted{
-  color: #7272D9 !important;
+.react-datepicker__day--highlighted {
+  color: #7272d9 !important;
   background-color: #ebebf7 !important;
   border-radius: 100% !important;
   font-weight: 700 !important;
+}
+
+.loader {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #6161ce; /* Blue */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
