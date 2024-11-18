@@ -239,7 +239,7 @@ export default function CalendarComp() {
         loginData.kakaoUserId = kakaoUser.kakaoUserId;
       }
       await tableLoginHandler(loginData, setUserId);
-
+      
       router.push(`/meeting/${hash}`);
     } catch (error) {
       console.error("제출 실패: ", error);
@@ -298,7 +298,7 @@ export default function CalendarComp() {
         />
 
         <hr className="w-[90%] border-1 border-[#ECECED] my-[1%]" />
-        <div className="flex flex-row align-center justify-between bg-white w-[84%] py-[5px]">
+        <div className="flex flex-row align-center justify-between bg-custom-bg w-[84%] py-[5px]">
           <span className="w-[15%] font-pretendard font-[500] text-[18px]">
             Starts
           </span>
@@ -333,7 +333,7 @@ export default function CalendarComp() {
             </button>
           </div>
         </div>
-        <div className="flex flex-row align-center justify-between bg-white w-[84%] py-[5px]">
+        <div className="flex flex-row align-center justify-between bg-custom-bg w-[84%] py-[5px]">
           <span className="w-[15%] font-pretendard font-[500] text-[18px]">
             Ends
           </span>
