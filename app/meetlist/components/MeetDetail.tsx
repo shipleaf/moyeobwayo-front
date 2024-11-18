@@ -92,7 +92,6 @@ const MeetDetail = () => {
             </div>
           </div>
         )}
-      {/* HEADER */}
       <div
         className="w-full py-[18px] px-5 mb-2.5 text-[#5E5E5E] text-[14px] font-normal rounded-[5px] border border-solid"
         style={{
@@ -127,6 +126,7 @@ const MeetDetail = () => {
             startDate={targetMeet.startDate}
             endDate={targetMeet.endDate}
             dates={targetMeet.dates as PartyDate[]} // 또는 필요한 타입으로 명시적 변환
+            currentNum={targetMeet.currentNum}
           />
         </section>
         {/* Candidate */}
