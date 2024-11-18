@@ -47,18 +47,21 @@ export default function Page() {
         </div>
       </div>
       <div className="page w-[90%] flex flex-col h-full bg-white rounded-[20px] z-50 p-[2%]">
-        <Suspense>
-          <Header />
-        </Suspense>
-        {/* Content */}
-        <section className="flex gap-6">
-          {/* List with Suspense */}
-          <div className="w-1/3 flex flex-col max-h-[76vh] overflow-auto">
+        <div className="w-full h-[11%]">
+          <Suspense>
+            <Header />
+          </Suspense>
+        </div>
+        <section className="flex-grow flex flex-row gap-6 overflow-hidden">
+          {/* MeetList */}
+          <div className="w-1/3 flex flex-col h-full overflow-auto">
             <Suspense fallback={<MeetListFallback />}>
               <MeetList />
             </Suspense>
           </div>
-          <div className="w-full relative">
+
+          {/* MeetDetail */}
+          <div className="w-full h-full relative overflow-auto">
             <Suspense fallback={<MeetDetailFallback />}>
               <MeetDetail />
             </Suspense>

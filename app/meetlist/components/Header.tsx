@@ -82,7 +82,7 @@ export default function Header() {
   };
 
   return (
-    <header className="pt-[12px] pb-[13px] flex justify-between items-center">
+    <header className="pt-[12px] pb-[13px] flex justify-between items-center h-full">
       <h1 className="font-bold text-[20px]">
         <strong className="text-[#6161CE]">
           {globalKakaoUserState.kakaoUserId && globalKakaoUserState.nickname}
