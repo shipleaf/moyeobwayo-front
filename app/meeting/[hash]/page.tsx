@@ -32,7 +32,6 @@ import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
 import { decodeJWT } from "@/app/utils/jwtUtils";
 import { LoginData } from "@/app/api/tableLogin";
 import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
-// import { Router } from "next/router";
 import { GetCompleteResponse, getDecision } from "@/app/api/partyCompleteAPI";
 // import { tableRefreshTrigger } from "@/app/recoil/atom";
 
@@ -56,7 +55,6 @@ export default function MeetingPage() {
   const router = useRouter();
   const { hash } = useParams(); // meetingId를 URL에서 추출
   const [tableData, setTableData] = useState<TableData | null>(null);
-  // const isLoggedIn = useRecoilValue(loginState);
   const [, setLoading] = useState(false);
   const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
   const [selectedAvatar, setSelectedAvatar] =

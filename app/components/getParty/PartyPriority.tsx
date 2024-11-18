@@ -75,18 +75,12 @@ export default function PartyPriority() {
     if (!hash) return;
 
     const selectedDate = timeSlot.start.split("T")[0]; // "2024-11-22"
-    console.log("Selected Date:", selectedDate);
-    console.log("Priority Data Dates:", priorityData?.party.dates);
 
     // dates에서 해당 날짜에 맞는 dateId를 찾기
     const matchingDate = priorityData?.party.dates.find((date) => {
       const dateOnly = date.selected_date.split("T")[0]; // "2024-11-22"
       return dateOnly === selectedDate;
     });
-
-    console.log(matchingDate);
-
-    console.log(matchingDate);
 
     if (!matchingDate) {
       console.error("해당 날짜와 일치하는 dateId를 찾을 수 없습니다.");

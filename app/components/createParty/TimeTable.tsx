@@ -158,8 +158,10 @@ export default function TimeTable({
 
   const generateTimeSlots = () => {
     const slots = [];
-    const start = parseInt(tableData.startTime.split(":")[0], 10);
-    const end = parseInt(tableData.endTime.split(":")[0], 10);
+    const start = parseInt(tableData.startTime.split(":")[0], 10) || 0;
+    const prevEnd = parseInt(tableData.endTime.split(":")[0], 10) || 0;
+
+    const end = prevEnd === 0 ? 24 : prevEnd;
     for (let hour = start; hour < end; hour++) {
       slots.push(`${hour}:00`);
       slots.push(`${hour}:30`);
@@ -170,7 +172,8 @@ export default function TimeTable({
   const generateHourlyLabels = () => {
     const labels = [];
     const start = parseInt(tableData.startTime.split(":")[0], 10);
-    const end = parseInt(tableData.endTime.split(":")[0], 10);
+    const prevEnd = parseInt(tableData.endTime.split(":")[0], 10);
+    const end = prevEnd === 0 ? 24 : prevEnd; 
     for (let hour = start; hour <= end; hour++) {
       labels.push(`${hour}:00`);
     }
