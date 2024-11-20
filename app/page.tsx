@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import CalendarComp from "./components/createParty/CalendarComp";
 import Link from "next/link";
-import { CalendarBlank, Clipboard } from "@phosphor-icons/react/dist/ssr";
+import { Clipboard } from "@phosphor-icons/react/dist/ssr";
 import SampleAvatarList from "./components/SampleAvatarList";
 import SampleTimeTable from "./components/SampleTimeTable";
 import Footer from "./components/common/Footer";

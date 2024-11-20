@@ -132,7 +132,7 @@ export default function TimeTable({
         <div className="flex gap-[10px] w-full">
           {timeslots?.map((day, dayIndex) => (
             <div key={dayIndex} className="flex flex-col min-w-[70px]">
-              {timeSlots.map((timeSlot, slotIndex, timeSlotArray) => {
+              {timeSlots.map((timeSlot, slotIndex) => {
                 const dateTime = new Date(dateObjects[dayIndex]);
                 const [hour, minute] = timeSlot.split(":").map(Number);
                 dateTime.setHours(hour, minute);
@@ -147,7 +147,7 @@ export default function TimeTable({
                 );
 
                 const colorLevel = getGradationNum(votes, AfterCurrnetNum);
-                const lastIndex = slotIndex === timeSlotArray.length;
+                // const lastIndex = slotIndex === timeSlotArray.length;
                 return (
                   <TimeBlock
                     key={slotIndex}
