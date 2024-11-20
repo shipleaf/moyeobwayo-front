@@ -121,7 +121,7 @@ const MeetDetail = () => {
       </div>
       <div className="flex gap-4">
         {/* TimeTable */}
-        <section className="w-2/3 max-h-[61vh] overflow-auto bg-[#F7F7F7] py-3 px-2 rounded-[10px]">
+        <section className="w-2/3 max-h-[61vh] overflow-y-auto bg-[#F7F7F7] py-3 px-2 rounded-[10px]">
           <TimeTable
             startDate={targetMeet.startDate}
             endDate={targetMeet.endDate}
