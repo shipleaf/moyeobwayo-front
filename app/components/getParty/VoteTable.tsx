@@ -257,6 +257,8 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
               position: "sticky",
               top: 0,
               zIndex: 10,
+              backgroundColor: "#fff",
+              marginBottom: "5px",
             }}
             >
               <div className="text-xs font-semibold">{weekday}</div>
@@ -268,11 +270,11 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
         {displaySlots.map((displayTime, displayIndex) => (
           <React.Fragment key={`display-${displayIndex}`}>
             <div 
-            className="flex flex-col text-right row-span-2 border-gray-300 text-[10px]"
+            className="flex flex-col text-center row-span-2 border-gray-300 text-[10px]"
             style={{
               position: "sticky",
               left: 0,
-              zIndex: 10,
+              zIndex: 8,
               backgroundColor: "#fff",
               transform: "translateY(-7px)", // 위로 5px 이동
             }}

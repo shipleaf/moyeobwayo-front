@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { CalendarBlank } from "@phosphor-icons/react/dist/ssr";
 import { Clipboard } from "@phosphor-icons/react/dist/ssr";
 import MeetList from "./components/MeetList";
@@ -13,7 +13,18 @@ import Link from "next/link";
 const MeetListFallback = () => <div>Loading Meet List...</div>;
 const MeetDetailFallback = () => <div>Loading Meet Detail...</div>;
 
+
+
 export default function Page() {
+  useEffect(() => {
+    // 페이지 스크롤 비활성화
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      // 페이지 스크롤 활성화 (컴포넌트 언마운트 시)
+      document.body.style.overflow = "auto";
+    };
+  }, []);
   return (
     <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
       <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
@@ -59,7 +70,6 @@ export default function Page() {
               <MeetList />
             </Suspense>
           </div>
-
           {/* MeetDetail */}
           <div className="w-full h-full relative overflow-auto">
             <Suspense fallback={<MeetDetailFallback />}>

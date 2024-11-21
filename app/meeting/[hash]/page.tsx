@@ -69,6 +69,8 @@ export default function MeetingPage() {
     useRecoilState(kakaoUserState); // Recoil 상태 사용
   const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue);
   // const refreshValue = useRecoilValue(tableRefreshTrigger);
+  const [possibleUsers, setPossibleUsers] = useState<string[]>([]);
+  const [impossibleUsers, setImpossibleUsers] = useState<string[]>([]);
 
   const handleLogoClick = () => {
     router.push(`/`);
@@ -169,14 +171,24 @@ export default function MeetingPage() {
     if (tableData?.party.decisionDate && hash) {
       getDecision({ table_id: hash as string })
         .then((decisionData: GetCompleteResponse) => {
-          console.log("possibleUsers:", decisionData.possibleUsers);
-          console.log("impossibleUsers:", decisionData.impossibleUsers);
+          setPossibleUsers(decisionData.possibleUsers);
+          setImpossibleUsers(decisionData.impossibleUsers);
         })
         .catch((error) => {
           console.error("getDecision API 호출 에러:", error);
         });
     }
   }, [tableData?.party.decisionDate, hash]);
+
+  useEffect(() => {
+    // 페이지 스크롤 비활성화
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      // 페이지 스크롤 활성화 (컴포넌트 언마운트 시)
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   return (
     <>
@@ -230,11 +242,11 @@ export default function MeetingPage() {
                 {users.map((user, index) => (
                   <div
                     key={user.userId}
-                    onClick={() => setSelectedAvatar(user)}
+                    onMouseEnter={() => setSelectedAvatar(user)} // Hover 시 avatar 선택
                     className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 ${
                       selectedAvatar?.userId === user.userId
                         ? "translate-y-[-20px] ring-2 ring-purple-400"
-                        : ""
+                        : "hover:translate-y-[-20px] hover:ring-2 hover:ring-purple-400"
                     }`}
                     style={{
                       top: `${index * -45}px`,
@@ -243,13 +255,13 @@ export default function MeetingPage() {
                   >
                     <div className="relative w-full h-full rounded-full overflow-hidden">
                       {user.profileImage == null ? (
-                        <Image
-                          src={`/images/sample_avatar${(index % 3) + 1}.png`} // 1, 2, 3 반복
-                          alt={user.userName}
-                          width={79}
-                          height={79}
-                          className="rounded-full"
-                        />
+                        <div
+                          className="w-[79px] h-[79px] rounded-full bg-[#ddd] flex items-center justify-center text-white text-xl font-bold"
+                          style={{ fontSize: "24px" }} // 글자 크기 조정
+                        >
+                          {user.userName.charAt(0).toUpperCase()}{" "}
+                          {/* 첫 글자 표시 */}
+                        </div>
                       ) : (
                         <Image
                           src={user.profileImage}
@@ -261,13 +273,13 @@ export default function MeetingPage() {
                       )}
                       <div className="inset-0 rounded-full bg-[#6161CE] backdrop-blur-[2px]"></div>
                     </div>
-                    {selectedAvatar?.userId === user.userId && (
+                    {(selectedAvatar?.userId === user.userId ||
+                      user.userId === selectedAvatar?.userId) && (
                       <div
                         className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-md shadow-md text-xs text-gray-700"
                         style={{ whiteSpace: "nowrap" }}
                       >
                         {user.userName.split("(")[0]}
-                        {/* {user.userName} */}
                       </div>
                     )}
                   </div>
@@ -292,6 +304,17 @@ export default function MeetingPage() {
                   style={{
                     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // 원하는 그림자 값
                   }}
+                  onClick={() => {
+                    navigator.clipboard
+                      .writeText(window.location.href)
+                      .then(() => {
+                        alert("링크가 클립보드에 복사되었습니다!");
+                      })
+                      .catch((err) => {
+                        console.error("링크 복사 중 오류가 발생했습니다:", err);
+                        alert("링크 복사에 실패했습니다.");
+                      });
+                  }}
                 >
                   <GoShareAndroid size={18} />
                 </div>
@@ -302,30 +325,23 @@ export default function MeetingPage() {
             </div>
             <div className="flex flex-row w-full h-[90%] gap-[5%]">
               <div className="w-[65%] h-full">
-                <TimeTable userList={users} setUserList={setUsers}/>
+                <TimeTable userList={users} setUserList={setUsers} />
               </div>
-              <div className="president w-[30%] h-full flex flex-col items-center justify-between">
-                <div className="relative flex flex-col gap-[10%] w-full items-center">
+              <div className="w-[30%] h-full flex flex-col items-center justify-between">
+                <div className="flex flex-col h-[30%] gap-[10%] w-full items-center mb-[10px]">
                   <div className="w-full font-pretendard text-[24px] font-[600] text-[#686868] text-center">
                     {"모임장"}
                   </div>
                   {users
                     .filter((user) => user.userName === tableData?.party.userId)
                     .map((user, index) => (
-                      <div
-                        key={user.userId}
-                        className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center transition-transform duration-300`}
-                        style={{
-                          top: `${index * -45}px`,
-                          zIndex: 10 + index,
-                        }}
-                      >
-                        <div className="relative w-full h-full rounded-full overflow-hidden">
+                      <div key={user.userId}>
+                        <div className="w-full h-full rounded-full overflow-hidden">
                           {user.profileImage == null ? (
                             <Image
                               src={`/images/sample_avatar${
                                 (index % 3) + 1
-                              }.png`} // 1, 2, 3 반복
+                              }.png`}
                               alt={user.userName}
                               width={79}
                               height={79}
@@ -348,6 +364,52 @@ export default function MeetingPage() {
                     {tableData?.party.userId.split("(")[0]}
                   </div>
                 </div>
+                <div className="flex flex-row w-full h-[30%] items-start justify-center gap-[20%] overflow-auto">
+                  <div className="mb-4">
+                    <h3 className="font-pretendard text-lg font-bold text-[#6161CE] mb-2">
+                      참여 가능
+                    </h3>
+                    <ul className="list-none space-y-2">
+                      {tableData?.party.decisionDate &&
+                        possibleUsers.map((user, index) => (
+                          <li
+                            key={index}
+                            className="flex items-center gap-2 text-gray-700 text-sm"
+                          >
+                            <span className="w-8 h-8 rounded-full bg-[#ddd] flex items-center justify-center text-white">
+                              {user.charAt(0)}
+                            </span>
+                            <span className="font-pretendard font-[600] text-sm">
+                              {user.split("(")[0]}
+                            </span>
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+
+                  {/* Impossible Users */}
+                  <div>
+                    <h3 className="font-pretendard text-lg font-bold text-[#FF6B6B] mb-2">
+                      참여 불가능
+                    </h3>
+                    <ul className="list-none space-y-2">
+                      {tableData?.party.decisionDate &&
+                        impossibleUsers.map((user, index) => (
+                          <li
+                            key={index}
+                            className="flex items-center gap-2 text-gray-700 text-sm"
+                          >
+                            <span className="w-8 h-8 rounded-full bg-[#ddd] flex items-center justify-center text-white">
+                              {user.charAt(0)}
+                            </span>
+                            <span className="font-pretendard font-[600] text-sm">
+                              {user.split("(")[0]}
+                            </span>
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                </div>
                 <PartyPriority />
               </div>
             </div>
@@ -368,11 +430,13 @@ export default function MeetingPage() {
               tableData ? (
                 <TimeSelector party={tableData.party} />
               ) : (
-                <TableLogin /> 
+                <TableLogin />
               )}
             </div>
             <div className="w-[75%]">
-              {tableData !== null && <TimeTable userList={users} setUserList={setUsers}/>}
+              {tableData !== null && (
+                <TimeTable userList={users} setUserList={setUsers} />
+              )}
             </div>
           </div>
         )}
