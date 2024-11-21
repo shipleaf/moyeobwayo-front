@@ -25,23 +25,24 @@
   font-style: normal;
   src: url("/fonts/PretendardVariable.woff2") format("woff2");
 }
-/* 전체 스크롤바 숨기기 */
+/* 전체 스크롤바 스타일 */
 ::-webkit-scrollbar {
-  width: 0px; /* 세로 스크롤바 너비를 0으로 설정하여 숨김 */
+  width: 0; /* 세로 스크롤바 숨기기 */
+  height: 8px; /* 가로 스크롤바 높이 설정 */
+  opacity: 0.5;
+
 }
 
-/* 가로 스크롤바는 표시 */
-::-webkit-scrollbar:horizontal {
-  height: 10px; /* 가로 스크롤바 높이 설정 */
+/* 가로 스크롤바 스타일 */
+::-webkit-scrollbar-thumb {
+  background-color: #7272D9; /* 스크롤바 색상 */
+  border-radius: 4px; /* 스크롤바 모서리 둥글게 */
 }
 
-::-webkit-scrollbar-thumb:horizontal {
-  background-color: #7272d9; /* 가로 스크롤바 색상 */
-  border-radius: 5px; /* 가로 스크롤바 둥글게 */
-}
-
-::-webkit-scrollbar-track:horizontal {
-  background-color: #f3f3f3; /* 가로 스크롤 트랙 색상 */
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1); /* 스크롤바 트랙 색상 */
+  border-radius: 4px;
+  height: 4px;
 }
 /* DatePicker */
 .react-datepicker {

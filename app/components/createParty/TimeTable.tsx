@@ -79,7 +79,9 @@ export default function TimeTable({
   const selectedAvatar = useRecoilValue(selectedAvatarState);
   const refreshValue = useRecoilValue(tableRefreshTrigger);
   const [globalTotalNum, setGlobalTotalNum] = useRecoilState(userNumberState);
-  
+  const [blockWidth, setBlockWidth] = useState(130);
+  const [blockHeight, setBlockHeight] = useState("6vh");
+  const [timeColumnWidth, setTimeColumnWidth] = useState(110);
   useEffect(() => {
     const fetchTableData = async () => {
       try {
@@ -141,6 +143,32 @@ export default function TimeTable({
       fetchTableData();
     }
   }, [hash, partyId, refreshValue]);
+  // 화면 너비에 따른 계산
+  const updateWidths = () => {
+    const screenWidth = window.innerWidth;
+
+    // 화면 너비가 1000px 이하일 때만 0.8을 곱해줌
+    if (screenWidth <= 1000) {
+      setBlockWidth(130 * 0.6);  // 0.8을 곱해줌
+      setTimeColumnWidth(110 * 0.6);  // 0.8을 곱해줌
+      setBlockHeight("5vh");  // 0.8을 곱해줌
+    } else {
+      setBlockWidth(130);  // 원래 크기로 복원
+      setTimeColumnWidth(110);  // 원래 크기로 복원
+      setBlockHeight("6vh");  // 원래 크기로 복원
+    }
+  };
+
+  useEffect(() => {
+    // 화면 크기 변화에 따라 너비 업데이트
+    updateWidths();
+    window.addEventListener('resize', updateWidths);
+
+    // 컴포넌트가 언마운트될 때 이벤트 리스너 정리
+    return () => {
+      window.removeEventListener('resize', updateWidths);
+    };
+  }, []);  // 빈 배열을 사용해 처음 한번만 실행되도록 설정
 
   if (!tableData) {
     return <div>Loading...</div>;
@@ -183,21 +211,26 @@ export default function TimeTable({
 
   const timeSlots = generateTimeSlots(); // 30분 간격의 시간 슬롯 생성
   const maxVotes = globalTotalNum;
-
+  const dateLength = dates?.length;
+  
   return (
-    <div className="flex flex-col gap-[2%] h-full">
+    <div className="flex flex-col gap-[2%] h-full overflow-auto">
       <div className="Head gap-[10px] h-[10%] flex flex-row w-full pr-[2%]">
         <div
-          className={`${roboto.className} rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] text-[17px] backdrop-blur-[48px] w-[8%] h-full flex justify-center items-center font-[500]`}
+          className={`${roboto.className} rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] text-[17px] backdrop-blur-[48px] 
+          h-full flex justify-center items-center font-[500]`}
+          style={{minWidth: `${timeColumnWidth}px`}}
         >
           Time
         </div>
-        <div className="flex flex-grow gap-[10px]">
+        <div className="flex gap-[10px]">
           {dates ? (
             dates.map((date, index) => (
               <div
                 key={index}
-                className="flex-1 rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] h-full flex justify-center items-center gap-[10px]"
+                className=" rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] py-2
+                h-full flex justify-center items-center"
+                style ={{width: `${blockWidth}px`}}
               >
                 <span className={`${roboto.className} font-[500] text-[17px]`}>
                   {getWeekday(date)}
@@ -212,20 +245,31 @@ export default function TimeTable({
           )}
         </div>
       </div>
-      <div className="Table flex gap-[10px] w-full h-[90%] rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] pt-[3%] pr-[2%] overflow-auto">
-        <div className="w-[8%]">
+      <div className="Table relative gap-[10px]
+        inline-flex rounded-[10px] pt-4 min-w-full bg-[#F7F7F7]">
+        {/* 배경판 깔기 */}
+        <div 
+          className={`bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] min-h-full absolute top-0 left-0 -z-10`} 
+          style={{width : `${(blockWidth+10) * dateLength + 10 + timeColumnWidth + 30}px `}}
+        />
+        <div
+        style={{minWidth: `${timeColumnWidth}px`}}
+        >
           {hourlyLabels.map((label, index) => (
             <div
               key={index}
-              className={`${roboto.className} font-[500] text-[15px] text-center m-0 p-0 h-[12vh]`}
+              className={`${roboto.className} font-[500] text-[15px] text-center m-0 p-0 h-[12vh] max-[1000px]:h-[10vh]`}
             >
               {label}
             </div>
           ))}
         </div>
-        <div className="flex flex-grow gap-[10px]">
+        <div className="flex gap-[10px]">
           {tableData.dates.map((day, dateIndex: number, dayArray) => (
-            <div key={dateIndex} className="flex-grow">
+            <div key={dateIndex}
+              className=""
+              style ={{width: `${blockWidth}px`}}
+            >
               {timeSlots.map((timeSlot, slotIndex, timeSlotArray) => {
                 let votes = 0;
 
@@ -263,10 +307,10 @@ export default function TimeTable({
                     votedUsersData={votedUsersData}
                     maxVotes={maxVotes}
                     className={
-                      colorLevel === "0" ? "bg-white" : `bg-MO${colorLevel}`
+                      colorLevel === "0" ? "bg-white" : `bg-MO${colorLevel} w-full`
                     }
                     style={{
-                      height: "6vh",
+                      height: `${blockHeight}`,
                       marginBottom: slotIndex % 2 === 0 ? "0" : "4px",
                       borderRadius:
                         slotIndex % 2 === 0 ? "10px 10px 0 0" : "0 0 10px 10px",
