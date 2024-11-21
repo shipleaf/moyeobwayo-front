@@ -150,12 +150,16 @@ export default function PartyPriority() {
                       {formatDateTime(timeSlot.start)} ~{" "}
                       {formatDateTime(timeSlot.end, false)}
                     </p>
-                    <button
-                      onClick={() => handleComplete(timeSlot)}
-                      className="border-1 rounded-[50px] w-[25%] h-[80%] text-[12px] md:text-[13px] lg:text-[14px] whitespace-nowrap font-bold font-pretendard bg-[#6161CE] text-white"
-                    >
-                      확정
-                    </button>
+                    {priorityData?.party?.decisionDate===true ? (
+                      ""
+                    ) : (
+                      <button
+                        onClick={() => handleComplete(timeSlot)}
+                        className="border-1 rounded-[50px] w-[25%] h-[80%] text-[12px] md:text-[13px] lg:text-[14px] whitespace-nowrap font-bold font-pretendard bg-[#6161CE] text-white"
+                      >
+                        확정
+                      </button>
+                    )}
                   </div>
                   <div className="flex gap-[3px] items-center">
                     <div className="w-[14px] h-[14px] bg-[#6161CE] rounded-full flex justify-center items-center">

@@ -84,7 +84,7 @@ export default function SampleAvatarList() {
       {isUserChecked ? (
         <div className="flex flex-col items-center w-full text-center font-pretendard text-[#fcfcfc] font-[500] mt-4">
           <div className="flex flex-row items-center mb-2">
-            <span>Hi, {globalKakaoLoginState.nickname}</span>
+            <span className="text-sm">Hi, {globalKakaoLoginState.nickname}</span>
             <Image
               src="/images/kakaotalk_sharing_btn_small_ov.png"
               alt="Exclamation Icon"
@@ -96,8 +96,8 @@ export default function SampleAvatarList() {
           <Image
             src={globalKakaoLoginState.profile_image}
             alt={globalKakaoLoginState.nickname}
-            width={79}
-            height={79}
+            width={69}
+            height={69}
             className="rounded-full"
           />
         </div>
@@ -111,7 +111,7 @@ export default function SampleAvatarList() {
         <div
           key={user.id}
           onClick={() => setSelectedAvatar(user)}
-          className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 ${
+          className={`relative w-[70px] h-[70px] rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 ${
             selectedAvatar?.id === user.id
               ? "translate-y-[-20px] ring-4 ring-blue-500"
               : ""
@@ -126,8 +126,8 @@ export default function SampleAvatarList() {
               <Image
                 src={`/images/sample_avatar${(index % 3) + 1}.png`} // 1, 2, 3 반복
                 alt={user.username}
-                width={79}
-                height={79}
+                width={69}
+                height={69}
                 className="rounded-full"
               />
             ) : (

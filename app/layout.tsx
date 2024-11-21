@@ -30,6 +30,16 @@ export default function RootLayout({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    // 페이지 로드 시 스크롤 비활성화
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      // 언마운트 시 스크롤 복구
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
   if (isMobile) {
     return (
       <html lang="en">

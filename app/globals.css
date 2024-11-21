@@ -27,8 +27,21 @@
 }
 /* 전체 스크롤바 숨기기 */
 ::-webkit-scrollbar {
-  width: 0px; /* 스크롤바 너비를 0으로 설정하여 숨김 */
-  height: 0px; /* 가로 스크롤바도 숨기려면 height도 설정 */
+  width: 0px; /* 세로 스크롤바 너비를 0으로 설정하여 숨김 */
+}
+
+/* 가로 스크롤바는 표시 */
+::-webkit-scrollbar:horizontal {
+  height: 10px; /* 가로 스크롤바 높이 설정 */
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+  background-color: #7272d9; /* 가로 스크롤바 색상 */
+  border-radius: 5px; /* 가로 스크롤바 둥글게 */
+}
+
+::-webkit-scrollbar-track:horizontal {
+  background-color: #f3f3f3; /* 가로 스크롤 트랙 색상 */
 }
 /* DatePicker */
 .react-datepicker {
