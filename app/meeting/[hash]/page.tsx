@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation"; // App Router에서 useParams 사용
 import { getTable } from "@/app/api/getTableAPI"; // API 호출 주석 처리
 import { GoShareAndroid } from "react-icons/go";
@@ -10,7 +10,6 @@ import { MdContentPaste } from "react-icons/md";
 // import { HiUserCircle } from "react-icons/hi2";
 import TimeTable from "@/app/components/createParty/TimeTable";
 import Image from "next/image";
-import { FiCalendar } from "react-icons/fi";
 import Modal from "react-modal";
 import {
   kakaoUserState,
@@ -34,6 +33,7 @@ import { LoginData } from "@/app/api/tableLogin";
 import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 import { GetCompleteResponse, getDecision } from "@/app/api/partyCompleteAPI";
 // import { tableRefreshTrigger } from "@/app/recoil/atom";
+import { FaRegCalendarCheck } from "react-icons/fa";
 
 export interface TableData {
   party: Party;
@@ -59,6 +59,7 @@ export default function MeetingPage() {
   const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
   const [selectedAvatar, setSelectedAvatar] =
     useState<GetUserAvatarResponse | null>(null);
+    const [hoveredAvatar, setHoveredAvatar] = useState(null);
   const setGlobalTotalNum = useSetRecoilState(userNumberState);
 
   const [selectedButton, setSelectedButton] = useState<"calendar" | "content">(
@@ -68,9 +69,9 @@ export default function MeetingPage() {
   const [globalKakaoState, setGlobalKakaoState] =
     useRecoilState(kakaoUserState); // Recoil 상태 사용
   const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue);
-  // const refreshValue = useRecoilValue(tableRefreshTrigger);
   const [possibleUsers, setPossibleUsers] = useState<string[]>([]);
   const [impossibleUsers, setImpossibleUsers] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogoClick = () => {
     router.push(`/`);
@@ -167,6 +168,33 @@ export default function MeetingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash]);
 
+  const resetSelection = () => setSelectedAvatar(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        resetSelection();
+      }
+    };
+
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        resetSelection();
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscKey);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, []);
+  
   useEffect(() => {
     if (tableData?.party.decisionDate && hash) {
       getDecision({ table_id: hash as string })
@@ -194,7 +222,7 @@ export default function MeetingPage() {
     <>
       <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
         <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center h-full">
             <Image
               src="/images/mainLogo.png"
               alt=""
@@ -229,25 +257,28 @@ export default function MeetingPage() {
                     : "bg-[rgba(255,255,255,0.1)] border-none"
                 }`}
               >
-                <FiCalendar
+                <FaRegCalendarCheck
                   size={30}
                   className={`${
                     selectedButton === "calendar"
-                      ? "text-black"
+                      ? "text-[#777]"
                       : "text-white opacity-100 "
                   }`}
                 />
               </button>
-              <div className="relative flex flex-col mt-8">
+              <div className="flex flex-col mt-8 h-[50%]" ref={containerRef}>
                 {users.map((user, index) => (
                   <div
                     key={user.userId}
-                    onMouseEnter={() => setSelectedAvatar(user)} // Hover 시 avatar 선택
+                    onClick={() => setSelectedAvatar(user)} // 클릭 시 아바타 선택
                     className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 ${
-                      selectedAvatar?.userId === user.userId
+                      selectedAvatar?.userId === user.userId ||
+                      hoveredAvatar?.userId === user.userId
                         ? "translate-y-[-20px] ring-2 ring-purple-400"
                         : "hover:translate-y-[-20px] hover:ring-2 hover:ring-purple-400"
                     }`}
+                    onMouseEnter={() => setHoveredAvatar(user)} // Hover 시 상태 업데이트
+                    onMouseLeave={() => setHoveredAvatar(null)} // Hover 해제 시 상태 초기화
                     style={{
                       top: `${index * -45}px`,
                       zIndex: 10 + index,
@@ -259,8 +290,7 @@ export default function MeetingPage() {
                           className="w-[79px] h-[79px] rounded-full bg-[#ddd] flex items-center justify-center text-white text-xl font-bold"
                           style={{ fontSize: "24px" }} // 글자 크기 조정
                         >
-                          {user.userName.charAt(0).toUpperCase()}{" "}
-                          {/* 첫 글자 표시 */}
+                          {user.userName.charAt(0).toUpperCase()}
                         </div>
                       ) : (
                         <Image
@@ -273,8 +303,9 @@ export default function MeetingPage() {
                       )}
                       <div className="inset-0 rounded-full bg-[#6161CE] backdrop-blur-[2px]"></div>
                     </div>
+                    {/* Hover 또는 클릭 시 이름 표시 */}
                     {(selectedAvatar?.userId === user.userId ||
-                      user.userId === selectedAvatar?.userId) && (
+                      hoveredAvatar?.userId === user.userId) && (
                       <div
                         className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-md shadow-md text-xs text-gray-700"
                         style={{ whiteSpace: "nowrap" }}
@@ -435,7 +466,7 @@ export default function MeetingPage() {
             </div>
             <div className="w-[75%]">
               {tableData !== null && (
-                <TimeTable userList={users} setUserList={setUsers} />
+                <TimeTable userList={users} setUserList={setUsers} selectedUserId={selectedAvatar?.userId} />
               )}
             </div>
           </div>

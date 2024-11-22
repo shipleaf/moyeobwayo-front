@@ -84,7 +84,9 @@ export default function SampleAvatarList() {
       {isUserChecked ? (
         <div className="flex flex-col items-center w-full text-center font-pretendard text-[#fcfcfc] font-[500] mt-4">
           <div className="flex flex-row items-center mb-2">
-            <span className="text-sm">Hi, {globalKakaoLoginState.nickname}</span>
+            <span className="text-sm">
+              Hi, {globalKakaoLoginState.nickname}
+            </span>
             <Image
               src="/images/kakaotalk_sharing_btn_small_ov.png"
               alt="Exclamation Icon"
