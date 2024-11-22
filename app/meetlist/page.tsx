@@ -8,12 +8,11 @@ import MeetList from "./components/MeetList";
 import MeetDetail from "./components/MeetDetail";
 import Header from "./components/Header";
 import Link from "next/link";
+import { FaRegCalendarCheck } from "react-icons/fa6";
 
 // Loading fallback components
 const MeetListFallback = () => <div>Loading Meet List...</div>;
 const MeetDetailFallback = () => <div>Loading Meet Detail...</div>;
-
-
 
 export default function Page() {
   useEffect(() => {
@@ -48,9 +47,8 @@ export default function Page() {
               className="calendar w-[80px] h-[80px] flex items-center justify-center border rounded-[10px] cursor-pointer
                     bg-[rgba(255,255,255,0.1)] border-none"
             >
-              <CalendarBlank
+              <FaRegCalendarCheck
                 size={30}
-                weight="bold"
                 className="text-white opacity-100"
               />
             </Link>
