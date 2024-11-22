@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React, { Suspense, useEffect } from "react";
-import { CalendarBlank } from "@phosphor-icons/react/dist/ssr";
 import { Clipboard } from "@phosphor-icons/react/dist/ssr";
 import MeetList from "./components/MeetList";
 import MeetDetail from "./components/MeetDetail";
