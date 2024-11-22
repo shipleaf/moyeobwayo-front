@@ -242,7 +242,7 @@ export default function MeetingPage() {
                 {users.map((user, index) => (
                   <div
                     key={user.userId}
-                    onMouseEnter={() => setSelectedAvatar(user)} // Hover 시 avatar 선택
+                    onClick={() => setSelectedAvatar(user)} // Hover 시 avatar 선택
                     className={`relative w-[80px] h-[80px] rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 ${
                       selectedAvatar?.userId === user.userId
                         ? "translate-y-[-20px] ring-2 ring-purple-400"
