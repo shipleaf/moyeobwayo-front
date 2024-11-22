@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { userIdValue } from "@/app/recoil/atom";
-import { useRecoilValue } from "recoil";
-// import { useParams } from "next/navigation";
-import { voteData } from "@/app/api/timeslotAPI";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { voteData, voteTime, getMyVote } from "@/app/api/timeslotAPI";
+import { useParams } from "next/navigation";
+import { tableRefreshTrigger } from "@/app/recoil/atom";
 
 // 1시간 간격으로 시간 표시, 마지막 시간 포함
 const generateDisplaySlots = (startHour: number, endHour: number): string[] => {
@@ -15,11 +16,11 @@ const generateDisplaySlots = (startHour: number, endHour: number): string[] => {
   return slots;
 };
 
-// 15분 간격으로 시간 슬롯 생성
+// 30분 간격으로 시간 슬롯 생성
 const generateTimeSlots = (startHour: number, endHour: number): string[] => {
   const slots = [];
   for (let hour = startHour; hour < endHour; hour++) {
-    for (let minute = 0; minute < 60; minute += 15) {
+    for (let minute = 0; minute < 60; minute += 30) {
       slots.push(
         `${hour.toString().padStart(2, "0")}:${minute
           .toString()
@@ -28,19 +29,6 @@ const generateTimeSlots = (startHour: number, endHour: number): string[] => {
     }
   }
   return slots;
-};
-
-// 한국 시간으로 서버에 전달할 시간 포맷 생성
-const formatToServerTime = (date: Date) => {
-  const koreanTime = new Date(date.getTime() + 9 * 60 * 60 * 1000); // 한국 시간대 적용 (GMT+09:00)
-  const year = koreanTime.getFullYear();
-  const month = (koreanTime.getMonth() + 1).toString().padStart(2, "0");
-  const day = koreanTime.getDate().toString().padStart(2, "0");
-  const hours = koreanTime.getHours().toString().padStart(2, "0");
-  const minutes = koreanTime.getMinutes().toString().padStart(2, "0");
-  const seconds = koreanTime.getSeconds().toString().padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 };
 
 // 요일과 날짜를 개별적으로 포맷팅
@@ -53,6 +41,18 @@ const formatDate = (dateString: string) => {
   return { weekday, day };
 };
 
+// 날짜별 이진 테이블 초기화
+const initializeBinaryTable = (
+  dates: Array<{ dateId: number }>,
+  slotsLength: number
+): { [key: number]: string } => {
+  const binaryTable: { [key: number]: string } = {};
+  dates.forEach((date) => {
+    binaryTable[date.dateId] = "0".repeat(slotsLength);
+  });
+  return binaryTable;
+};
+
 type TimeSelectorProps = {
   party: {
     partyId: string;
@@ -63,126 +63,168 @@ type TimeSelectorProps = {
     startDate: string;
     locationName: string | null;
     endDate: string;
-    decisionDate: string;
+    decisionDate: boolean;
     userId: string;
-    alarms: boolean[]; // 수정: string[] -> boolean[]
-    dates: Array<{
+    alarms: boolean[];
+    dates: {
       dateId: number;
       selected_date: string;
-      timeslots: Array<{
-        slotId: number;
-        selectedStartTime: string;
-        selectedEndTime: string;
-        userEntity: {
-          userId: number;
-          userName: string;
-          password: null;
-        };
-      }>;
-    }>;
+      convertedTimeslots: {
+        userId: number;
+        userName: string;
+        byteString: string;
+      }[];
+    }[];
   };
 };
 
-
 export default function TimeSelector({ party }: TimeSelectorProps) {
+  const { hash } = useParams();
   const { dates, startDate, endDate } = party;
   const userId = useRecoilValue(userIdValue);
-  // const { hash: partyId } = useParams();
+  const setRefreshTrigger = useSetRecoilState(tableRefreshTrigger);
 
   const startHour = new Date(startDate).getHours();
-  const endHour = new Date(endDate).getHours();
+  const prevEndHour = new Date(endDate).getHours();
+  const endHour = prevEndHour === 0? 24: prevEndHour;
   const timeSlots = generateTimeSlots(startHour, endHour);
   const displaySlots = generateDisplaySlots(startHour, endHour);
+  const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
+
+  const [binaryTable, setBinaryTable] = useState(
+    initializeBinaryTable(dates, timeSlots.length)
+  );
 
   const [selectedSlots, setSelectedSlots] = useState<boolean[]>(
     Array(timeSlots.length * dates.length).fill(false)
   );
 
+  useEffect(() => {
+    const fetchMyVoteData = async () => {
+      try {
+        const data = {
+          userId: userId as number,
+          partyId: hash as string,
+        };
+
+        const response = await getMyVote(data);
+        console.log("Fetched vote data:", response);
+
+        const updatedSlots = [...selectedSlots];
+        const updatedTable = { ...binaryTable };
+
+        response.dates.forEach(
+          (vote: { dateId: number; binaryString: string }) => {
+            const { dateId, binaryString } = vote;
+            updatedTable[dateId] = binaryString;
+
+            const dateIndex = dates.findIndex((date) => date.dateId === dateId);
+            if (dateIndex !== -1) {
+              for (let i = 0; i < binaryString.length; i++) {
+                const slotIndex = dateIndex * timeSlots.length + i;
+                updatedSlots[slotIndex] = binaryString[i] === "1";
+              }
+            }
+          }
+        );
+
+        setBinaryTable(updatedTable);
+        setSelectedSlots(updatedSlots);
+      } catch (error) {
+        console.error("Error fetching vote data:", error);
+      }
+    };
+
+    fetchMyVoteData();
+  }, [userId, hash, dates, timeSlots.length]);
+
   const [isSelecting, setIsSelecting] = useState(false);
-  const [isDeselecting, setIsDeselecting] = useState(false); // 드래그 취소 플래그 추가
+  const [isDeselecting, setIsDeselecting] = useState(false);
   const [startIndex, setStartIndex] = useState<number | null>(null);
-  const [endIndex, setEndIndex] = useState<number | null>(null);
+  const [lastDraggedDateId, setLastDraggedDateId] = useState<number | null>(
+    null
+  );
 
-  // 드래그 시작 및 종료를 기반으로 voteData 형식의 데이터 생성
-  const generateDragVoteData = (): voteData | null => {
-    if (startIndex === null || endIndex === null) return null;
+  const updateBinaryTable = (
+    dateId: number,
+    slotIndex: number,
+    value: "0" | "1"
+  ) => {
+    setBinaryTable((prevTable) => {
+      const currentBinaryString = prevTable[dateId];
+      const updatedBinaryString =
+        currentBinaryString.substring(0, slotIndex) +
+        value +
+        currentBinaryString.substring(slotIndex + 1);
 
-    const [finalStartIndex, finalEndIndex] = [
-      Math.min(startIndex, endIndex),
-      Math.max(startIndex, endIndex),
-    ];
-
-    const dateIndex = Math.floor(finalStartIndex / timeSlots.length);
-    const timeSlotStart = finalStartIndex % timeSlots.length;
-    const timeSlotEnd = finalEndIndex % timeSlots.length;
-    const dateId = dates[dateIndex].dateId;
-
-    const startHourAdjusted = Math.floor(timeSlotStart / 4) + startHour;
-    const startMinute = (timeSlotStart % 4) * 15;
-    const endHourAdjusted = Math.floor(timeSlotEnd / 4) + startHour;
-    const endMinute = (timeSlotEnd % 4) * 15;
-
-    const selectedStartTime = new Date(
-      new Date(dates[dateIndex].selected_date).setHours(
-        startHourAdjusted,
-        startMinute,
-        0
-      )
-    );
-    const selectedEndTime = new Date(
-      new Date(dates[dateIndex].selected_date).setHours(
-        endHourAdjusted,
-        endMinute + 15,
-        0
-      )
-    );
-
-    if (userId === null) {
-      throw new Error("User ID is missing");
-    } else {
+      setLastDraggedDateId(dateId);
       return {
-        selected_start_time: formatToServerTime(selectedStartTime),
-        selected_end_time: formatToServerTime(selectedEndTime),
-        user_id: parseInt(userId.toString()),
-        date_id: dateId,
+        ...prevTable,
+        [dateId]: updatedBinaryString,
       };
-    }
+    });
   };
 
-  // 마우스 드래그 시작
+  useEffect(() => {
+    if (!isSelecting && lastDraggedDateId !== null) {
+      const updatedData: voteData = {
+        binaryString: binaryTable[lastDraggedDateId],
+        userId: userId as number,
+        dateId: lastDraggedDateId,
+      };
+
+      voteTime(updatedData)
+        .then(() => {
+          setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
+        })
+        .catch((error) => console.error("Error posting vote data:", error));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSelecting, lastDraggedDateId, binaryTable, userId]);
+
   const handleMouseDown = (index: number, event: React.MouseEvent) => {
     event.preventDefault();
+    const dateIndex = Math.floor(index / timeSlots.length);
+    if (selectedColumn !== null && selectedColumn !== dateIndex) {
+      alert("한 번에 한 열만 선택할 수 있습니다.");
+      setIsSelecting(false); // 드래그 취소
+      setSelectedColumn(null);
+      return; // 드래그 동작 취소
+    }
     setIsSelecting(true);
-    setIsDeselecting(selectedSlots[index]); // 선택 상태에 따라 플래그 설정
+    setIsDeselecting(selectedSlots[index]);
     setStartIndex(index);
-    setEndIndex(index);
-  };
+    setSelectedColumn(dateIndex);
+    };
 
-  // 마우스 이동 중
   const handleMouseOver = (index: number) => {
     if (!isSelecting) return;
-    setEndIndex(index);
 
+    const dateIndex = Math.floor(index / timeSlots.length);
+    if (selectedColumn !== null && selectedColumn !== dateIndex) {
+      alert("한 번에 한 열만 선택할 수 있습니다.");
+      setIsSelecting(false); // 드래그 동작 취소
+      setSelectedColumn(null);
+      return;
+    }
     const newSelectedSlots = [...selectedSlots];
     const rangeStart = Math.min(startIndex!, index);
     const rangeEnd = Math.max(startIndex!, index);
 
     for (let i = rangeStart; i <= rangeEnd; i++) {
-      newSelectedSlots[i] = !isDeselecting; // 선택/해제에 따라 변경
+      newSelectedSlots[i] = !isDeselecting;
+      const dateIndex = Math.floor(i / timeSlots.length);
+      const dateId = dates[dateIndex].dateId;
+      const slotIndex = i % timeSlots.length;
+      updateBinaryTable(dateId, slotIndex, !isDeselecting ? "1" : "0");
     }
     setSelectedSlots(newSelectedSlots);
   };
 
-  // 마우스 드래그 종료
   const handleMouseUp = () => {
     setIsSelecting(false);
-
-    const voteData = generateDragVoteData();
-    if (voteData) {
-      console.log("Selected time range (drag):", voteData);
-    }
     setStartIndex(null);
-    setEndIndex(null);
+    setSelectedColumn(null);
   };
 
   const handleCellClick = (index: number) => {
@@ -191,36 +233,28 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
     setSelectedSlots(newSelectedSlots);
 
     const dateIndex = Math.floor(index / timeSlots.length);
-    const timeSlotIndex = index % timeSlots.length;
     const dateId = dates[dateIndex].dateId;
+    const slotIndex = index % timeSlots.length;
+    updateBinaryTable(dateId, slotIndex, newSelectedSlots[index] ? "1" : "0");
 
-    const hour = Math.floor(timeSlotIndex / 4) + startHour;
-    const minute = (timeSlotIndex % 4) * 15;
-    const selectedStartTime = new Date(
-      new Date(dates[dateIndex].selected_date).setHours(hour, minute, 0)
-    );
-    const selectedEndTime = new Date(
-      selectedStartTime.getTime() + 15 * 60 * 1000 // 15분 후
-    );
+    const updatedData: voteData = {
+      binaryString: binaryTable[dateId],
+      userId: userId as number,
+      dateId: dateId,
+    };
 
-    if (userId === null) {
-      throw new Error("User ID is missing");
-    } else {
-      return {
-        selected_start_time: formatToServerTime(selectedStartTime),
-        selected_end_time: formatToServerTime(selectedEndTime),
-        user_id: parseInt(userId.toString()),
-        date_id: dateId,
-      };
-    }
-
+    voteTime(updatedData)
+      .then(() => {
+        setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
+      })
+      .catch((error) => console.error("Error posting vote data:", error));
   };
 
   return (
     <div
       onMouseUp={handleMouseUp}
       style={{ userSelect: "none" }}
-      className="w-[90%] mr-[5%] bg-[#fff] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] pt-[5%]"
+      className="w-[90%] mr-[5%] flex justify-start items-start bg-[#fff] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] overflow-auto"
     >
       <div
         className="grid items-start justify-center"
@@ -233,37 +267,53 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
         {dates.map((date, index) => {
           const { weekday, day } = formatDate(date.selected_date);
           return (
-            <div key={index} className="text-center border-b border-gray-300">
+            <div 
+            key={index} 
+            className="text-center border-b border-gray-300"
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+              backgroundColor: "#fff",
+              marginBottom: "5px",
+            }}
+            >
               <div className="text-xs font-semibold">{weekday}</div>
               <div className="text-lg font-bold">{day}</div>
             </div>
           );
         })}
 
-        {/* 시간과 슬롯 표시 */}
         {displaySlots.map((displayTime, displayIndex) => (
           <React.Fragment key={`display-${displayIndex}`}>
-            <div className="flex flex-col items-start text-right pr-2 row-span-4 border-gray-300 text-[10px] relative top-[-5px]">
+            <div 
+            className="flex flex-col text-center row-span-2 border-gray-300 text-[10px]"
+            style={{
+              position: "sticky",
+              left: 0,
+              zIndex: 8,
+              backgroundColor: "#fff",
+              transform: "translateY(-7px)", // 위로 5px 이동
+            }}
+            >
               {displayTime}
             </div>
             {timeSlots
-              .slice(displayIndex * 4, displayIndex * 4 + 4)
+              .slice(displayIndex * 2, displayIndex * 2 + 2)
               .map((_, innerIndex) => {
-                const cellIndex = displayIndex * 4 + innerIndex;
+                const cellIndex = displayIndex * 2 + innerIndex;
                 return dates.map((date, dateIndex) => {
                   const fullCellIndex =
                     cellIndex + dateIndex * timeSlots.length;
                   return (
                     <div
-                      key={fullCellIndex}
+                      key={`${date.dateId}-${fullCellIndex}`}
                       data-dateid={date.dateId}
-                      className={`block w-[50px] h-[10px] cursor-pointer ${
+                      className={`block w-[50px] h-[20px] cursor-pointer ${
                         selectedSlots[fullCellIndex]
                           ? "bg-[#A1A1FF]"
                           : "bg-white"
-                      } ${
-                        innerIndex % 2 === 1 ? "border-b border-dotted" : ""
-                      } border-l border-r border-gray-300`}
+                      } border-l border-r border-b border-b-dashed border-gray-300`}
                       onMouseDown={(e) => handleMouseDown(fullCellIndex, e)}
                       onMouseOver={() => handleMouseOver(fullCellIndex)}
                       onClick={() => handleCellClick(fullCellIndex)}

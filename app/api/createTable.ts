@@ -7,7 +7,7 @@ export interface SubmitData {
     startTime: Date,
     endTime: Date,
     dates: Date[],
-    decisionDate: Date,
+    decisionDate: boolean,
     user_id: string
 }
 
@@ -29,7 +29,6 @@ export const createTable = async (
   data: SubmitData
 ): Promise<CreateTableResponse> => {
   try {
-    console.log("here");
     const response = await axiosInstance.post("/party/create", data, {
       headers: {
         "Content-Type": "application/json",

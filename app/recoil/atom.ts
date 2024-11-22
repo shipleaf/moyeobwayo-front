@@ -36,8 +36,9 @@ export const kakaoLoginState = atom({
 
 export const kakaoIDState = atom({
   key: "kakaoIDState",
-  default: 3720994926,
+  default: null,
 });
+
 // 카카오 사용자 정보 상태 (프로필 이미지, 닉네임)
 export const kakaoUserState = atom({
   key: "kakaoUserState",
@@ -45,8 +46,9 @@ export const kakaoUserState = atom({
     nickname: "", // 초기 닉네임은 빈 문자열
     profile_image: "", // 초기 프로필 이미지는 빈 문자열
     kakaoUserId: null as null | number, // null로 초기화
-  },  // 초기값 설정
+  },
 });
+
 export const selectedDateState = atom({
   key: "isSelectedDateState",
   default: [],
@@ -60,4 +62,26 @@ export const selectedStartTime = atom({
 export const selectedEndTime = atom({
   key: "isSelectedEndTimeState",
   default: 15,
+});
+
+// Avator(유저) 강조 관련 변수
+
+export const selectedAvatarState = atom<null | { id: number; }>({
+  key: "selectedAvatarState",
+  default: null,
+});
+
+export const avatarVotesState = atom({
+  key: 'avatarVotesState',
+  default: {},
+});
+
+export const tableRefreshTrigger = atom({
+  key: "tableRefreshTrigger",
+  default: 0,
+});
+
+export const userNumberState = atom({
+  key: 'userNumberState',
+  default: 0,
 });

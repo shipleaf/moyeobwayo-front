@@ -12,9 +12,11 @@ import { loginValue } from "@/app/recoil/atom";
 import CreateTableLogin from "@/app/components/login/CreateTableLogin";
 import Modal from "react-modal";
 import { useRouter } from "next/navigation";
-import { tableLogin, LoginData } from "@/app/api/tableLogin";
+import { LoginData } from "@/app/api/tableLogin";
 import { loadFromLocalStorage } from "@/app/recoil/recoilUtils";
-import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
+import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
+// import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
+// import { linkKakaoAndPartyUser } from "@/app/api/kakaoLoginAPI";
 
 export default function CalendarComp() {
   const router = useRouter();
@@ -24,12 +26,14 @@ export default function CalendarComp() {
   const [startTime, setStartTime] = useState<number>(9); // 시작 시간 (1 ~ 12)
   const [endTime, setEndTime] = useState<number>(15); // 종료 시간 (1 ~ 12)
   const [isEndToggled, setIsEndToggled] = useState(endTime >= 12); // 초기값에 따라 AM/PM 토글 설정
-  const [totalPeople, setTotalPeople] = useState<number>(1); // 총 인원수 상태
+  const [totalPeople, setTotalPeople] = useState<number>(0); // 총 인원수 상태
   const [isTotalPeopleUnset, setIsTotalPeopleUnset] = useState<boolean>(false); // 총 인원 미정 상태
   const [title, setTitle] = useState<string>(""); // 제목
   const [subTitle, setSubTitle] = useState<string>(""); // 부제
   const [userId, setUserId] = useRecoilState(userIdValue);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
+  const [isLoading, setIsLoading] = useState(false)
+
   const userName = useRecoilValue(loginValue);
   const kakaoUser = useRecoilValue(kakaoUserState);
   const setKakaoUserState = useSetRecoilState(kakaoUserState);
@@ -38,11 +42,12 @@ export default function CalendarComp() {
   const handleCloseModal = () => setIsModalOpen(false);
 
   useEffect(() => {
+    
     const checkUserStatus = async () => {
       if (kakaoUser.kakaoUserId !== null) {
         return; // 이미 로그인된 상태
       }
-
+      setIsLoading(true);
       // 카카오 로그인이 되어 있지 않다면, 로컬 스토리지 확인
       const kakaoUserDataByStorage = await loadFromLocalStorage(
         "kakaoUserDataByStorage"
@@ -63,6 +68,8 @@ export default function CalendarComp() {
           });
         }
       }
+
+      setIsLoading(false);
     };
 
     checkUserStatus();
@@ -73,12 +80,9 @@ export default function CalendarComp() {
     // AM/PM 토글 상태를 변경
     setIsEndToggled(!isEndToggled);
 
-    // AM에서 PM으로 변경할 경우
     if (!isEndToggled && endTime < 12) {
       setEndTime(endTime + 12); // 12를 더해서 PM으로 변환
-    }
-    // PM에서 AM으로 변경할 경우
-    else if (isEndToggled && endTime >= 12) {
+    } else if (isEndToggled && endTime >= 12) {
       setEndTime(endTime - 12); // 12를 빼서 AM으로 변환
     }
   };
@@ -104,7 +108,7 @@ export default function CalendarComp() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 1) {
+    if (!isNaN(value) && value >= 0) {
       setTotalPeople(value);
     }
   };
@@ -134,7 +138,7 @@ export default function CalendarComp() {
   };
 
   const calculateTime = (time: number, isPM: boolean) => {
-    if (isPM && time < 12) {
+    if (isPM && time <= 12) {
       return time + 12; // PM일 때 12시간을 더함
     } else if (!isPM && time === 12) {
       return 0; // AM 12시일 때는 0시로 변경
@@ -144,6 +148,12 @@ export default function CalendarComp() {
 
   // 제출 시 JSON 객체를 console.log
   const handleSubmit = async () => {
+    if (totalPeople <= 0 && isTotalPeopleUnset === false) {
+      alert(
+        "인원 수를 설정해주세요 설정인원이 모두 투표완료 시 알림 메시지가 발송돼요!"
+      );
+      return;
+    }
     if (selectedDates.length === 0) {
       alert("날짜를 선택해 주세요.");
       return;
@@ -166,12 +176,13 @@ export default function CalendarComp() {
     const startHour = calculateTime(startTime, isStartToggled);
     const endHour = calculateTime(endTime, isEndToggled);
 
-    // 첫 번째 선택된 날짜에 startHour 추가
-    const firstSelectedDate =
-      selectedDates.length > 0 ? selectedDates[0] : null;
-    // 마지막 선택된 날짜에 endHour 추가
-    const lastSelectedDate =
-      selectedDates.length > 0 ? selectedDates[selectedDates.length - 1] : null;
+    // 날짜를 빠른 날짜순으로 정렬
+    const sortedDates = [...selectedDates].sort(
+      (a, b) => a.getTime() - b.getTime()
+    );
+
+    const firstSelectedDate = sortedDates[0];
+    const lastSelectedDate = sortedDates[sortedDates.length - 1];
 
     let startDateTime: Date | null = null;
     let endDateTime: Date | null = null;
@@ -183,14 +194,14 @@ export default function CalendarComp() {
 
     if (lastSelectedDate) {
       endDateTime = new Date(lastSelectedDate);
-      endDateTime.setHours(endHour, 0, 0, 0); // 종료 시간 적용
+      if (endHour === 24) {
+        endDateTime.setDate(endDateTime.getDate() + 1); // 날짜를 하루 증가
+        endDateTime.setHours(0, 0, 0, 0); // 다음 날 자정 (00:00)
+      } else {
+        endDateTime.setHours(endHour, 0, 0, 0); // 일반적인 종료 시간
+      }
     }
-
-    // 날짜를 빠른 날짜순으로 정렬
-    const sortedDates = [...selectedDates].sort(
-      (a, b) => a.getTime() - b.getTime()
-    );
-
+    console.log('final endTime', endDateTime)
     // 인터페이스 SubmitData에 맞게 데이터를 매핑
     const dataToSubmit: SubmitData = {
       participants: totalPeople,
@@ -199,15 +210,18 @@ export default function CalendarComp() {
       startTime: startDateTime as Date, // Date 형식으로 전송
       endTime: endDateTime as Date, // Date 형식으로 전송
       dates: sortedDates,
-      decisionDate: new Date(), // 버튼을 누른 시점의 시간 기록
+      decisionDate: false,
       user_id: userName.userId,
     };
     // 카카오 유저라면 카카오 정보로 갱신
+    // 여기서 문제가 발생함!
     if (kakaoUser.kakaoUserId !== null) {
-      dataToSubmit.user_id = kakaoUser.nickname; // 올바른 속성 접근 방식
+      dataToSubmit.user_id =
+        kakaoUser.nickname + "(" + kakaoUser.kakaoUserId + ")"; // 올바른 속성 접근 방식
     }
 
     try {
+      setIsLoading(true);
       const result = await createTable(dataToSubmit);
       const hash = result.partyId;
 
@@ -216,32 +230,21 @@ export default function CalendarComp() {
         password: userName.userPassword,
         partyId: hash,
         isKakao: false,
+        kakaoUserId: null,
       };
       if (kakaoUser.kakaoUserId !== null) {
-        loginData.userName = kakaoUser.nickname; // 올바른 속성 접근 방식
+        loginData.userName = kakaoUser.nickname;
         loginData.isKakao = true;
         loginData.password = "";
+        loginData.kakaoUserId = kakaoUser.kakaoUserId;
       }
-      const response = await tableLogin(loginData);
-      const userID = response.user.userId;
-
-      setUserId(userID);
-      if (kakaoUser.kakaoUserId !== null) {
-        // 카카오 유저와 파티 유저 연동 처리
-        try {
-          const linkResponse = await linkKakaoAndPartyUser(
-            userID,
-            kakaoUser.kakaoUserId,
-            hash
-          );
-          console.log("linkResponse", linkResponse);
-        } catch (error) {
-          console.error("Kakao link API error:", error);
-        }
-      }
+      await tableLoginHandler(loginData, setUserId);
+      
       router.push(`/meeting/${hash}`);
     } catch (error) {
       console.error("제출 실패: ", error);
+    } finally{
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -267,7 +270,16 @@ export default function CalendarComp() {
   };
 
   return (
-    <div className="mr-[2%] basis-1/4">
+    <div className="mr-[2%] basis-1/4 overflow-auto">
+      {/* Loading Indicator */}
+      {isLoading && (
+          <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50'>
+            <div className='flex flex-col items-center'>
+              <div className="loader"></div>
+              <p className="mt-4 text-lg">로딩 중입니다...</p>
+            </div>
+          </div>
+        )}
       <div className="flex flex-col flex-none items-center justify-center bg-custom-bg border border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom">
         <DatePicker
           key={selectedDates.toString()} // 선택된 날짜 배열이 변경될 때마다 재렌더링
@@ -275,6 +287,7 @@ export default function CalendarComp() {
           onChange={(date) => handleDateChange(date as Date)} // 다중 선택 처리
           inline
           highlightDates={selectedDates} // 선택된 날짜 강조
+          openToDate={selectedDates[selectedDates.length - 1] || new Date()} // 마지막 선택된 날짜에 고정
           dayClassName={(date) =>
             selectedDates.some(
               (selectedDate) => selectedDate.getTime() === date.getTime()
@@ -283,8 +296,9 @@ export default function CalendarComp() {
               : ""
           }
         />
+
         <hr className="w-[90%] border-1 border-[#ECECED] my-[1%]" />
-        <div className="flex flex-row align-center justify-between bg-white w-[84%] py-[5px]">
+        <div className="flex flex-row align-center justify-between bg-custom-bg w-[84%] py-[5px]">
           <span className="w-[15%] font-pretendard font-[500] text-[18px]">
             Starts
           </span>
@@ -294,9 +308,9 @@ export default function CalendarComp() {
               onChange={handleStartTimeChange}
               className="w-[55%] pr-[5px] mr-[5%] focus:outline-none rounded-[4.216px] bg-[rgba(120,120,128,0.12)] text-right font-pretendard font-[500]"
             >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i} value={i + 1}>
-                  {i + 1}:00
+              {Array.from({ length: 13}, (_, i) => (
+                <option key={i} value={i}>
+                  {i}:00
                 </option>
               ))}
             </select>
@@ -319,7 +333,7 @@ export default function CalendarComp() {
             </button>
           </div>
         </div>
-        <div className="flex flex-row align-center justify-between bg-white w-[84%] py-[5px]">
+        <div className="flex flex-row align-center justify-between bg-custom-bg w-[84%] py-[5px]">
           <span className="w-[15%] font-pretendard font-[500] text-[18px]">
             Ends
           </span>
@@ -380,7 +394,10 @@ export default function CalendarComp() {
         </div>
       </div>
 
-      <div className="number flex flex-col items-start justify-center bg-custom-bg border border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom mt-[5%] p-[4%] pl-[2%]">
+      <div
+        className="number flex flex-col items-start justify-center bg-custom-bg border 
+        border-solid shadow-custom-shadow backdrop-blur-custom-blur rounded-custom mt-[5%] p-[4%] pl-[2%]"
+      >
         <div className="w-[100%] mb-[5%] pl-[8%] flex flex-row justify-between">
           <span className="text-[18px] font-bold font-pretendard">총 인원</span>
           <div className="flex flex-row items-center">
@@ -440,19 +457,22 @@ export default function CalendarComp() {
       {/* 제출 버튼 */}
       <button
         onClick={handleSubmit}
-        className="mt-[5%] w-[100%] bg-[#6161CE] text-white font-bold py-2 px-4 rounded-[32.988px] hover:bg-blue-600"
+        className="mt-[5%] w-[100%] bg-[#6161CE] text-white font-bold py-2 px-4 rounded-[32.988px] 
+                  hover:bg-[#4e4ecb] transition duration-300 ease-in-out"
       >
         일정 생성하기
       </button>
       <Modal
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
-        className="z-[9999] fixed inset-0 flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-30 z-[9998]" // 배경을 어둡게 하면서 z-index 설정
+        shouldCloseOnOverlayClick={true}
+        className="z-[9999] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fixed flex items-center justify-center"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-30 z-[9998]"
       >
         <CreateTableLogin
           closeModal={handleCloseModal}
           onLoginSuccess={handleLoginSuccess}
+          setIsLoading={setIsLoading}
         />
       </Modal>
     </div>

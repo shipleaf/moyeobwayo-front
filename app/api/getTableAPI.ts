@@ -12,20 +12,18 @@ export interface UserEntity {
 
 // Timeslot representing each time slot with user entity information
 export interface Timeslot {
-  slotId: number;
-  selectedStartTime: string;
-  selectedEndTime: string;
-  userEntity: UserEntity;
+  userId: number,
+  userName: string,
+  byteString: string;
 }
 
-// PartyDate representing each date with timeslots
 export interface PartyDate {
   dateId: number;
+  timeslots?: null;
   selected_date: string;
-  timeslots: Timeslot[];
+  convertedTimeslots: Timeslot[];
 }
 
-// Party representing the main party details
 export interface Party {
   partyId: string;
   targetNum: number;
@@ -34,18 +32,20 @@ export interface Party {
   partyDescription: string;
   startDate: string;
   endDate: string;
-  decisionDate: string;
+  decisionDate: boolean;
   userId: string;
-  locationName: string | null;
-  alarms: boolean[]; // 알람 배열
-  dates: PartyDate[]; // 날짜 배열
+  locationName: string;
+  alarms: boolean[];
+  dates: PartyDate[];
 }
 
-// AvailableTimesResponse representing available time slots for the party
 export interface AvailableTimesResponse {
   start: string;
   end: string;
-  users: string[];
+  users: {
+    userName: string;
+    userId: number;
+  }[];
 }
 
 // Response structure for getTable API

@@ -2,8 +2,9 @@ import axiosInstance from "./axiosInstance";
 
 // MeetData는 이미 정의된 것으로 가정합니다.
 export interface MeetData {
-  kakaoUserId: number;
+  kakaoUserId: number | null;
 }
+
 
 // Party 인터페이스 정의 (API 응답에 맞게 수정)
 export interface Party {

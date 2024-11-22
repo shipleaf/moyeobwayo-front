@@ -2,15 +2,8 @@ import axiosInstance from "./axiosInstance";
 import axios, { AxiosError } from "axios";
 
 interface KakaoUserResponse {
-  access_token: string;
-  alarm_off: boolean;
-  expires_in: number;
-  kakaoUserId: number;
-  kakao_message_allow: boolean;
-  nickname: string;
-  profile_image: string;
-  refresh_token: string;
-  refresh_token_expires_in: number;
+  token: string;
+  talkCalendarOn: boolean;
 }
 
 interface ApiError {
@@ -58,16 +51,14 @@ export async function sendAuthCodeToBackend(
 }
 
 export async function linkKakaoAndPartyUser(
-  userID: number, kakaoId: number, partyID:string
+  userID: number, kakaoId: number
 ): Promise<linkKakaoResponse | undefined> {
   try {
     const response = await axiosInstance.post<linkKakaoResponse>(
       "/kakaoUser/link",
       {
         currentUserID: userID,
-        partyID: partyID,
         kakaoUserId: kakaoId,
-        code: "anyOK"
       }
     );
 

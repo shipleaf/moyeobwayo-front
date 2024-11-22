@@ -8,11 +8,13 @@ import Image from "next/image";
 interface TableLoginProps {
   closeModal: () => void; // 모달 닫기 함수
   onLoginSuccess: () => void; // 로그인 성공 후 호출되는 함수
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function CreateTableLogin({
   closeModal,
   onLoginSuccess,
+  setIsLoading
 }: TableLoginProps) {
   const [loginInfo, setLoginInfo] = useRecoilState(loginValue);
   const setIsLoggedIn = useSetRecoilState(loginState);
@@ -29,18 +31,30 @@ export default function CreateTableLogin({
   }, [loginInfo, isLoginSubmitted, onLoginSuccess]);
 
   const handleSubmit = (e: React.FormEvent) => {
+    setIsLoading(true)
     e.preventDefault();
     const newLoginInfo = { userId: userNameInput, userPassword: passwordInput };
     setLoginInfo(newLoginInfo);
     setIsLoggedIn(true);
     setIsLoginSubmitted(true); // 로그인 제출 상태로 설정
+    setIsLoading(false)
 
     closeModal();
   };
 
+  const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9ㄱ-ㅎ가-힣\s]/g, ""); // 특수문자 제거
+
+    if (value !== sanitizedValue) {
+      alert("특수문자는 입력할 수 없습니다."); // 특수문자 입력 시 alert 표시
+    }
+    setUserNameInput(sanitizedValue); // 특수문자가 제거된 값으로 업데이트
+  };
+
   return (
     <>
-      <div className="bg-white rounded-[10px] flex flex-row w-[20vw] h-[60vh] overflow-hidden items-center justify-center">
+      <div className="bg-white rounded-[10px] flex flex-row w-[360px] h-[60vh] overflow-hidden items-center justify-center">  
         <form
           onSubmit={handleSubmit}
           className="flex flex-col items-center justify-center gap-[2vh] border-[#285cc4]"
@@ -63,7 +77,7 @@ export default function CreateTableLogin({
               id="userId"
               value={userNameInput}
               placeholder="성함"
-              onChange={(e) => setUserNameInput(e.target.value)}
+              onChange={handleUserNameChange}
               required
               className="p-[10px] border-1 bg-[#f9fbfc] rounded-[10px] focus:outline-none focus:border-[#285cc4] focus:bg-[#fff]"
             />

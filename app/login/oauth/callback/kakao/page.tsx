@@ -1,71 +1,119 @@
-// pages/login/oauth/callback/kakao/page.tsx
 "use client";
 
-import dynamic from "next/dynamic";
+import Script from "next/script";
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { sendAuthCodeToBackend } from "@/app/api/kakaoLoginAPI";
+import { useRouter } from "next/navigation";
+import {
+  linkKakaoAndPartyUser,
+  sendAuthCodeToBackend,
+} from "@/app/api/kakaoLoginAPI";
 import { useSetRecoilState } from "recoil";
 import { kakaoUserState } from "@/app/recoil/atom";
 import { saveToLocalStorage } from "@/app/recoil/recoilUtils";
-
-// 클라이언트 사이드 전용으로 페이지를 로드하도록 설정
-const Page = dynamic(() => Promise.resolve(KakaoCallback), { ssr: false });
+import { decodeJWT } from "@/app/utils/jwtUtils";
 
 function KakaoCallback() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const code = searchParams.get("code");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
   const setKakaoUserState = useSetRecoilState(kakaoUserState);
+  const [isKakaoReady, setIsKakaoReady] = useState(false);
+  const [code, setCode] = useState<string | null>(null);
+  const router = useRouter();
+
+  const redirectUri: string = process.env.NEXT_PUBLIC_KAKAO_LOGIN_REDIRECT_URI as string;
+  const scope = [
+    "profile_nickname",
+    "profile_image",
+    "talk_message",
+    "talk_calendar",
+    "phone_number",
+  ].join(",");
+
+  // useSearchParams를 useEffect 내부에서 호출해 클라이언트 측에서만 코드가 실행되도록 합니다.
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const authCode = searchParams.get("code");
+    setCode(authCode);
+  }, []);
 
   useEffect(() => {
-    const handleLogin = async () => {
-      if (!code) return;
-      setLoading(true);
+    if (isKakaoReady && code) {
+      const handleLogin = async () => {
+        setLoading(true);
 
-      try {
-        const kakaoUserData = await sendAuthCodeToBackend(code);
-        if (kakaoUserData) {
-          const { expires_in, kakaoUserId, nickname, profile_image } = kakaoUserData;
-          setKakaoUserState({
-            kakaoUserId: kakaoUserId,
-            nickname: nickname,
-            profile_image: profile_image,
-          });
+        try {
+          const responseData = await sendAuthCodeToBackend(code);
+          if (responseData) {
+            const { token } = responseData;
+            const kakaoUserData = decodeJWT(token);
+            setKakaoUserState({
+              kakaoUserId: kakaoUserData?.kakao_user_id as number,
+              nickname: kakaoUserData?.nickname as string,
+              profile_image: kakaoUserData?.profile_image as string,
+            });
+            saveToLocalStorage("kakaoUserJWT", token);
+            const storedUserId = sessionStorage.getItem("globalUserId");
+            if (storedUserId) {
+              const userId = parseInt(storedUserId, 10);
+              await linkKakaoAndPartyUser(
+                userId,
+                kakaoUserData?.kakao_user_id as number
+              );
+            }
 
-          const expiresAt = new Date(Date.now() + expires_in * 1000);
-          const kakaoUserDataByStorage = {
-            kakaoUserId,
-            nickname,
-            profile_image,
-            expiresAt,
-          };
-          saveToLocalStorage("kakaoUserDataByStorage", kakaoUserDataByStorage);
+            // talkCalendarOn이 false일 때 SDK 초기화 및 재인증
+            if (responseData.talkCalendarOn === false) {
+              setKakaoUserState({
+                kakaoUserId: null,
+                nickname: "",
+                profile_image: "",
+              });
+              saveToLocalStorage("kakaoUserJWT", "");
 
-          router.push("/meetlist");
-        } else {
-          throw new Error("Login failed");
+              if (window.Kakao) {
+                window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
+                window.Kakao.Auth.authorize({
+                  redirectUri,
+                  scope,
+                });
+              } else {
+                console.error("Kakao SDK 초기화 실패.");
+              }
+            } else {
+              router.push("/");
+            }
+          } else {
+            throw new Error("Login failed");
+          }
+        } catch (error) {
+          setError((error as Error).message);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        setError((error as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    handleLogin();
-  }, [code]);
+      handleLogin();
+    }
+  }, [code, isKakaoReady]);
 
   return (
-    <div>
-      <h1>Kakao OAuth Callback</h1>
-      {loading && <div>Loading...</div>}
-      {error && <div style={{ color: "red" }}>{error}</div>}
-    </div>
+    <>
+      <Script
+        src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+        onLoad={() => setIsKakaoReady(true)}
+      />
+
+      {isKakaoReady ? (
+        <div>
+          <h1>Kakao OAuth Callback</h1>
+          {loading && <div>Loading...</div>}
+          {error && <div style={{ color: "red" }}>{error}</div>}
+        </div>
+      ) : (
+        <div>Loading Kakao SDK...</div>
+      )}
+    </>
   );
 }
 
-export default Page;
+export default KakaoCallback;

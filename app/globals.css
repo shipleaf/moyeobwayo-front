@@ -6,16 +6,16 @@
 :root {
   --background: #ffffff; /* 필요에 맞게 색상 지정 */
   --foreground: #000000;
-  
+
   /* HeatMap 색상 */
-  --MO10: #A1A1FF;
-  --MO20: #8D8DF4;
-  --MO30: #8181E8;
-  --MO40: #7272D9;
-  --MO50: #6161CE;
-  --MO60: #5555BF;
-  --MO70: #4A4AAE;
-  --MO80: #3D3D97;
+  --MO10: #a1a1ff;
+  --MO20: #8d8df4;
+  --MO30: #8181e8;
+  --MO40: #7272d9;
+  --MO50: #6161ce;
+  --MO60: #5555bf;
+  --MO70: #4a4aae;
+  --MO80: #3d3d97;
   --MO90: #313183;
   --MO100: #262669;
 }
@@ -25,10 +25,24 @@
   font-style: normal;
   src: url("/fonts/PretendardVariable.woff2") format("woff2");
 }
-/* 전체 스크롤바 숨기기 */
+/* 전체 스크롤바 스타일 */
 ::-webkit-scrollbar {
-  width: 0px; /* 스크롤바 너비를 0으로 설정하여 숨김 */
-  height: 0px; /* 가로 스크롤바도 숨기려면 height도 설정 */
+  width: 0; /* 세로 스크롤바 숨기기 */
+  height: 8px; /* 가로 스크롤바 높이 설정 */
+  opacity: 0.5;
+
+}
+
+/* 가로 스크롤바 스타일 */
+::-webkit-scrollbar-thumb {
+  background-color: #7272D9; /* 스크롤바 색상 */
+  border-radius: 4px; /* 스크롤바 모서리 둥글게 */
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1); /* 스크롤바 트랙 색상 */
+  border-radius: 4px;
+  height: 4px;
 }
 /* DatePicker */
 .react-datepicker {
@@ -104,16 +118,39 @@
   right: 10% !important;
 }
 
-.react-datepicker__day--keyboard-selected{
-  color: #7272D9 !important;
+.react-datepicker__day--keyboard-selected {
+  background-color: transparent !important;
+  color: inherit !important;
+  font-weight: inherit !important;
+}
+
+.react-datepicker__day--today {
+  background-color: transparent !important;
+  color: inherit !important;
+  font-weight: inherit !important;
+}
+
+.react-datepicker__day--highlighted {
+  color: #7272d9 !important;
   background-color: #ebebf7 !important;
   border-radius: 100% !important;
   font-weight: 700 !important;
 }
 
-.react-datepicker__day--highlighted{
-  color: #7272D9 !important;
-  background-color: #ebebf7 !important;
-  border-radius: 100% !important;
-  font-weight: 700 !important;
+.loader {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #6161ce; /* Blue */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
