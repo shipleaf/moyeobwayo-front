@@ -49,7 +49,11 @@ const convertAvailableTimeToTimeSlot = (
   };
 };
 
-export default function PartyPriority() {
+export default function PartyPriority({
+  decisionTime,
+}: {
+  decisionTime?: string;
+}) {
   const { hash } = useParams();
   const [priorityData, setPriorityData] = useState<GetTableResponse | null>(
     null
@@ -58,6 +62,8 @@ export default function PartyPriority() {
   const [message, setMessage] = useState("");
   const userId = useRecoilValue(userIdValue);
   const refreshTrigger = useRecoilValue(tableRefreshTrigger);
+
+  const decisionDate = decisionTime ? new Date(decisionTime) : null;
 
   useEffect(() => {
     if (hash && refreshTrigger >= 0) {
@@ -140,17 +146,24 @@ export default function PartyPriority() {
                 index + 1,
                 priorityData.party.locationName
               );
+
+              const isDecisionTimeMatched =
+                decisionDate &&
+                new Date(timeSlot.start).getTime() === decisionDate.getTime();
+
               return (
                 <div
                   key={index}
-                  className="priorList px-4 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px] flex flex-col gap-2"
+                  className={`priorList px-4 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px] flex flex-col gap-2 ${
+                    isDecisionTimeMatched ? "border-2 border-[#6161CE] bg-[rgba(97,97,206,0.1)]": ""
+                  }`}
                 >
                   <div className="flex flex-row justify-between gap-1">
                     <p className="font-pretendard text-sm font-[500]">
                       {formatDateTime(timeSlot.start)} ~{" "}
                       {formatDateTime(timeSlot.end, false)}
                     </p>
-                    {priorityData?.party?.decisionDate===true ? (
+                    {priorityData?.party?.decisionDate === true ? (
                       ""
                     ) : (
                       <button

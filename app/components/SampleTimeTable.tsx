@@ -256,6 +256,7 @@ export default function SampleTimeTable() {
                 
                 const votedUsersData = getVotedUsers(
                   day.timeslots, srcMap, slotIndex);
+                  
                 return (
                   <TimeBlock
                     key={`${dateIndex}-${slotIndex}`}
