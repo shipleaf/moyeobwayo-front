@@ -89,6 +89,7 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
   const endHour = prevEndHour === 0? 24: prevEndHour;
   const timeSlots = generateTimeSlots(startHour, endHour);
   const displaySlots = generateDisplaySlots(startHour, endHour);
+  const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
 
   const [binaryTable, setBinaryTable] = useState(
     initializeBinaryTable(dates, timeSlots.length)
@@ -183,14 +184,29 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
 
   const handleMouseDown = (index: number, event: React.MouseEvent) => {
     event.preventDefault();
+    const dateIndex = Math.floor(index / timeSlots.length);
+    if (selectedColumn !== null && selectedColumn !== dateIndex) {
+      alert("한 번에 한 열만 선택할 수 있습니다.");
+      setIsSelecting(false); // 드래그 취소
+      setSelectedColumn(null);
+      return; // 드래그 동작 취소
+    }
     setIsSelecting(true);
     setIsDeselecting(selectedSlots[index]);
     setStartIndex(index);
-  };
+    setSelectedColumn(dateIndex);
+    };
 
   const handleMouseOver = (index: number) => {
     if (!isSelecting) return;
 
+    const dateIndex = Math.floor(index / timeSlots.length);
+    if (selectedColumn !== null && selectedColumn !== dateIndex) {
+      alert("한 번에 한 열만 선택할 수 있습니다.");
+      setIsSelecting(false); // 드래그 동작 취소
+      setSelectedColumn(null);
+      return;
+    }
     const newSelectedSlots = [...selectedSlots];
     const rangeStart = Math.min(startIndex!, index);
     const rangeEnd = Math.max(startIndex!, index);
@@ -208,6 +224,7 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
   const handleMouseUp = () => {
     setIsSelecting(false);
     setStartIndex(null);
+    setSelectedColumn(null);
   };
 
   const handleCellClick = (index: number) => {
