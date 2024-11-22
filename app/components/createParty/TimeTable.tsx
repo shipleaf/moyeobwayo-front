@@ -8,7 +8,6 @@ import {
   getUserAvatar,
 } from "@/app/api/getUserAvatarAPI";
 import {
-  selectedAvatarState,
   tableRefreshTrigger,
   userNumberState,
 } from "@/app/recoil/atom";
@@ -85,7 +84,6 @@ export default function TimeTable({
   const { hash } = useParams();
   const partyId = searchParams.get("partyId");
   const [tableData, setTableData] = useState<Table | null>(null); // 테이블 데이터 상태 관리
-  const selectedAvatar = useRecoilValue(selectedAvatarState);
   const refreshValue = useRecoilValue(tableRefreshTrigger);
   const [globalTotalNum, setGlobalTotalNum] = useRecoilState(userNumberState);
   const [blockWidth, setBlockWidth] = useState(130);

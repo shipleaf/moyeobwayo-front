@@ -59,7 +59,8 @@ export default function MeetingPage() {
   const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
   const [selectedAvatar, setSelectedAvatar] =
     useState<GetUserAvatarResponse | null>(null);
-  const [hoveredAvatar, setHoveredAvatar] = useState(null);
+  const [hoveredAvatar, setHoveredAvatar] =
+    useState<GetUserAvatarResponse | null>(null);
   const setGlobalTotalNum = useSetRecoilState(userNumberState);
 
   const [selectedButton, setSelectedButton] = useState<"calendar" | "content">(
@@ -71,7 +72,7 @@ export default function MeetingPage() {
   const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue);
   const [possibleUsers, setPossibleUsers] = useState<string[]>([]);
   const [impossibleUsers, setImpossibleUsers] = useState<string[]>([]);
-  const [decisionTime, setDecisionTime] = useState<string>('');
+  const [decisionTime, setDecisionTime] = useState<string>("");
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogoClick = () => {
@@ -201,8 +202,8 @@ export default function MeetingPage() {
       getDecision({ table_id: hash as string })
         .then((decisionData: GetCompleteResponse) => {
           setPossibleUsers(decisionData.possibleUsers);
-          setImpossibleUsers(decisionData.impossibleUsers)
-          setDecisionTime(decisionData.startTime)
+          setImpossibleUsers(decisionData.impossibleUsers);
+          setDecisionTime(decisionData.startTime);
         })
         .catch((error) => {
           console.error("getDecision API 호출 에러:", error);
