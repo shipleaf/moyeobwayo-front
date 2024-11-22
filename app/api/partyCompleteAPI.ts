@@ -27,8 +27,8 @@ export interface CompleteResponse {
 
 export interface GetCompleteResponse {
   partyId: string,
-  startTime: Date,
-  endTime: Date,
+  startTime: string,
+  endTime: string,
   possibleUsers: string[],
   impossibleUsers: string[]
 }

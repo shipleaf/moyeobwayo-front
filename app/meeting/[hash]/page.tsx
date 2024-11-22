@@ -59,7 +59,7 @@ export default function MeetingPage() {
   const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
   const [selectedAvatar, setSelectedAvatar] =
     useState<GetUserAvatarResponse | null>(null);
-    const [hoveredAvatar, setHoveredAvatar] = useState(null);
+  const [hoveredAvatar, setHoveredAvatar] = useState(null);
   const setGlobalTotalNum = useSetRecoilState(userNumberState);
 
   const [selectedButton, setSelectedButton] = useState<"calendar" | "content">(
@@ -71,6 +71,7 @@ export default function MeetingPage() {
   const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue);
   const [possibleUsers, setPossibleUsers] = useState<string[]>([]);
   const [impossibleUsers, setImpossibleUsers] = useState<string[]>([]);
+  const [decisionTime, setDecisionTime] = useState<string>('');
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleLogoClick = () => {
@@ -194,13 +195,14 @@ export default function MeetingPage() {
       document.removeEventListener("keydown", handleEscKey);
     };
   }, []);
-  
+
   useEffect(() => {
     if (tableData?.party.decisionDate && hash) {
       getDecision({ table_id: hash as string })
         .then((decisionData: GetCompleteResponse) => {
           setPossibleUsers(decisionData.possibleUsers);
-          setImpossibleUsers(decisionData.impossibleUsers);
+          setImpossibleUsers(decisionData.impossibleUsers)
+          setDecisionTime(decisionData.startTime)
         })
         .catch((error) => {
           console.error("getDecision API 호출 에러:", error);
@@ -266,7 +268,7 @@ export default function MeetingPage() {
                   }`}
                 />
               </button>
-              <div className="flex flex-col mt-8 h-[50%]" ref={containerRef}>
+              <div className="flex flex-col mt-8" ref={containerRef}>
                 {users.map((user, index) => (
                   <div
                     key={user.userId}
@@ -356,7 +358,11 @@ export default function MeetingPage() {
             </div>
             <div className="flex flex-row w-full h-[90%] gap-[5%]">
               <div className="w-[65%] h-full">
-                <TimeTable userList={users} setUserList={setUsers} />
+                <TimeTable
+                  userList={users}
+                  setUserList={setUsers}
+                  selectedUserId={selectedAvatar?.userId}
+                />
               </div>
               <div className="w-[30%] h-full flex flex-col items-center justify-between">
                 <div className="flex flex-col h-[30%] gap-[10%] w-full items-center mb-[10px]">
@@ -417,8 +423,6 @@ export default function MeetingPage() {
                         ))}
                     </ul>
                   </div>
-
-                  {/* Impossible Users */}
                   <div>
                     <h3 className="font-pretendard text-lg font-bold text-[#FF6B6B] mb-2">
                       참여 불가능
@@ -441,7 +445,7 @@ export default function MeetingPage() {
                     </ul>
                   </div>
                 </div>
-                <PartyPriority />
+                <PartyPriority decisionTime={decisionTime} />
               </div>
             </div>
           </div>
@@ -466,7 +470,11 @@ export default function MeetingPage() {
             </div>
             <div className="w-[75%]">
               {tableData !== null && (
-                <TimeTable userList={users} setUserList={setUsers} selectedUserId={selectedAvatar?.userId} />
+                <TimeTable
+                  userList={users}
+                  setUserList={setUsers}
+                  selectedUserId={selectedAvatar?.userId}
+                />
               )}
             </div>
           </div>
