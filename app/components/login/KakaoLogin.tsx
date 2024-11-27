@@ -24,7 +24,7 @@ export default function KakaoLogin() {
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
       window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
-      console.log("after Init: ", window.Kakao.isInitialized());
+      // console.log("after Init: ", window.Kakao.isInitialized());
     }
   }, [isKakaoReady]); 
 

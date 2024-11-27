@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
@@ -10,8 +10,13 @@ import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 import Image from "next/image";
 import Script from "next/script";
 import { kakaoLoginHandlerbyMeeting } from "@/app/meeting/service/kakaoLoginHandler";
+import { shadow } from "pdfjs-dist";
 
-export default function TableLogin() {
+interface TableLoginProps {
+  isMobile: boolean;
+}
+
+export default function TableLogin({ isMobile }: TableLoginProps) {
   const { hash } = useParams() as { hash: string }; // hash를 string으로 단언
   const [userName, setUserName] = useState(""); // 사용자 이름 입력 상태
   const [password, setPassword] = useState(""); // 비밀번호 입력 상태
@@ -22,46 +27,50 @@ export default function TableLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    
-  // LoginData 객체 생성
-  const loginData: LoginData = {
-    userName: userName,
-    password: password,
-    partyId: hash,
-    isKakao: false,
-    kakaoUserId: null
-  };
+    // LoginData 객체 생성
+    const loginData: LoginData = {
+      userName: userName,
+      password: password,
+      partyId: hash,
+      isKakao: false,
+      kakaoUserId: null,
+    };
 
-  try {
-    const response = await tableLoginHandler(loginData, setUserId);
-    console.log("API 응답:", response);
+    try {
+      const response = await tableLoginHandler(loginData, setUserId);
+      console.log("API 응답:", response);
 
-    setIsLoggedIn(true);
-    if(kakaoUser.kakaoUserId !== null){
-      if(userId){
-        await linkKakaoAndPartyUser(userId, kakaoUser.kakaoUserId);
+      setIsLoggedIn(true);
+      if (kakaoUser.kakaoUserId !== null) {
+        if (userId) {
+          await linkKakaoAndPartyUser(userId, kakaoUser.kakaoUserId);
+        }
       }
+      // 추가적으로 필요한 동작이 있으면 여기에 추가
+    } catch (error) {
+      console.error("로그인 실패:", error);
     }
-    // 추가적으로 필요한 동작이 있으면 여기에 추가
-  } catch (error) {
-    console.error("로그인 실패:", error);
-  }
-  
   };
 
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
       window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY as string);
-      console.log("after Init: ", window.Kakao.isInitialized());
     }
   }, [isKakaoReady]);
-  
+
   const handleKakaoLoginButtonClick = (globalUserID: number | null): void => {
-    setIsKakaoReady(true)
-    kakaoLoginHandlerbyMeeting(globalUserID, hash)
-  }
+    setIsKakaoReady(true);
+    kakaoLoginHandlerbyMeeting(globalUserID, hash);
+  };
   return (
-    <div className="login-container bg-[#fff] w-full rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] pt-[15%] p-[10%]">
+    <div
+      className={`login-container bg-[#fff] w-full rounded-[10px] pt-[15%] p-[10%]
+    ${
+      isMobile
+        ? "shadow-none backdrop-blur-none"
+        : "shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px]"
+    }`}
+    >
       <Script
         src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
         onLoad={() => {
@@ -108,7 +117,7 @@ export default function TableLogin() {
             onClick={() => {
               // Add your Kakao login functionality here
 
-              handleKakaoLoginButtonClick(userId)
+              handleKakaoLoginButtonClick(userId);
             }}
           >
             <Image
@@ -120,7 +129,6 @@ export default function TableLogin() {
             카카오로 시작
           </button>
         </div>
-         
       </form>
     </div>
   );

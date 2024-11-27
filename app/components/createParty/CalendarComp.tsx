@@ -145,8 +145,6 @@ export default function CalendarComp() {
     }
     return time;
   };
-
-  // 제출 시 JSON 객체를 console.log
   const handleSubmit = async () => {
     if (totalPeople <= 0 && isTotalPeopleUnset === false) {
       alert(
@@ -201,7 +199,6 @@ export default function CalendarComp() {
         endDateTime.setHours(endHour, 0, 0, 0); // 일반적인 종료 시간
       }
     }
-    console.log('final endTime', endDateTime)
     // 인터페이스 SubmitData에 맞게 데이터를 매핑
     const dataToSubmit: SubmitData = {
       participants: totalPeople,
@@ -248,7 +245,6 @@ export default function CalendarComp() {
     }
   };
   useEffect(() => {
-    console.log("User ID Changed:", userId);
   }, [userId]);
 
   useEffect(() => {

@@ -57,7 +57,6 @@ export default function Header() {
             partyId: partyId as string,
           });
           if (res) {
-            console.log(res);
             setAlarm(res.alarm_on)
             setAlarmID(res.alarmId)
           }

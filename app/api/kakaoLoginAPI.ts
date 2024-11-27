@@ -30,7 +30,6 @@ export async function sendAuthCodeToBackend(
     );
 
     if (response.status >= 200 && response.status <= 299) {
-      console.log("Server response:", response.data);
       return response.data; // Kakao user response
     } else {
       throw new Error("Failed to send auth code");
@@ -63,7 +62,6 @@ export async function linkKakaoAndPartyUser(
     );
 
     if (response.status >= 200 && response.status <= 299) {
-      console.log("Server response:", response.data);
       return response.data; // Kakao user response
     } else {
       throw new Error("Failed to send auth code");

@@ -41,7 +41,6 @@ const MeetDetail = () => {
 
     fetchMeetDetail(); // 비동기 함수 호출
   }, [table_id]); // table_id가 변경될 때마다 호출
-  console.log('targetting', targetMeet)
   if (!targetMeet) {
     return (
       <div className="absolute top-[25vh] left-[10vw]">

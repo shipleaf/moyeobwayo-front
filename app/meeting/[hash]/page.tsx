@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation"; // App Router에서 useParams 사용
-import { getTable } from "@/app/api/getTableAPI"; // API 호출 주석 처리
+import { getTable, GetTableResponse } from "@/app/api/getTableAPI"; // API 호출 주석 처리
 import { GoShareAndroid } from "react-icons/go";
 import { useRecoilState, useSetRecoilState } from "recoil";
 // import { selectedAvatarState } from "@/app/recoil/atom";
@@ -34,6 +34,9 @@ import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 import { GetCompleteResponse, getDecision } from "@/app/api/partyCompleteAPI";
 // import { tableRefreshTrigger } from "@/app/recoil/atom";
 import { FaRegCalendarCheck } from "react-icons/fa";
+import MeetingMobileHeader from "../components/MeetingMobileHeader";
+import MeetingMobileBody from "../components/MeetingMobileBody";
+import BottomSheet from "../components/MeetingMobileBottomSheet";
 
 export interface TableData {
   party: Party;
@@ -55,6 +58,8 @@ export default function MeetingPage() {
   const router = useRouter();
   const { hash } = useParams(); // meetingId를 URL에서 추출
   const [tableData, setTableData] = useState<TableData | null>(null);
+  const [originalTableData, setOriginalTableData] =
+    useState<GetTableResponse | null>(null);
   const [, setLoading] = useState(false);
   const [users, setUsers] = useState<GetUserAvatarResponse[]>([]);
   const [selectedAvatar, setSelectedAvatar] =
@@ -115,7 +120,8 @@ export default function MeetingPage() {
         getUserAvatar({ table_id: hash as string }),
       ])
         .then(([tableDataResponse, userAvatarResponse]) => {
-          // 첫 번째 API 응답 처리
+          setOriginalTableData(tableDataResponse);
+
           const dates = tableDataResponse.party.dates.map((date) => {
             const localDate = new Date(date.selected_date);
             return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식으로 변환
@@ -211,15 +217,64 @@ export default function MeetingPage() {
     }
   }, [tableData?.party.decisionDate, hash]);
 
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
-    // 페이지 스크롤 비활성화
-    document.body.style.overflow = "hidden";
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // 768px 이하를 모바일로 간주
+    };
+
+    handleResize(); // 초기 화면 크기 확인
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const handleScrollControl = () => {
+      if (isMobile) {
+        document.body.style.overflow = "auto"; // 모바일이면 스크롤 활성화
+      } else {
+        document.body.style.overflow = "hidden"; // 모바일이 아니면 스크롤 비활성화
+      }
+    };
+
+    handleScrollControl(); // 초기 실행
 
     return () => {
-      // 페이지 스크롤 활성화 (컴포넌트 언마운트 시)
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "auto"; // 컴포넌트 언마운트 시 스크롤 활성화
     };
-  }, []);
+  }, [isMobile]); // isMobile 상태가 변경될 때마다 실행
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (isMobile) {
+    return (
+      <div>
+        <MeetingMobileHeader />
+        <div className="body bg-[rgb(216,216,255)] bg-opacity-50 rounded-[10px] relative pb-[25px]">
+          <MeetingMobileBody tableData={originalTableData} userAvatar={users} />
+          <TimeTable
+            userList={users}
+            setUserList={setUsers}
+            selectedUserId={selectedAvatar?.userId}
+            isMobile={isMobile}
+          />
+          <div className="fixed-btn-container">
+            <button
+              className="fixed-btn"
+              onClick={() => {
+                setIsOpen(true);
+              }}
+            >
+              +
+            </button>
+          </div>
+        </div>
+        <BottomSheet isMobile={isMobile} tableData={tableData} isOpen={isOpen} onClose={() => setIsOpen(false)} decisionTime={decisionTime} globalKakaoState={globalKakaoState} globalUserId={globalUserId}/>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -306,7 +361,6 @@ export default function MeetingPage() {
                       )}
                       <div className="inset-0 rounded-full bg-[#6161CE] backdrop-blur-[2px]"></div>
                     </div>
-                    {/* Hover 또는 클릭 시 이름 표시 */}
                     {(selectedAvatar?.userId === user.userId ||
                       hoveredAvatar?.userId === user.userId) && (
                       <div
@@ -323,7 +377,6 @@ export default function MeetingPage() {
           </div>
         </div>
         {tableData?.party.decisionDate ? (
-          // decisionDate가 true일 때 보여줄 내용
           <div className="w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] flex flex-col gap-[2%]">
             <div className="w-[65%] rounded-[10px] h-[10%] box-border">
               <div className="Title font-pretendard text-[25px] font-[600] flex flex-row box-border items-center justify-start gap-2">
@@ -363,6 +416,7 @@ export default function MeetingPage() {
                   userList={users}
                   setUserList={setUsers}
                   selectedUserId={selectedAvatar?.userId}
+                  isMobile = {isMobile}
                 />
               </div>
               <div className="w-[30%] h-full flex flex-col items-center justify-between">
@@ -464,9 +518,9 @@ export default function MeetingPage() {
               <PartyPriority />
               {(globalKakaoState.kakaoUserId !== null || globalUserId) &&
               tableData ? (
-                <TimeSelector party={tableData.party} />
+                <TimeSelector isMobile = {isMobile} party={tableData.party} />
               ) : (
-                <TableLogin />
+                <TableLogin isMobile = {isMobile} />
               )}
             </div>
             <div className="w-[75%]">
@@ -475,6 +529,7 @@ export default function MeetingPage() {
                   userList={users}
                   setUserList={setUsers}
                   selectedUserId={selectedAvatar?.userId}
+                  isMobile={isMobile}
                 />
               )}
             </div>

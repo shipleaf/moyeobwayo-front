@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Script from "next/script";
 import { RecoilRoot } from "recoil";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,18 +17,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isMobile, setIsMobile] = useState(false);
+  // const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768); // 768px 이하를 모바일로 간주
-    };
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     setIsMobile(window.innerWidth < 768); // 768px 이하를 모바일로 간주
+  //   };
 
-    handleResize(); // 초기 화면 크기 확인
-    window.addEventListener("resize", handleResize);
+  //   handleResize(); // 초기 화면 크기 확인
+  //   window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, []);
 
   useEffect(() => {
     // 페이지 로드 시 스크롤 비활성화
@@ -40,22 +40,22 @@ export default function RootLayout({
     };
   }, []);
 
-  if (isMobile) {
-    return (
-      <html lang="en">
-        <head>
-          <link rel="icon" href="/icons/moyeobwayoIcon.svg" />
-          <title>모여봐요</title>
-        </head>
-        <body className={`${geistSans.variable} antialiased`}>
-          <div style={{ textAlign: "center", marginTop: "20%" }}>
-            <h1>모바일 화면은 지원하지 않습니다.</h1>
-            <p>PC로 접속해 주세요.</p>
-          </div>
-        </body>
-      </html>
-    );
-  }
+  // if (isMobile) {
+  //   return (
+  //     <html lang="en">
+  //       <head>
+  //         <link rel="icon" href="/icons/moyeobwayoIcon.svg" />
+  //         <title>모여봐요</title>
+  //       </head>
+  //       <body className={`${geistSans.variable} antialiased`}>
+  //         <div style={{ textAlign: "center", marginTop: "20%" }}>
+  //           <h1>모바일 화면은 지원하지 않습니다.</h1>
+  //           <p>PC로 접속해 주세요.</p>
+  //         </div>
+  //       </body>
+  //     </html>
+  //   );
+  // }
 
   return (
     <html lang="en">
