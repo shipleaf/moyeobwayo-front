@@ -233,7 +233,7 @@ export default function Home() {
           className={`relative page w-[90%] max-[740px]:w-full h-[100%] bg-white min-[740px]:rounded-[20px] z-50 p-[2%] max-[740px]:px-[13px] overflow-y-auto`}
         >
           <div className="flex flex-row max-[740px]:flex-col h-[100%]">
-            <MobileHeader></MobileHeader>
+            <MobileHeader endpoint="home"></MobileHeader>
             <div
               className={`relative mr-[2%] min-[740px]:basis-1/4 overflow-auto ${
                 count === 2 || count === 3

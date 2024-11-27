@@ -7,7 +7,6 @@ import { getTable, Party, AvailableTimesResponse, PartyDate } from "@/app/api/ge
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
-import Header from "./Header";
 import MobileHeader from "./MobileHeader";
 // import TimeTable from "@/app/components/createParty/TimeTable";
 // import { PartyDate } from "@/app/api/getTableAPI";

@@ -15,7 +15,7 @@ export interface Party {
   partyDescription: string;
   startDate: string;
   endDate: string;
-  decisionDate: string;
+  decisionDate: boolean;
   userId: string;
   locationName: string | null;
   alarms: boolean[];

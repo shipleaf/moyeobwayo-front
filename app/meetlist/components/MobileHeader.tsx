@@ -5,7 +5,7 @@ import { decodeJWT } from '@/app/utils/jwtUtils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import AlarmHandler from './AlarmHandler'
+import AlarmHandlerMobile from './AlarmHandlerMobile'
 
 interface MobileHeaderProps {
   isDescision: boolean;
@@ -79,17 +79,20 @@ export default function MobileHeader({isDescision}:MobileHeaderProps) {
         </strong>의
         <br />일정 한눈에 보기
       </h1>
-      <h1 className="font-extrabold text-[24px] text-[#262669]  min-[740px]:hidden">
-        투표결과
-      </h1>
-      {isDescision && 
-        <div className="py-[7px] px-4 text-white rounded-[50px] font-bold bg-[var(--mo-50,#6161CE)] hover:bg-[#4949A0]">
-          보러 가기
-        </div>
-      }
+      <div className='flex gap-2.5 items-center'>
+        <h1 className="font-extrabold text-[24px] text-[#262669]  min-[740px]:hidden">
+          투표결과
+        </h1>
+        {isDescision && 
+          <div className=" text-[14px] px-4 py-0.5 text- text-white rounded-[50px] font-bold bg-[var(--mo-50,#6161CE)] hover:bg-[#4949A0]">
+            <span>확정</span>
+          </div>
+        }
+
+      </div>
 
       <div className="flex gap-4 items-center">
-        <AlarmHandler alarm={alarm} setAlarm={setAlarm} alarmID={alarmID}></AlarmHandler>
+        <AlarmHandlerMobile alarm={alarm} setAlarm={setAlarm} alarmID={alarmID}></AlarmHandlerMobile>
       </div>
     </header>
   );
