@@ -196,7 +196,7 @@ export default function SampleTimeTable() {
   const hourlyLabels = generateHourlyLabels(); // 시간 라벨
 
   return (
-    <div className="flex flex-col gap-[20px] basis-3/4">
+    <div className="flex flex-col gap-[20px] basis-3/4 max-[740px]:hidden">
       <div className="Head gap-[10px] h-[10%] flex flex-row w-full pr-[2%]">
         <div
           className={`${roboto.className} rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] text-[17px] backdrop-blur-[48px] w-[8%] h-full flex justify-center items-center font-[500]`}

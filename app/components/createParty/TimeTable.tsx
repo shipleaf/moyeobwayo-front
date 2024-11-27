@@ -79,7 +79,7 @@ export default function TimeTable({
   selectedUserId,
 }: timeTableProps) {
   const srcMap = getSrcMap(userList);
-
+  
   const searchParams = useSearchParams();
   const { hash } = useParams();
   const partyId = searchParams.get("partyId");
@@ -100,41 +100,41 @@ export default function TimeTable({
           getTable({ table_id: hash as string }),
           getUserAvatar({ table_id: hash as string }),
         ]).then(([tableDataResponse, userAvatarResponse]) => {
-          const dates = tableDataResponse.party.dates.map((date) => {
-            const localDate = new Date(date.selected_date);
-            return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식
-          });
-
-          const timeslots = tableDataResponse.party.dates.map((date) => ({
-            dateId: date.dateId,
-            convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
-              userId: slot.userId,
-              userName: slot.userName,
-              byteString: slot.byteString,
-            })),
-          }));
-
-          const startTime = new Date(
-            tableDataResponse.party.startDate
-          ).toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          const endTime = new Date(
-            tableDataResponse.party.endDate
-          ).toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          setTableData({
-            party: tableDataResponse.party,
-            formattedDates: dates,
-            startTime: startTime,
-            endTime: endTime,
-            dates: timeslots,
-          });
+            const dates = tableDataResponse.party.dates.map((date) => {
+              const localDate = new Date(date.selected_date);
+              return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식
+            });
+    
+            const timeslots = tableDataResponse.party.dates.map((date) => ({
+              dateId: date.dateId,
+              convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
+                userId: slot.userId,
+                userName: slot.userName,
+                byteString: slot.byteString,
+              })),
+            }));
+    
+            const startTime = new Date(
+              tableDataResponse.party.startDate
+            ).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+    
+            const endTime = new Date(
+              tableDataResponse.party.endDate
+            ).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+    
+            setTableData({
+              party: tableDataResponse.party,
+              formattedDates: dates,
+              startTime: startTime,
+              endTime: endTime,
+              dates: timeslots,
+            });
 
           setUserList(userAvatarResponse);
           setGlobalTotalNum(userAvatarResponse.length);
@@ -206,7 +206,7 @@ export default function TimeTable({
     const labels = [];
     const start = parseInt(tableData.startTime.split(":")[0], 10);
     const prevEnd = parseInt(tableData.endTime.split(":")[0], 10);
-    const end = prevEnd === 0 ? 24 : prevEnd;
+    const end = prevEnd === 0 ? 24 : prevEnd; 
     for (let hour = start; hour <= end; hour++) {
       labels.push(`${hour}:00`);
     }
@@ -217,7 +217,7 @@ export default function TimeTable({
   const timeSlots = generateTimeSlots(); // 30분 간격의 시간 슬롯 생성
   const maxVotes = globalTotalNum;
   const dateLength = dates?.length;
-
+  
   return (
     <div className="flex flex-col gap-[2%] h-full overflow-auto">
       <div className="Head gap-[10px] h-[10%] flex flex-row w-full pr-[2%]">
@@ -255,8 +255,8 @@ export default function TimeTable({
         inline-flex rounded-[10px] pt-4 min-w-full bg-[#F7F7F7]"
       >
         {/* 배경판 깔기 */}
-        <div
-          className={`bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] min-h-full absolute top-0 left-0 -z-10`}
+        <div 
+          className={`bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] min-h-full absolute top-0 left-0 -z-10`} 
           style={{
             width: `${
               (blockWidth + 10) * dateLength + 10 + timeColumnWidth + 30
@@ -267,7 +267,7 @@ export default function TimeTable({
           {hourlyLabels.map((label, index) => (
             <div
               key={index}
-              className={`${roboto.className} font-[500] text-[15px] text-center m-0 p-0 h-[12vh] max-[1000px]:h-[10vh]`}
+              className={`${roboto.className} font-[500] text-[15px] text-center m-0 mb-1 p-0 h-[12vh] max-[1000px]:h-[10vh]`}
             >
               {label}
             </div>

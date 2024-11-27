@@ -18,7 +18,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isMobile, setIsMobile] = useState(false);
+  const [, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -33,7 +33,7 @@ export default function RootLayout({
 
   useEffect(() => {
     // 페이지 로드 시 스크롤 비활성화
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = "auto";
 
     return () => {
       // 언마운트 시 스크롤 복구
@@ -41,22 +41,22 @@ export default function RootLayout({
     };
   }, []);
 
-  if (isMobile) {
-    return (
-      <html lang="en">
-        <head>
-          <link rel="icon" href="/icons/moyeobwayoIcon.svg" />
-          <title>모여봐요</title>
-        </head>
-        <body className={`${geistSans.variable} antialiased`}>
-          <div style={{ textAlign: "center", marginTop: "20%" }}>
-            <h1>모바일 화면은 지원하지 않습니다.</h1>
-            <p>PC로 접속해 주세요.</p>
-          </div>
-        </body>
-      </html>
-    );
-  }
+  // if (isMobile) {
+  //   return (
+  //     <html lang="en">
+  //       <head>
+  //         <link rel="icon" href="/icons/moyeobwayoIcon.svg" />
+  //         <title>모여봐요</title>
+  //       </head>
+  //       <body className={`${geistSans.variable} antialiased`}>
+  //         <div style={{ textAlign: "center", marginTop: "20%" }}>
+  //           <h1>모바일 화면은 지원하지 않습니다.</h1>
+  //           <p>PC로 접속해 주세요.</p>
+  //         </div>
+  //       </body>
+  //     </html>
+  //   );
+  // }
 
   return (
     <html lang="en">

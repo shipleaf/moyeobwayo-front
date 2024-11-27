@@ -8,6 +8,7 @@ import SampleTimeTable from "./components/SampleTimeTable";
 import Footer from "./components/common/Footer";
 import MeetPageRedirectHandler from "./components/MeetPageRedirectHandler";
 import { FaRegCalendarCheck } from "react-icons/fa";
+import MobileHeader from "./components/common/MobileHeader";
 
 
 // 예시 사용자 데이터
@@ -15,8 +16,10 @@ export default function Home() {
   return (
     <>
       <MeetPageRedirectHandler></MeetPageRedirectHandler>
-      <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
-        <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
+      <div className="flex items-center justify-end bg-[#6161CE] h-screen min-[740px]:p-[2%] relative">
+        {/* Side Nav */}
+        <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start
+          max-[740px]:hidden">
           <div className="flex flex-col items-center">
             <Image
               src="/images/mainLogo.png"
@@ -43,8 +46,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="page w-[90%] h-[100%] bg-white rounded-[20px] z-50 p-[2%] overflow-auto">
-          <div className="flex flex-row h-[100%]">
+        <div className="page w-[90%] max-[740px]:w-full h-[100%] bg-white min-[740px]:rounded-[20px] z-50 p-[2%] max-[740px]:px-[13px] overflow-auto">
+          <div className="flex flex-row max-[740px]:flex-col h-[100%]">
+            {/* Mobile Header */}
+            <MobileHeader></MobileHeader>
             <CalendarComp />
             <SampleTimeTable />
           </div>
