@@ -5,6 +5,7 @@ import "./globals.css";
 import Script from "next/script";
 import { RecoilRoot } from "recoil";
 import { useEffect, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -70,7 +71,10 @@ export default function RootLayout({
           integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4"
           crossOrigin="anonymous"
         ></Script>
-        <RecoilRoot>{children}</RecoilRoot>
+        <RecoilRoot>
+          {children}
+          <Analytics />
+        </RecoilRoot>
       </body>
     </html>
   );
