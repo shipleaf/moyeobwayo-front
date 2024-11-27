@@ -267,7 +267,7 @@ export default function TimeTable({
           {hourlyLabels.map((label, index) => (
             <div
               key={index}
-              className={`${roboto.className} font-[500] text-[15px] text-center m-0 p-0 h-[12vh] max-[1000px]:h-[10vh]`}
+              className={`${roboto.className} font-[500] text-[15px] text-center m-0 mb-1 p-0 h-[12vh] max-[1000px]:h-[10vh]`}
             >
               {label}
             </div>
