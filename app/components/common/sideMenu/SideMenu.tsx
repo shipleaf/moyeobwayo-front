@@ -1,15 +1,17 @@
 import { SignOut, X } from '@phosphor-icons/react/dist/ssr';
-import React from 'react'
+import React, { Suspense } from 'react'
 import AvatarSideMenu from '../AvatarSideMenu';
 import SideMenuList from './SideMenuList';
 import { useRecoilState } from 'recoil';
 import { kakaoUserState } from '@/app/recoil/atom';
 import { saveToLocalStorage } from '@/app/recoil/recoilUtils';
 import { useRouter } from 'next/navigation';
+import { MobileHeaderProps } from '../MobileHeader';
 
 interface SideMenuProps {
   isOpen: boolean;
   onClose: VoidFunction;
+  endPoint: MobileHeaderProps["endpoint"];
   userName?: string;
   userProfile?: string;
   kakaoUserId?: number;
@@ -19,7 +21,8 @@ export default function SideMenu({
   onClose,
   userName,
   userProfile,
-  kakaoUserId
+  kakaoUserId,
+  endPoint
 }:SideMenuProps) {
 
   const [,setGloabalKakaoUserState] = useRecoilState(kakaoUserState);
@@ -73,7 +76,9 @@ export default function SideMenu({
   
         {/* Menu List (scrollable content) */}
         <div className=" overflow-y-auto">
-          <SideMenuList kakaoUserId={kakaoUserId}/>
+          <Suspense>
+            <SideMenuList endPoint={endPoint} kakaoUserId={kakaoUserId}/>
+          </Suspense>
         </div>
   
         {/* Logout Button */}

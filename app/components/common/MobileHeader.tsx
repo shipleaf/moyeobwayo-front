@@ -7,15 +7,15 @@ import { useRecoilState } from 'recoil';
 import AvatarSmall from './AvatarSmall';
 import SideMenu from './sideMenu/SideMenu';
 
-// interface MobileHeaderProps {
-//   endpoint: 'home' | '/meeting/{id}' | ''; // 정해진 문자열 값 중 하나
-// }
-export default function MobileHeader() {
+export interface MobileHeaderProps {
+  endpoint: "home" | "meeting" | "meetlist"; // 정해진 문자열 값 중 하나
+}
+export default function MobileHeader({endpoint}:MobileHeaderProps) {
   const [globalKakaoLoginState, ] = useRecoilState(kakaoUserState);
   const userName = globalKakaoLoginState.nickname !== "" ? globalKakaoLoginState.nickname : ""
   const avatarSrc = globalKakaoLoginState.profile_image !== "" ? globalKakaoLoginState.profile_image : ""
   const kakaoUserId = globalKakaoLoginState.kakaoUserId !== null ? globalKakaoLoginState.kakaoUserId : undefined
-  const [isSideOpen, setIsSideOpen] = useState<boolean>(false)
+  const [isSideOpen, setIsSideOpen] = useState<boolean>(endpoint === "meetlist")
 
   const closeSideMenu = () =>{
     setIsSideOpen(false)
@@ -25,7 +25,11 @@ export default function MobileHeader() {
   }
   return (
     <section className='w-full flex min-[740px]:hidden my-[30px] items-center'>
-      <SideMenu isOpen={isSideOpen} onClose={closeSideMenu} userName={userName} userProfile={avatarSrc} kakaoUserId={kakaoUserId} />
+      <SideMenu 
+        endPoint={endpoint} 
+        isOpen={isSideOpen} 
+        onClose={closeSideMenu} 
+        userName={userName} userProfile={avatarSrc} kakaoUserId={kakaoUserId} />
       {/* List BTN */}
       <div className='mr-2'
         onClick={openSideMenu}

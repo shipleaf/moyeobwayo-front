@@ -58,7 +58,7 @@ export default function Page() {
       <div className="page w-[90%] max-[1000px]:w-full flex flex-col h-full bg-white rounded-[20px] 
       max-[740px]:rounded-none z-50 p-[2%] max-[740px]:px-[13px]">
         {/* Mobile Header */}
-        <MobileHeader/>
+        <MobileHeader endpoint="meetlist"/>
         <div className="w-full h-[11%] max-[740px]:hidden">
           <Suspense>
             <Header />
