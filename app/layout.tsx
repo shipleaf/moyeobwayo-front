@@ -41,22 +41,22 @@ export default function RootLayout({
     };
   }, []);
 
-  if (isMobile) {
-    return (
-      <html lang="en">
-        <head>
-          <link rel="icon" href="/icons/moyeobwayoIcon.svg" />
-          <title>모여봐요</title>
-        </head>
-        <body className={`${geistSans.variable} antialiased`}>
-          <div style={{ textAlign: "center", marginTop: "20%" }}>
-            <h1>모바일 화면은 지원하지 않습니다.</h1>
-            <p>PC로 접속해 주세요.</p>
-          </div>
-        </body>
-      </html>
-    );
-  }
+  // if (isMobile) {
+  //   return (
+  //     <html lang="en">
+  //       <head>
+  //         <link rel="icon" href="/icons/moyeobwayoIcon.svg" />
+  //         <title>모여봐요</title>
+  //       </head>
+  //       <body className={`${geistSans.variable} antialiased`}>
+  //         <div style={{ textAlign: "center", marginTop: "20%" }}>
+  //           <h1>모바일 화면은 지원하지 않습니다.</h1>
+  //           <p>PC로 접속해 주세요.</p>
+  //         </div>
+  //       </body>
+  //     </html>
+  //   );
+  // }
 
   return (
     <html lang="en">

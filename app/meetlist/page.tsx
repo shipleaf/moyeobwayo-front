@@ -8,6 +8,7 @@ import MeetDetail from "./components/MeetDetail";
 import Header from "./components/Header";
 import Link from "next/link";
 import { FaRegCalendarCheck } from "react-icons/fa6";
+import MobileHeader from "../components/common/MobileHeader";
 
 // Loading fallback components
 const MeetListFallback = () => <div>Loading Meet List...</div>;
@@ -24,8 +25,8 @@ export default function Page() {
     };
   }, []);
   return (
-    <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
-      <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
+    <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] max-[740px]:p-0 relative">
+      <div className="flex flex-col w-[10%] h-[100%] pl-[1%] max-[740px]:p-0 items-start max-[740px]:hidden">
         <div className="flex flex-col items-center">
           <Image
             src="/images/mainLogo.png"
@@ -54,15 +55,18 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <div className="page w-[90%] flex flex-col h-full bg-white rounded-[20px] z-50 p-[2%]">
-        <div className="w-full h-[11%]">
+      <div className="page w-[90%] max-[1000px]:w-full flex flex-col h-full bg-white rounded-[20px] 
+      max-[740px]:rounded-none z-50 p-[2%] max-[740px]:px-[13px]">
+        {/* Mobile Header */}
+        <MobileHeader/>
+        <div className="w-full h-[11%] max-[740px]:hidden">
           <Suspense>
             <Header />
           </Suspense>
         </div>
         <section className="flex-grow flex flex-row gap-6 overflow-hidden">
           {/* MeetList */}
-          <div className="w-1/3 flex flex-col h-full overflow-auto">
+          <div className="w-1/3 flex flex-col h-full overflow-auto max-[740px]:hidden">
             <Suspense fallback={<MeetListFallback />}>
               <MeetList />
             </Suspense>
@@ -74,6 +78,7 @@ export default function Page() {
             </Suspense>
           </div>
         </section>
+        
       </div>
       <div
         className={`absolute transition-all duration-300 z-0 ${"top-[18%] left-[10.5%]"}`}
