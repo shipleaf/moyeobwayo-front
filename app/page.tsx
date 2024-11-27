@@ -208,15 +208,6 @@ export default function Home() {
               >
                 <FaRegCalendarCheck size={30} className="text-[#777]" />
               </Link>
-              <div
-                className={`absolute transition-all duration-300 z-0 ${"top-[125px] right-[-120%]"}`}
-              >
-                <div
-                  className={`${getHighlightClass(
-                    12
-                  )}w-16 h-16 bg-white rounded-[20%] transform rotate-45 shadow-lg`}
-                ></div>
-              </div>
             </div>
           </div>
           <div
@@ -323,6 +314,15 @@ export default function Home() {
             </div>
           </div>
           <Footer></Footer>
+        </div>
+        <div
+          className={`absolute transition-all duration-300 z-0 ${"top-[32%] left-[10.5%]"}`}
+        >
+          <div
+            className={`${getHighlightClass(
+              12
+            )}w-16 h-16 bg-white rounded-[20%] transform rotate-45 shadow-lg`}
+          ></div>
         </div>
       </div>
     </>
