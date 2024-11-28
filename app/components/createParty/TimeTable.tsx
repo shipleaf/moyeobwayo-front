@@ -30,6 +30,7 @@ interface timeTableProps {
   setUserList: React.Dispatch<React.SetStateAction<GetUserAvatarResponse[]>>;
   selectedUserId: number | undefined;
   isMobile: boolean;
+  decision: boolean | undefined;
 }
 
 export interface Table {
@@ -87,6 +88,7 @@ export default function TimeTable({
   setUserList,
   selectedUserId,
   isMobile,
+  decision,
 }: timeTableProps) {
   const srcMap = getSrcMap(userList);
   const searchParams = useSearchParams();
@@ -260,7 +262,7 @@ export default function TimeTable({
 
     return (
       <>
-        <div className="flex justify-between items-center px-2">
+        <div className={`flex justify-between items-center px-2`}>
           {/* 왼쪽 화살표 */}
           <button
             className={`${

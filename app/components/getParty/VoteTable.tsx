@@ -250,6 +250,8 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
       .catch((error) => console.error("Error posting vote data:", error));
   };
 
+  
+
   if (isMobile) {
     return (
       <div

@@ -37,6 +37,18 @@ import { FaRegCalendarCheck } from "react-icons/fa";
 import MeetingMobileHeader from "../components/MeetingMobileHeader";
 import MeetingMobileBody from "../components/MeetingMobileBody";
 import BottomSheet from "../components/MeetingMobileBottomSheet";
+import { LuAlarmClock } from "react-icons/lu";
+import { Jua } from "next/font/google";
+import { IoIosCheckmarkCircle } from "react-icons/io";
+import { BiSolidNoEntry } from "react-icons/bi";
+import { CiCirclePlus } from "react-icons/ci";
+import { FaMinus, FaPlus } from "react-icons/fa6";
+
+const jua = Jua({
+  weight: "400", // 폰트 굵기 설정
+  subsets: ["latin"], // 필요한 언어 설정
+  display: "swap", // FOUT 방지
+});
 
 export interface TableData {
   party: Party;
@@ -79,6 +91,7 @@ export default function MeetingPage() {
   const [impossibleUsers, setImpossibleUsers] = useState<string[]>([]);
   const [decisionTime, setDecisionTime] = useState<string>("");
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [decisionEndTime, setDecisionEndTine] = useState<string>("");
 
   const handleLogoClick = () => {
     router.push(`/`);
@@ -176,6 +189,36 @@ export default function MeetingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash]);
 
+  const formatDecisionTime = (startTime: string, endTime: string) => {
+    const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
+    const startDate = new Date(startTime);
+
+    const month = startDate.getMonth() + 1; // 월은 0부터 시작하므로 +1
+    const day = startDate.getDate();
+    const dayOfWeek = daysOfWeek[startDate.getDay()];
+
+    const startHours = startDate.getHours();
+    const startMinutes = startDate.getMinutes();
+    const formattedStartHours = startHours % 12 || 12; // 0을 12로 변환
+    const startAmPm = startHours >= 12 ? "PM" : "AM";
+    const formattedStartMinutes = startMinutes.toString().padStart(2, "0");
+
+    const endDate = new Date(endTime);
+    const endHours = endDate.getHours();
+    const endMinutes = endDate.getMinutes();
+    const formattedEndHours = endHours % 12 || 12; // 0을 12로 변환
+    const endAmPm = endHours >= 12 ? "PM" : "AM";
+    const formattedEndMinutes = endMinutes.toString().padStart(2, "0");
+
+    // 같은 날짜를 가정하고 출력
+    return `${month}월 ${day}일 (${dayOfWeek}) ${formattedStartHours}:${formattedStartMinutes} ${startAmPm} ~ ${formattedEndHours}:${formattedEndMinutes} ${endAmPm}`;
+  };
+
+  const formattedDecisionTime = formatDecisionTime(
+    decisionTime,
+    decisionEndTime
+  );
+
   const resetSelection = () => setSelectedAvatar(null);
 
   useEffect(() => {
@@ -210,6 +253,7 @@ export default function MeetingPage() {
           setPossibleUsers(decisionData.possibleUsers);
           setImpossibleUsers(decisionData.impossibleUsers);
           setDecisionTime(decisionData.startTime);
+          setDecisionEndTine(decisionData.endTime);
         })
         .catch((error) => {
           console.error("getDecision API 호출 에러:", error);
@@ -247,33 +291,224 @@ export default function MeetingPage() {
   }, [isMobile]); // isMobile 상태가 변경될 때마다 실행
 
   const [isOpen, setIsOpen] = useState(false);
+  const contentRef = useRef<HTMLUListElement | null>(null); // 컨텐츠 참조
+
+  const [isPossibleAccordianOpen, setIsPossibleAccordianOpen] = useState(false); // 아코디언 열림 상태
+  const [isImpossibleAccordianOpen, setImpossibleIsAccordianOpen] =
+    useState(false); // 아코디언 열림 상태
+
+  const toggleAccordion = () => {
+    setIsPossibleAccordianOpen(!isPossibleAccordianOpen);
+  };
+
+  const toggleImpossibleAccordion = () => {
+    setImpossibleIsAccordianOpen(!isImpossibleAccordianOpen);
+  };
+
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.style.maxHeight = isImpossibleAccordianOpen
+        ? `${contentRef.current.scrollHeight}px`
+        : "0";
+    }
+  }, [isImpossibleAccordianOpen]);
 
   if (isMobile) {
-    return (
-      <div>
-        <MeetingMobileHeader />
-        <div className="body bg-[rgb(216,216,255)] bg-opacity-50 rounded-[10px] relative pb-[25px]">
-          <MeetingMobileBody tableData={originalTableData} userAvatar={users} />
-          <TimeTable
-            userList={users}
-            setUserList={setUsers}
-            selectedUserId={selectedAvatar?.userId}
+    if (!tableData?.party.decisionDate) {
+      return (
+        <div>
+          <MeetingMobileHeader />
+          <div className="body bg-[rgb(216,216,255)] bg-opacity-50 rounded-[10px] relative pb-[25px]">
+            <MeetingMobileBody
+              tableData={originalTableData}
+              userAvatar={users}
+            />
+            <TimeTable
+              userList={users}
+              setUserList={setUsers}
+              selectedUserId={selectedAvatar?.userId}
+              isMobile={isMobile}
+              decision={tableData?.party.decisionDate}
+            />
+            <div className="fixed-btn-container">
+              <button
+                className="fixed-btn"
+                onClick={() => {
+                  setIsOpen(true);
+                }}
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <BottomSheet
             isMobile={isMobile}
+            tableData={tableData}
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            decisionTime={decisionTime}
+            globalKakaoState={globalKakaoState}
+            globalUserId={globalUserId}
           />
-          <div className="fixed-btn-container">
-            <button
-              className="fixed-btn"
-              onClick={() => {
-                setIsOpen(true);
-              }}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <MeetingMobileHeader />
+          <MeetingMobileBody tableData={originalTableData} userAvatar={users} />
+          <div className="pl-[5%] flex flex-row h-[30%] w-full items-center gap-1 mb-[10px]">
+            <div
+              className={`font-pretendard text-md font-[600] text-[#686868] text-center ${jua.className}`}
             >
-              +
-            </button>
+              {"모임장"}
+            </div>
+            {users
+              .filter((user) => user.userName === tableData?.party.userId)
+              .map((user, index) => (
+                <div key={user.userId}>
+                  <div className="w-full h-full rounded-full overflow-hidden">
+                    {user.profileImage == null ? (
+                      <Image
+                        src={`/images/sample_avatar${(index % 3) + 1}.png`}
+                        alt={user.userName}
+                        width={25}
+                        height={25}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <Image
+                        src={user.profileImage}
+                        alt={user.userName}
+                        width={25}
+                        height={25}
+                        className="rounded-full"
+                      />
+                    )}
+                    <div className="inset-0 rounded-full bg-[#6161CE] backdrop-blur-[2px]"></div>
+                  </div>
+                </div>
+              ))}
+            <div
+              className={`text-center text-sm font-pretendard font-[600] ${jua.className}`}
+            >
+              {tableData?.party.userId.split("(")[0]}님
+            </div>
+          </div>
+          <span className={`${jua.className} pl-[5%]`}>
+            {formattedDecisionTime}
+          </span>
+          <div className="flex flex-col w-full items-center justify-center gap-[20%] pt-[2%]">
+            <div className="mb-4 w-full flex flex-col items-center">
+              <button
+                onClick={toggleAccordion}
+                className="border w-[90%] p-2 flex flex-row gap-1 items-center justify-between text-lg font-bold text-[#6161CE] mb-2 hover:bg-[#efefef]"
+              >
+                <div className="flex flex-row items-center gap-1">
+                  <IoIosCheckmarkCircle />
+                  <span>참여 가능</span>
+                </div>
+                {isPossibleAccordianOpen ? (
+                  <FaMinus size={20} />
+                ) : (
+                  <FaPlus size={20} />
+                )}
+              </button>
+              {isPossibleAccordianOpen && (
+                <ul className="list-none space-y-2">
+                  {tableData?.party.decisionDate &&
+                    possibleUsers.map((user, index) => (
+                      <li
+                        key={index}
+                        className="flex flex-col items-center gap-1 text-gray-700 text-sm"
+                      >
+                        <span className="w-8 h-8 rounded-full bg-[#ddd] flex items-center justify-center text-white">
+                          {user.charAt(0)}
+                        </span>
+                        <span className="font-pretendard font-[600] text-[10px]">
+                          {user.split("(")[0]}
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+            <div className="mb-4 w-full flex flex-col items-center">
+              <button
+                onClick={toggleImpossibleAccordion}
+                className="border w-[90%] flex flex-row gap-1 justify-between items-center p-2 hover:bg-[#efefef] text-lg font-bold text-[#aaa] mb-2"
+              >
+                <div className="flex flex-row items-center gap-1">
+                  <BiSolidNoEntry />
+                  <span>참여 불가능</span>
+                </div>
+                {isImpossibleAccordianOpen ? (
+                  <FaMinus size={20} />
+                ) : (
+                  <FaPlus size={20} />
+                )}
+              </button>
+              {isImpossibleAccordianOpen && (
+                <ul className="grid grid-cols-3 gap-4 mt-2">
+                  {tableData?.party.decisionDate ? (
+                    impossibleUsers.length > 0 ? (
+                      impossibleUsers.map((user, index) => (
+                        <li
+                          key={index}
+                          className="flex flex-col items-center gap-2 text-gray-700 text-sm"
+                        >
+                          <span className="w-8 h-8 rounded-full bg-[#ddd] flex items-center justify-center text-white">
+                            {user.charAt(0)}
+                          </span>
+                          <span className="font-pretendard font-[600] text-[10px]">
+                            {user.split("(")[0]}
+                          </span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-gray-500 text-sm">
+                        불가능한 유저가 없습니다.
+                      </li>
+                    )
+                  ) : null}
+                </ul>
+              )}
+            </div>
+          </div>
+          <div className="body bg-[#7878801E] bg-opacity-50 rounded-[10px] relative pb-[25px] pt-[25px]">
+            {tableData.party.decisionDate ? (
+              <div
+                className={`flex flex-row gap-1 justify-center items-center ${jua.className} text-[#6161CE]`}
+              >
+                <LuAlarmClock />
+                <span className="flex items-center justify-center">
+                  완료된 투표
+                </span>
+                <LuAlarmClock />
+              </div>
+            ) : (
+              <div
+                className={`flex flex-row gap-1 justify-center items-center ${jua.className} text-[#6161CE]`}
+              >
+                <LuAlarmClock />
+                <span className="flex items-center justify-center">
+                  현재 투표된 시간
+                </span>
+                <LuAlarmClock />
+              </div>
+            )}
+
+            <TimeTable
+              userList={users}
+              setUserList={setUsers}
+              selectedUserId={selectedAvatar?.userId}
+              isMobile={isMobile}
+              decision={tableData.party.decisionDate}
+            />
           </div>
         </div>
-        <BottomSheet isMobile={isMobile} tableData={tableData} isOpen={isOpen} onClose={() => setIsOpen(false)} decisionTime={decisionTime} globalKakaoState={globalKakaoState} globalUserId={globalUserId}/>
-      </div>
-    );
+      );
+    }
   }
 
   return (
@@ -416,7 +651,8 @@ export default function MeetingPage() {
                   userList={users}
                   setUserList={setUsers}
                   selectedUserId={selectedAvatar?.userId}
-                  isMobile = {isMobile}
+                  isMobile={isMobile}
+                  decision={tableData.party.decisionDate}
                 />
               </div>
               <div className="w-[30%] h-full flex flex-col items-center justify-between">
@@ -518,9 +754,9 @@ export default function MeetingPage() {
               <PartyPriority />
               {(globalKakaoState.kakaoUserId !== null || globalUserId) &&
               tableData ? (
-                <TimeSelector isMobile = {isMobile} party={tableData.party} />
+                <TimeSelector isMobile={isMobile} party={tableData.party} />
               ) : (
-                <TableLogin isMobile = {isMobile} />
+                <TableLogin isMobile={isMobile} />
               )}
             </div>
             <div className="w-[75%]">
