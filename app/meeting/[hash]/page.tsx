@@ -41,7 +41,6 @@ import { LuAlarmClock } from "react-icons/lu";
 import { Jua } from "next/font/google";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { BiSolidNoEntry } from "react-icons/bi";
-import { CiCirclePlus } from "react-icons/ci";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 
 const jua = Jua({
@@ -328,7 +327,6 @@ export default function MeetingPage() {
               setUserList={setUsers}
               selectedUserId={selectedAvatar?.userId}
               isMobile={isMobile}
-              decision={tableData?.party.decisionDate}
             />
             <div className="fixed-btn-container">
               <button
@@ -503,7 +501,6 @@ export default function MeetingPage() {
               setUserList={setUsers}
               selectedUserId={selectedAvatar?.userId}
               isMobile={isMobile}
-              decision={tableData.party.decisionDate}
             />
           </div>
         </div>
@@ -652,7 +649,6 @@ export default function MeetingPage() {
                   setUserList={setUsers}
                   selectedUserId={selectedAvatar?.userId}
                   isMobile={isMobile}
-                  decision={tableData.party.decisionDate}
                 />
               </div>
               <div className="w-[30%] h-full flex flex-col items-center justify-between">

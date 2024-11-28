@@ -15,22 +15,14 @@ import { Party } from "@/app/api/getTableAPI";
 import { useSearchParams } from "next/navigation";
 import { roboto } from "@/app/utils/getRobot";
 import { VotedUser } from "@/app/interfaces/VotedUser";
-import { Jua } from "next/font/google";
 import { IoIosArrowDropright } from "react-icons/io";
 import { IoIosArrowDropleft } from "react-icons/io";
-
-const jua = Jua({
-  weight: "400", // 폰트 굵기 설정
-  subsets: ["latin"], // 필요한 언어 설정
-  display: "swap", // FOUT 방지
-});
 
 interface timeTableProps {
   userList: GetUserAvatarResponse[];
   setUserList: React.Dispatch<React.SetStateAction<GetUserAvatarResponse[]>>;
   selectedUserId: number | undefined;
   isMobile: boolean;
-  decision: boolean | undefined;
 }
 
 export interface Table {
@@ -87,9 +79,7 @@ export default function TimeTable({
   userList,
   setUserList,
   selectedUserId,
-  isMobile,
-  decision,
-}: timeTableProps) {
+  isMobile}: timeTableProps) {
   const srcMap = getSrcMap(userList);
   const searchParams = useSearchParams();
   const { hash } = useParams();

@@ -13,7 +13,7 @@ const jua = Jua({
 
 interface MeetingMobileBodyProps {
   tableData: GetTableResponse | null;
-  userAvatar: GetUserAvatarResponse | null;
+  userAvatar: GetUserAvatarResponse[] | null;
 }
 
 export default function MeetingMobileBody({

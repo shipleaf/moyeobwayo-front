@@ -1,6 +1,5 @@
 import React from 'react';
 import Toggle from './Toggle'; // Toggle 컴포넌트 import 경로는 프로젝트 구조에 맞게 조정하세요.
-import { setServerAlarmState } from '@/app/api/setAlarmState';
 import { Bell, BellSimpleSlash } from '@phosphor-icons/react/dist/ssr';
 
 interface AlarmHandlerProps {

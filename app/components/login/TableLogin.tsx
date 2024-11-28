@@ -10,7 +10,6 @@ import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 import Image from "next/image";
 import Script from "next/script";
 import { kakaoLoginHandlerbyMeeting } from "@/app/meeting/service/kakaoLoginHandler";
-import { shadow } from "pdfjs-dist";
 
 interface TableLoginProps {
   isMobile: boolean;
