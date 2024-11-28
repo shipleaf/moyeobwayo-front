@@ -1,6 +1,5 @@
 import React from 'react';
 import Toggle from './Toggle'; // Toggle 컴포넌트 import 경로는 프로젝트 구조에 맞게 조정하세요.
-import { setServerAlarmState } from '@/app/api/setAlarmState';
 import { Bell, BellSimpleSlash } from '@phosphor-icons/react/dist/ssr';
 
 interface AlarmHandlerProps {
@@ -13,8 +12,7 @@ export default function AlarmHandler({ alarm, alarmID, setAlarm }: AlarmHandlerP
   const handleAlarmToggle = async () => {
     if (alarmID === null) return;
 
-    const res = await setServerAlarmState(alarmID, !alarm); // 서버 상태 변경 호출
-    console.log('setServerAlarmState Result: ', res);
+    // const res = await setServerAlarmState(alarmID, !alarm); // 서버 상태 변경 호출
 
     setAlarm(prevAlarm => !prevAlarm); // 상태 반전
   };

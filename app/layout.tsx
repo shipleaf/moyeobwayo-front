@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Script from "next/script";
 import { RecoilRoot } from "recoil";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = localFont({
@@ -18,18 +18,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [, setIsMobile] = useState(false);
+  // const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768); // 768px 이하를 모바일로 간주
-    };
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     setIsMobile(window.innerWidth < 768); // 768px 이하를 모바일로 간주
+  //   };
 
-    handleResize(); // 초기 화면 크기 확인
-    window.addEventListener("resize", handleResize);
+  //   handleResize(); // 초기 화면 크기 확인
+  //   window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, []);
 
   useEffect(() => {
     // 페이지 로드 시 스크롤 비활성화

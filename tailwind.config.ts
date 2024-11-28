@@ -8,6 +8,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        sm: "640px",
+        md: "768px", // 'md'가 768px로 정의되어 있는지 확인
+        lg: "1024px",
+        xl: "1280px",
+      },
       backgroundColor: {
         "custom-white": "rgba(255, 255, 255, 0.36)", // 사용자 정의 색상
         "custom-bg": "rgba(246, 246, 246, 0.36)",
@@ -41,6 +47,7 @@ const config: Config = {
       },
       fontFamily: {
         pretendard: ["Pretendard", "sans-serif"],
+        jua: ["Jua", "sans-serif"],
         roboto: ["Roboto", "sans-serif"],
       },
       borderWidth: {

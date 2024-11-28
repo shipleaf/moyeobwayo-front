@@ -54,6 +54,7 @@ const initializeBinaryTable = (
 };
 
 type TimeSelectorProps = {
+  isMobile: boolean;
   party: {
     partyId: string;
     targetNum: number;
@@ -78,7 +79,7 @@ type TimeSelectorProps = {
   };
 };
 
-export default function TimeSelector({ party }: TimeSelectorProps) {
+export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
   const { hash } = useParams();
   const { dates, startDate, endDate } = party;
   const userId = useRecoilValue(userIdValue);
@@ -86,7 +87,7 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
 
   const startHour = new Date(startDate).getHours();
   const prevEndHour = new Date(endDate).getHours();
-  const endHour = prevEndHour === 0? 24: prevEndHour;
+  const endHour = prevEndHour === 0 ? 24 : prevEndHour;
   const timeSlots = generateTimeSlots(startHour, endHour);
   const displaySlots = generateDisplaySlots(startHour, endHour);
   const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
@@ -108,7 +109,6 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
         };
 
         const response = await getMyVote(data);
-        console.log("Fetched vote data:", response);
 
         const updatedSlots = [...selectedSlots];
         const updatedTable = { ...binaryTable };
@@ -195,7 +195,7 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
     setIsDeselecting(selectedSlots[index]);
     setStartIndex(index);
     setSelectedColumn(dateIndex);
-    };
+  };
 
   const handleMouseOver = (index: number) => {
     if (!isSelecting) return;
@@ -250,6 +250,87 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
       .catch((error) => console.error("Error posting vote data:", error));
   };
 
+  
+
+  if (isMobile) {
+    return (
+      <div
+        onMouseUp={handleMouseUp}
+        style={{ userSelect: "none" }}
+        className="w-[90%] mr-[5%] flex justify-start items-start bg-[#fff] rounded-[10px] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] backdrop-blur-[48px] overflow-auto"
+      >
+        <div
+          className="grid items-start justify-center"
+          style={{
+            gridTemplateColumns: `40px repeat(${dates.length}, 50px)`,
+            gap: "0",
+          }}
+        >
+          <div></div>
+          {dates.map((date, index) => {
+            const { weekday, day } = formatDate(date.selected_date);
+            return (
+              <div
+                key={index}
+                className="text-center border-b border-gray-300"
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  zIndex: 10,
+                  backgroundColor: "#fff",
+                  marginBottom: "5px",
+                }}
+              >
+                <div className="text-xs font-semibold">{weekday}</div>
+                <div className="text-lg font-bold">{day}</div>
+              </div>
+            );
+          })}
+
+          {displaySlots.map((displayTime, displayIndex) => (
+            <React.Fragment key={`display-${displayIndex}`}>
+              <div
+                className="flex flex-col text-center row-span-2 border-gray-300 text-[10px]"
+                style={{
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 8,
+                  backgroundColor: "#fff",
+                  transform: "translateY(-7px)", // 위로 5px 이동
+                }}
+              >
+                {displayTime}
+              </div>
+              {timeSlots
+                .slice(displayIndex * 2, displayIndex * 2 + 2)
+                .map((_, innerIndex) => {
+                  const cellIndex = displayIndex * 2 + innerIndex;
+                  return dates.map((date, dateIndex) => {
+                    const fullCellIndex =
+                      cellIndex + dateIndex * timeSlots.length;
+                    return (
+                      <div
+                        key={`${date.dateId}-${fullCellIndex}`}
+                        data-dateid={date.dateId}
+                        className={`block w-[50px] h-[20px] cursor-pointer ${
+                          selectedSlots[fullCellIndex]
+                            ? "bg-[#A1A1FF]"
+                            : "bg-white"
+                        } border-l border-r border-b border-b-dashed border-gray-300`}
+                        onMouseDown={(e) => handleMouseDown(fullCellIndex, e)}
+                        onMouseOver={() => handleMouseOver(fullCellIndex)}
+                        onClick={() => handleCellClick(fullCellIndex)}
+                      />
+                    );
+                  });
+                })}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       onMouseUp={handleMouseUp}
@@ -267,16 +348,16 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
         {dates.map((date, index) => {
           const { weekday, day } = formatDate(date.selected_date);
           return (
-            <div 
-            key={index} 
-            className="text-center border-b border-gray-300"
-            style={{
-              position: "sticky",
-              top: 0,
-              zIndex: 10,
-              backgroundColor: "#fff",
-              marginBottom: "5px",
-            }}
+            <div
+              key={index}
+              className="text-center border-b border-gray-300"
+              style={{
+                position: "sticky",
+                top: 0,
+                zIndex: 10,
+                backgroundColor: "#fff",
+                marginBottom: "5px",
+              }}
             >
               <div className="text-xs font-semibold">{weekday}</div>
               <div className="text-lg font-bold">{day}</div>
@@ -286,15 +367,15 @@ export default function TimeSelector({ party }: TimeSelectorProps) {
 
         {displaySlots.map((displayTime, displayIndex) => (
           <React.Fragment key={`display-${displayIndex}`}>
-            <div 
-            className="flex flex-col text-center row-span-2 border-gray-300 text-[10px]"
-            style={{
-              position: "sticky",
-              left: 0,
-              zIndex: 8,
-              backgroundColor: "#fff",
-              transform: "translateY(-7px)", // 위로 5px 이동
-            }}
+            <div
+              className="flex flex-col text-center row-span-2 border-gray-300 text-[10px]"
+              style={{
+                position: "sticky",
+                left: 0,
+                zIndex: 8,
+                backgroundColor: "#fff",
+                transform: "translateY(-7px)", // 위로 5px 이동
+              }}
             >
               {displayTime}
             </div>
