@@ -120,11 +120,28 @@ export default function Home() {
   const TUTORIAL_KEY = "tutorialDone";
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768; // 초기 상태를 브라우저 크기에 따라 설정
+    }
+    return false; // 서버 렌더링 시 기본값
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  console.log(isMobile);
 
   useEffect(() => {
     // 로컬 스토리지에서 튜토리얼 상태 확인
     const tutorialStatus = localStorage.getItem(TUTORIAL_KEY);
-    if (tutorialStatus === "true") {
+    if (tutorialStatus === "true" || isMobile) {
       setCount(TUTORIAL_DONE); // 이미 완료된 상태라면 튜토리얼 스킵
     }
     setIsLoading(false); // 로딩 완료
