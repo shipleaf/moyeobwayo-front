@@ -3,7 +3,12 @@ import React, { Suspense, useEffect, useState } from "react";
 import { CheckFat } from "@phosphor-icons/react/dist/ssr";
 import { useSearchParams } from "next/navigation"; // useRouter를 가져옵니다
 import TimeTable from "./TimeTable";
-import { getTable, Party, AvailableTimesResponse, PartyDate } from "@/app/api/getTableAPI";
+import {
+  getTable,
+  Party,
+  AvailableTimesResponse,
+  PartyDate,
+} from "@/app/api/getTableAPI";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,21 +25,22 @@ const MeetDetail = () => {
   const searchParams = useSearchParams(); // 검색 파라미터 가져오기
   const table_id = searchParams.get("partyId"); // table_id 가져오기
   const [targetMeet, setTargetMeet] = useState<Party | null>(null); // 상태 초기화
-  const [avariableTime, setAvariableTime] = useState<AvailableTimesResponse[] | null>(null);
-  const [isLoading, setIsLoading] = useState(false)
-  console.log('in target Compo', targetMeet?.decisionDate);
+  const [avariableTime, setAvariableTime] = useState<
+    AvailableTimesResponse[] | null
+  >(null);
+  const [isLoading, setIsLoading] = useState(false);
+  console.log("in target Compo", targetMeet?.decisionDate);
   useEffect(() => {
     const fetchMeetDetail = async () => {
       if (table_id) {
         try {
-          setIsLoading(true)
+          setIsLoading(true);
           const response = await getTable({ table_id: table_id }); // API 호출
           setTargetMeet(response.party); // API로부터 받은 데이터로 상태 업데이트
           setAvariableTime(response.availableTime);
-          
         } catch (error) {
           console.error("Failed to fetch table detail:", error); // 에러 처리
-        } finally{
+        } finally {
           setIsLoading(false);
         }
       }
@@ -85,13 +91,13 @@ const MeetDetail = () => {
   return (
     <div>
       {isLoading && (
-          <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50'>
-            <div className='flex flex-col items-center'>
-              <div className="loader"></div>
-              <p className="mt-4 text-lg">로딩 중입니다...</p>
-            </div>
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <div className="flex flex-col items-center">
+            <div className="loader"></div>
+            <p className="mt-4 text-lg">로딩 중입니다...</p>
           </div>
-        )}
+        </div>
+      )}
       <div
         className="w-full py-[18px] px-5 mb-2.5 text-[#5E5E5E] text-[14px] font-normal rounded-[5px] border border-solid"
         style={{
@@ -119,10 +125,10 @@ const MeetDetail = () => {
         </div>
       </div>
       <div className="w-full h-[11%] min-[740px]:hidden">
-          <Suspense>
-            <MobileHeader isDescision={targetMeet.decisionDate}/>
-          </Suspense>
-        </div>
+        <Suspense>
+          <MobileHeader isDescision={targetMeet.decisionDate} />
+        </Suspense>
+      </div>
       <div className="flex max-[740px]:flex-col gap-4">
         {/* TimeTable */}
         <section className="w-2/3 max-[740px]:w-full max-h-[61vh] overflow-y-auto bg-[#F7F7F7] py-3 px-2 rounded-[10px]">
@@ -135,10 +141,9 @@ const MeetDetail = () => {
         </section>
         {/* Candidate */}
         <h1 className="font-extrabold text-[24px] text-[#262669]  min-[740px]:hidden mb-4">
-            추천 시간
-          </h1>
-        <section className="w-1/3 max-[740px]:w-full max-h-[61vh] overflow-auto">
-          
+          추천 시간
+        </h1>
+        <section className="w-1/3 max-[740px]:w-full max-[740px]:mb-12 max-h-[61vh] overflow-auto">
           {avariableTime?.map((candi, idx) => {
             const people = candi.users.map((user) => user.userName);
             const date = new Date(candi.start);

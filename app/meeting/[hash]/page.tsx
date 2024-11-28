@@ -318,17 +318,21 @@ export default function MeetingPage() {
     if (!tableData?.party.decisionDate) {
       return (
         <div>
-          <MobileHeader endpoint="home" />
+          <div className="p-2">
+            <MobileHeader endpoint="home" />
+          </div>
           <div className="body bg-[rgb(216,216,255)] bg-opacity-50 rounded-[10px] relative pb-[25px]">
             <MeetingMobileBody
               tableData={originalTableData}
               userAvatar={users}
             />
             <LinkShareModal
-            partyId={hash as string}
-            isOpen={isLinkShareModalOpen} 
-            onClose={()=>{setIsLinkShareModalOpen(false)}}
-          />
+              partyId={hash as string}
+              isOpen={isLinkShareModalOpen}
+              onClose={() => {
+                setIsLinkShareModalOpen(false);
+              }}
+            />
             <TimeTable
               userList={users}
               setUserList={setUsers}
@@ -521,8 +525,10 @@ export default function MeetingPage() {
         <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
           <LinkShareModal
             partyId={hash as string}
-            isOpen={isLinkShareModalOpen} 
-            onClose={()=>{setIsLinkShareModalOpen(false)}}
+            isOpen={isLinkShareModalOpen}
+            onClose={() => {
+              setIsLinkShareModalOpen(false);
+            }}
           />
           <div className="flex flex-col items-center h-full">
             <Image
