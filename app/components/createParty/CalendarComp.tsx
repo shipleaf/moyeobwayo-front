@@ -266,7 +266,7 @@ export default function CalendarComp() {
   };
 
   return (
-    <div className="mr-[2%] basis-1/4 overflow-auto">
+    <>
       {/* Loading Indicator */}
       {isLoading && (
           <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50'>
@@ -471,6 +471,6 @@ export default function CalendarComp() {
           setIsLoading={setIsLoading}
         />
       </Modal>
-    </div>
+      </>
   );
 }

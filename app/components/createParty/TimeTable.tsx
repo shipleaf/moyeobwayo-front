@@ -81,6 +81,7 @@ export default function TimeTable({
   selectedUserId,
   isMobile}: timeTableProps) {
   const srcMap = getSrcMap(userList);
+  
   const searchParams = useSearchParams();
   const { hash } = useParams();
   const partyId = searchParams.get("partyId");
@@ -103,41 +104,41 @@ export default function TimeTable({
           getTable({ table_id: hash as string }),
           getUserAvatar({ table_id: hash as string }),
         ]).then(([tableDataResponse, userAvatarResponse]) => {
-          const dates = tableDataResponse.party.dates.map((date) => {
-            const localDate = new Date(date.selected_date);
-            return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식
-          });
-
-          const timeslots = tableDataResponse.party.dates.map((date) => ({
-            dateId: date.dateId,
-            convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
-              userId: slot.userId,
-              userName: slot.userName,
-              byteString: slot.byteString,
-            })),
-          }));
-
-          const startTime = new Date(
-            tableDataResponse.party.startDate
-          ).toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          const endTime = new Date(
-            tableDataResponse.party.endDate
-          ).toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          setTableData({
-            party: tableDataResponse.party,
-            formattedDates: dates,
-            startTime: startTime,
-            endTime: endTime,
-            dates: timeslots,
-          });
+            const dates = tableDataResponse.party.dates.map((date) => {
+              const localDate = new Date(date.selected_date);
+              return localDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD 형식
+            });
+    
+            const timeslots = tableDataResponse.party.dates.map((date) => ({
+              dateId: date.dateId,
+              convertedTimeslots: (date.convertedTimeslots || []).map((slot) => ({
+                userId: slot.userId,
+                userName: slot.userName,
+                byteString: slot.byteString,
+              })),
+            }));
+    
+            const startTime = new Date(
+              tableDataResponse.party.startDate
+            ).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+    
+            const endTime = new Date(
+              tableDataResponse.party.endDate
+            ).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+    
+            setTableData({
+              party: tableDataResponse.party,
+              formattedDates: dates,
+              startTime: startTime,
+              endTime: endTime,
+              dates: timeslots,
+            });
 
           setUserList(userAvatarResponse);
           setGlobalTotalNum(userAvatarResponse.length);
@@ -214,7 +215,7 @@ export default function TimeTable({
     const labels = [];
     const start = parseInt(tableData.startTime.split(":")[0], 10);
     const prevEnd = parseInt(tableData.endTime.split(":")[0], 10);
-    const end = prevEnd === 0 ? 24 : prevEnd;
+    const end = prevEnd === 0 ? 24 : prevEnd; 
     for (let hour = start; hour <= end; hour++) {
       labels.push(`${hour}:00`);
     }
@@ -479,7 +480,7 @@ export default function TimeTable({
           {hourlyLabels.map((label, index) => (
             <div
               key={index}
-              className={`${roboto.className} font-[500] text-[15px] text-center m-0 p-0 h-[12vh] max-[1000px]:h-[10vh]`}
+              className={`${roboto.className} font-[500] text-[15px] text-center m-0 mb-1 p-0 h-[12vh] max-[1000px]:h-[10vh]`}
             >
               {label}
             </div>

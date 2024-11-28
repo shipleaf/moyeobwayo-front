@@ -4,7 +4,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Script from "next/script";
 import { RecoilRoot } from "recoil";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,7 +33,7 @@ export default function RootLayout({
 
   useEffect(() => {
     // 페이지 로드 시 스크롤 비활성화
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = "auto";
 
     return () => {
       // 언마운트 시 스크롤 복구
@@ -70,7 +71,10 @@ export default function RootLayout({
           integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4"
           crossOrigin="anonymous"
         ></Script>
-        <RecoilRoot>{children}</RecoilRoot>
+        <RecoilRoot>
+          {children}
+          <Analytics />
+        </RecoilRoot>
       </body>
     </html>
   );

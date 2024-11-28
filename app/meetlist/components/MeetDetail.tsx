@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { CheckFat } from "@phosphor-icons/react/dist/ssr";
 import { useSearchParams } from "next/navigation"; // useRouter를 가져옵니다
 import TimeTable from "./TimeTable";
@@ -7,6 +7,7 @@ import { getTable, Party, AvailableTimesResponse, PartyDate } from "@/app/api/ge
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
+import MobileHeader from "./MobileHeader";
 // import TimeTable from "@/app/components/createParty/TimeTable";
 // import { PartyDate } from "@/app/api/getTableAPI";
 
@@ -21,7 +22,7 @@ const MeetDetail = () => {
   const [targetMeet, setTargetMeet] = useState<Party | null>(null); // 상태 초기화
   const [avariableTime, setAvariableTime] = useState<AvailableTimesResponse[] | null>(null);
   const [isLoading, setIsLoading] = useState(false)
-
+  console.log('in target Compo', targetMeet?.decisionDate);
   useEffect(() => {
     const fetchMeetDetail = async () => {
       if (table_id) {
@@ -97,10 +98,9 @@ const MeetDetail = () => {
           borderColor: "var(--mo-50, #6161CE)",
           background: "rgba(97, 97, 206, 0.10)",
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.15)",
-          // backdropFilter: 'blur(48px)',
         }}
       >
-        <p className="text-[#5E5E5E] text-[14px] font-normal">
+        <p className="text-[#5E5E5E] text-[14px] font-normal max-[740px]:hidden">
           {targetMeet.targetNum}명 중 {targetMeet.currentNum}명
         </p>
         <h3 className="mb-[5px] text-[22px] text-[#2D2D2D] font-semibold">
@@ -118,9 +118,14 @@ const MeetDetail = () => {
           </Link>
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="w-full h-[11%] min-[740px]:hidden">
+          <Suspense>
+            <MobileHeader isDescision={targetMeet.decisionDate}/>
+          </Suspense>
+        </div>
+      <div className="flex max-[740px]:flex-col gap-4">
         {/* TimeTable */}
-        <section className="w-2/3 max-h-[61vh] overflow-y-auto bg-[#F7F7F7] py-3 px-2 rounded-[10px]">
+        <section className="w-2/3 max-[740px]:w-full max-h-[61vh] overflow-y-auto bg-[#F7F7F7] py-3 px-2 rounded-[10px]">
           <TimeTable
             startDate={targetMeet.startDate}
             endDate={targetMeet.endDate}
@@ -129,7 +134,11 @@ const MeetDetail = () => {
           />
         </section>
         {/* Candidate */}
-        <section className="w-1/3 max-h-[61vh] overflow-auto">
+        <h1 className="font-extrabold text-[24px] text-[#262669]  min-[740px]:hidden mb-4">
+            추천 시간
+          </h1>
+        <section className="w-1/3 max-[740px]:w-full max-h-[61vh] overflow-auto">
+          
           {avariableTime?.map((candi, idx) => {
             const people = candi.users.map((user) => user.userName);
             const date = new Date(candi.start);

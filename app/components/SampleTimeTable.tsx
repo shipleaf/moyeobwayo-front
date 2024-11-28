@@ -25,9 +25,9 @@ export interface Timeslot {
   userName: string;
 }
 export interface GetSampleUserAvatarResponse {
-  userId: number,
-  userName: string,
-  profileImage?: string,
+  userId: number;
+  userName: string;
+  profileImage?: string;
 }
 // 1시간 단위로 시간을 반환하는 함수
 const generateHourlyLabels = () => {
@@ -132,7 +132,6 @@ function generateDummyData(): PartyDate[] {
       { userId: 2, dateId: 7, byteString: "000000000000", userName: "존" },
       { userId: 3, dateId: 7, byteString: "000000000000", userName: "사라" },
     ],
-    
   });
 
   return dummyData;
@@ -146,9 +145,9 @@ function getVotedUsers(
   slotIndex: number
 ): VotedUser[] {
   return users
-    .filter(user => user.byteString[slotIndex] === '1') // byteString[slotIndex]가 '1'인 경우만 포함
-    .map(user => ({
-      src: srcMap[user.userId] || '/images/default_avatar.png', // srcMap에서 찾지 못하면 기본 이미지 사용
+    .filter((user) => user.byteString[slotIndex] === "1") // byteString[slotIndex]가 '1'인 경우만 포함
+    .map((user) => ({
+      src: srcMap[user.userId] || "/images/default_avatar.png", // srcMap에서 찾지 못하면 기본 이미지 사용
       name: user.userName,
     }));
 }
@@ -161,9 +160,13 @@ const generateTimeSlots = () => {
   }
   return slots;
 };
-function getSrcMap(userList: GetSampleUserAvatarResponse[]): Record<number, string> {
+function getSrcMap(
+  userList: GetSampleUserAvatarResponse[]
+): Record<number, string> {
   return userList.reduce((acc, user, index) => {
-    acc[user.userId] = user.profileImage ? user.profileImage : `/images/sample_avatar${(index % 3) + 1}.png`;
+    acc[user.userId] = user.profileImage
+      ? user.profileImage
+      : `/images/sample_avatar${(index % 3) + 1}.png`;
     return acc;
   }, {} as Record<number, string>);
 }
@@ -173,19 +176,17 @@ const userList: GetSampleUserAvatarResponse[] = [
   {
     userId: 1,
     userName: "제시카",
-    profileImage: undefined
-
+    profileImage: undefined,
   },
   {
     userId: 2,
     userName: "존",
-    profileImage: undefined
+    profileImage: undefined,
   },
   {
     userId: 3,
     userName: "사라",
-    profileImage: undefined
-
+    profileImage: undefined,
   },
 ];
 
@@ -196,7 +197,7 @@ export default function SampleTimeTable() {
   const hourlyLabels = generateHourlyLabels(); // 시간 라벨
 
   return (
-    <div className="flex flex-col gap-[20px] basis-3/4">
+    <>
       <div className="Head gap-[10px] h-[10%] flex flex-row w-full pr-[2%]">
         <div
           className={`${roboto.className} rounded-[10px] bg-[#F7F7F7] shadow-[0px_0px_6px_0px_rgba(0,0,0,0.15)] text-[17px] backdrop-blur-[48px] w-[8%] h-full flex justify-center items-center font-[500]`}
@@ -253,10 +254,13 @@ export default function SampleTimeTable() {
                   );
                 }
                 const colorLevel = getGradationNum(votes, maxVotes);
-                
+
                 const votedUsersData = getVotedUsers(
-                  day.timeslots, srcMap, slotIndex);
-                  
+                  day.timeslots,
+                  srcMap,
+                  slotIndex
+                );
+
                 return (
                   <TimeBlock
                     key={`${dateIndex}-${slotIndex}`}
@@ -294,6 +298,6 @@ export default function SampleTimeTable() {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }
