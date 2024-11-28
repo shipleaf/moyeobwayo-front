@@ -34,7 +34,6 @@ import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 import { GetCompleteResponse, getDecision } from "@/app/api/partyCompleteAPI";
 // import { tableRefreshTrigger } from "@/app/recoil/atom";
 import { FaRegCalendarCheck } from "react-icons/fa";
-<<<<<<< HEAD
 import MeetingMobileBody from "../components/MeetingMobileBody";
 import BottomSheet from "../components/MeetingMobileBottomSheet";
 import { LuAlarmClock } from "react-icons/lu";
@@ -43,15 +42,13 @@ import { IoIosCheckmarkCircle } from "react-icons/io";
 import { BiSolidNoEntry } from "react-icons/bi";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import MobileHeader from "@/app/components/common/MobileHeader";
+import LinkShareModal from "./components/LinkShareModal";
 
 const jua = Jua({
   weight: "400", // 폰트 굵기 설정
   subsets: ["latin"], // 필요한 언어 설정
   display: "swap", // FOUT 방지
 });
-=======
-import LinkShareModal from "./components/LinkShareModal";
->>>>>>> 490e296 (feat: link공유 유도 모달 데스크탑)
 
 export interface TableData {
   party: Party;
@@ -327,6 +324,11 @@ export default function MeetingPage() {
               tableData={originalTableData}
               userAvatar={users}
             />
+            <LinkShareModal
+            partyId={hash as string}
+            isOpen={isLinkShareModalOpen} 
+            onClose={()=>{setIsLinkShareModalOpen(false)}}
+          />
             <TimeTable
               userList={users}
               setUserList={setUsers}
