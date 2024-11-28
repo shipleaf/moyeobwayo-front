@@ -34,6 +34,7 @@ import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 import { GetCompleteResponse, getDecision } from "@/app/api/partyCompleteAPI";
 // import { tableRefreshTrigger } from "@/app/recoil/atom";
 import { FaRegCalendarCheck } from "react-icons/fa";
+<<<<<<< HEAD
 import MeetingMobileBody from "../components/MeetingMobileBody";
 import BottomSheet from "../components/MeetingMobileBottomSheet";
 import { LuAlarmClock } from "react-icons/lu";
@@ -48,6 +49,9 @@ const jua = Jua({
   subsets: ["latin"], // 필요한 언어 설정
   display: "swap", // FOUT 방지
 });
+=======
+import LinkShareModal from "./components/LinkShareModal";
+>>>>>>> 490e296 (feat: link공유 유도 모달 데스크탑)
 
 export interface TableData {
   party: Party;
@@ -83,6 +87,7 @@ export default function MeetingPage() {
     "calendar"
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(true);
   const [globalKakaoState, setGlobalKakaoState] =
     useRecoilState(kakaoUserState); // Recoil 상태 사용
   const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue);
@@ -512,6 +517,11 @@ export default function MeetingPage() {
     <>
       <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
         <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
+          <LinkShareModal
+            partyId={hash as string}
+            isOpen={isLinkShareModalOpen} 
+            onClose={()=>{setIsLinkShareModalOpen(false)}}
+          />
           <div className="flex flex-col items-center h-full">
             <Image
               src="/images/mainLogo.png"
