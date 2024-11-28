@@ -34,7 +34,6 @@ import { tableLoginHandler } from "@/app/utils/tableLoginCallback";
 import { GetCompleteResponse, getDecision } from "@/app/api/partyCompleteAPI";
 // import { tableRefreshTrigger } from "@/app/recoil/atom";
 import { FaRegCalendarCheck } from "react-icons/fa";
-import MeetingMobileHeader from "../components/MeetingMobileHeader";
 import MeetingMobileBody from "../components/MeetingMobileBody";
 import BottomSheet from "../components/MeetingMobileBottomSheet";
 import { LuAlarmClock } from "react-icons/lu";
@@ -42,6 +41,7 @@ import { Jua } from "next/font/google";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { BiSolidNoEntry } from "react-icons/bi";
 import { FaMinus, FaPlus } from "react-icons/fa6";
+import MobileHeader from "@/app/components/common/MobileHeader";
 
 const jua = Jua({
   weight: "400", // 폰트 굵기 설정
@@ -316,7 +316,7 @@ export default function MeetingPage() {
     if (!tableData?.party.decisionDate) {
       return (
         <div>
-          <MeetingMobileHeader />
+          <MobileHeader endpoint="home" />
           <div className="body bg-[rgb(216,216,255)] bg-opacity-50 rounded-[10px] relative pb-[25px]">
             <MeetingMobileBody
               tableData={originalTableData}
@@ -353,7 +353,7 @@ export default function MeetingPage() {
     } else {
       return (
         <div>
-          <MeetingMobileHeader />
+          <MobileHeader endpoint="home" />
           <MeetingMobileBody tableData={originalTableData} userAvatar={users} />
           <div className="pl-[5%] flex flex-row h-[30%] w-full items-center gap-1 mb-[10px]">
             <div

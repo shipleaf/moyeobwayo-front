@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Script from "next/script";
 import { RecoilRoot } from "recoil";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = localFont({
