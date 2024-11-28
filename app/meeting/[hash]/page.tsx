@@ -42,6 +42,7 @@ import { IoIosCheckmarkCircle } from "react-icons/io";
 import { BiSolidNoEntry } from "react-icons/bi";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import MobileHeader from "@/app/components/common/MobileHeader";
+import LinkShareModal from "./components/LinkShareModal";
 
 const jua = Jua({
   weight: "400", // 폰트 굵기 설정
@@ -83,6 +84,7 @@ export default function MeetingPage() {
     "calendar"
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLinkShareModalOpen, setIsLinkShareModalOpen] = useState(true);
   const [globalKakaoState, setGlobalKakaoState] =
     useRecoilState(kakaoUserState); // Recoil 상태 사용
   const [globalUserId, setGlobalUserId] = useRecoilState(userIdValue);
@@ -322,6 +324,11 @@ export default function MeetingPage() {
               tableData={originalTableData}
               userAvatar={users}
             />
+            <LinkShareModal
+            partyId={hash as string}
+            isOpen={isLinkShareModalOpen} 
+            onClose={()=>{setIsLinkShareModalOpen(false)}}
+          />
             <TimeTable
               userList={users}
               setUserList={setUsers}
@@ -512,6 +519,11 @@ export default function MeetingPage() {
     <>
       <div className="flex items-center justify-end bg-[#6161CE] h-screen p-[2%] relative">
         <div className="flex flex-col w-[10%] h-[100%] pl-[1%] items-start">
+          <LinkShareModal
+            partyId={hash as string}
+            isOpen={isLinkShareModalOpen} 
+            onClose={()=>{setIsLinkShareModalOpen(false)}}
+          />
           <div className="flex flex-col items-center h-full">
             <Image
               src="/images/mainLogo.png"
