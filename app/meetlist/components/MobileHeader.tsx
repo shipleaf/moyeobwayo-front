@@ -1,16 +1,18 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation'
-import { useRecoilState } from 'recoil';
-import { kakaoUserState } from '@/app/recoil/atom';
-import { loadFromLocalStorage, saveToLocalStorage } from '@/app/recoil/recoilUtils';
-import { getAlarmState } from '@/app/api/getAlarmState';
-import { useRouter } from 'next/navigation';
-import { decodeJWT } from '@/app/utils/jwtUtils';
-import AlarmHandler from './AlarmHandler';
+import { getAlarmState } from '@/app/api/getAlarmState'
+import { kakaoUserState } from '@/app/recoil/atom'
+import { loadFromLocalStorage } from '@/app/recoil/recoilUtils'
+import { decodeJWT } from '@/app/utils/jwtUtils'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import { useRecoilState } from 'recoil'
+import AlarmHandlerMobile from './AlarmHandlerMobile'
 
-export default function Header() {
-  const router = useRouter()
+interface MobileHeaderProps {
+  isDescision: boolean;
+}
+
+export default function MobileHeader({isDescision}:MobileHeaderProps) {
+  const router = useRouter();
   const searchParams = useSearchParams()
   const partyId = searchParams.get('partyId')
   const [alarmID, setAlarmID] = useState<number | null>(null)
@@ -69,37 +71,28 @@ export default function Header() {
     fetchAlarmState();
   }, [partyId, globalKakaoUserState.kakaoUserId]);
 
-  const handleLogout = () => {
-    setGloabalKakaoUserState({
-      kakaoUserId: null,
-      nickname: "",
-      profile_image: "",
-    });
-    saveToLocalStorage("kakaoUserJWT", "");
-
-    router.push('/');
-  };
-
   return (
-    <header className="pt-[12px] pb-[13px] flex justify-between items-center h-full">
-      <h1 className="font-bold text-[20px]">
+    <header className="pt-[12px] pb-[13px] flex justify-between items-center h-full ">
+      <h1 className="font-bold text-[20px] max-[740px]:hidden">
         <strong className="text-[#6161CE]">
           {globalKakaoUserState.kakaoUserId && globalKakaoUserState.nickname}
         </strong>의
         <br />일정 한눈에 보기
       </h1>
+      <div className='flex gap-2.5 items-center'>
+        <h1 className="font-extrabold text-[24px] text-[#262669]  min-[740px]:hidden">
+          투표결과
+        </h1>
+        {isDescision && 
+          <div className=" text-[14px] px-4 py-0.5 text- text-white rounded-[50px] font-bold bg-[var(--mo-50,#6161CE)] hover:bg-[#4949A0]">
+            <span>확정</span>
+          </div>
+        }
+
+      </div>
 
       <div className="flex gap-4 items-center">
-        <button 
-          onClick={handleLogout}
-          className="text-[#5F5F5F] text-[16px] font-semibold py-3 px-[26px] 
-              border-[1px] border-[#D7D7D7] rounded-[50px] outline-none 
-              transition-all duration-300 ease-in-out 
-              hover:bg-[#F0F0F0] hover:text-[#3E3E3E] hover:border-[#B0B0B0]">
-          로그아웃
-        </button>
-
-        <AlarmHandler alarm={alarm} setAlarm={setAlarm} alarmID={alarmID}></AlarmHandler>
+        <AlarmHandlerMobile alarm={alarm} setAlarm={setAlarm} alarmID={alarmID}></AlarmHandlerMobile>
       </div>
     </header>
   );

@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 
 :root {
   --background: #ffffff; /* 필요에 맞게 색상 지정 */
@@ -25,6 +26,7 @@
   font-style: normal;
   src: url("/fonts/PretendardVariable.woff2") format("woff2");
 }
+
 /* 전체 스크롤바 스타일 */
 ::-webkit-scrollbar {
   width: 0; /* 세로 스크롤바 숨기기 */
@@ -153,4 +155,30 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.fixed-btn-container {
+  position: fixed; /* 화면에 고정 */
+  bottom: 20px; /* 하단에서 20px */
+  right: 20px; /* 오른쪽에서 20px */
+  z-index: 1000; /* 다른 요소 위에 위치 */
+}
+
+.fixed-btn {
+  background-color: #6161ce; /* 버튼 배경색 */
+  color: white; /* 버튼 텍스트 색상 */
+  border: none;
+  border-radius: 50%; /* 원형 버튼 */
+  width: 45px; /* 버튼 크기 */
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  cursor: pointer;
+  transition: transform 0.3s ease; /* 호버 시 애니메이션 */
+}
+
+.fixed-btn:hover {
+  transform: scale(1.1); /* 버튼 크기 확대 */
 }

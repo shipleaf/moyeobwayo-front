@@ -41,7 +41,6 @@ export default function UserTimeTable() {
   useEffect(() => {
     const handleMouseUp = () => {
       if (isSelecting && startSelectTime && endSelectTime) {
-        console.log(`Drag selected from ${startSelectTime} to ${endSelectTime}`);
       }
       setIsSelecting(false); // 마우스를 놓으면 선택 종료
       setStartSelectTime(null); // 시작 시간 초기화

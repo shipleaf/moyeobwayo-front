@@ -130,8 +130,16 @@ export default function TimeTable({
 
         {/* TimeBlock */}
         <div className="flex gap-[10px] w-full">
-          {timeslots?.map((day, dayIndex) => (
-            <div key={dayIndex} className="flex flex-col min-w-[70px]">
+          {timeslots?.map((day, dayIndex, dayArray) => (
+            <div key={dayIndex} className={`flex flex-col min-w-[70px]
+            
+            `}
+              style={{
+                marginRight:
+                  dayIndex === dayArray.length - 1 ?  
+                  "16px" : "0px"
+              }}
+            >
               {timeSlots.map((timeSlot, slotIndex) => {
                 const dateTime = new Date(dateObjects[dayIndex]);
                 const [hour, minute] = timeSlot.split(":").map(Number);
