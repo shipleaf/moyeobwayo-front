@@ -7,7 +7,6 @@ import { voteData, voteTime, getMyVote } from "@/app/api/timeslotAPI";
 import { useParams } from "next/navigation";
 import { tableRefreshTrigger } from "@/app/recoil/atom";
 
-// 1시간 간격으로 시간 표시, 마지막 시간 포함
 const generateDisplaySlots = (startHour: number, endHour: number): string[] => {
   const slots = [];
   for (let hour = startHour; hour <= endHour; hour++) {
@@ -16,7 +15,6 @@ const generateDisplaySlots = (startHour: number, endHour: number): string[] => {
   return slots;
 };
 
-// 30분 간격으로 시간 슬롯 생성
 const generateTimeSlots = (startHour: number, endHour: number): string[] => {
   const slots = [];
   for (let hour = startHour; hour < endHour; hour++) {
@@ -31,7 +29,6 @@ const generateTimeSlots = (startHour: number, endHour: number): string[] => {
   return slots;
 };
 
-// 요일과 날짜를 개별적으로 포맷팅
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   const weekday = date
@@ -41,7 +38,6 @@ const formatDate = (dateString: string) => {
   return { weekday, day };
 };
 
-// 날짜별 이진 테이블 초기화
 const initializeBinaryTable = (
   dates: Array<{ dateId: number }>,
   slotsLength: number
@@ -90,24 +86,25 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
   const endHour = prevEndHour === 0 ? 24 : prevEndHour;
   const timeSlots = generateTimeSlots(startHour, endHour);
   const displaySlots = generateDisplaySlots(startHour, endHour);
-  const [selectedColumn, setSelectedColumn] = useState<number | null>(null);
 
   const [binaryTable, setBinaryTable] = useState(
     initializeBinaryTable(dates, timeSlots.length)
   );
-
   const [selectedSlots, setSelectedSlots] = useState<boolean[]>(
     Array(timeSlots.length * dates.length).fill(false)
+  );
+
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [isDeselecting, setIsDeselecting] = useState(false);
+  const [startIndex, setStartIndex] = useState<number | null>(null);
+  const [lastDraggedDateId, setLastDraggedDateId] = useState<number | null>(
+    null
   );
 
   useEffect(() => {
     const fetchMyVoteData = async () => {
       try {
-        const data = {
-          userId: userId as number,
-          partyId: hash as string,
-        };
-
+        const data = { userId: userId as number, partyId: hash as string };
         const response = await getMyVote(data);
 
         const updatedSlots = [...selectedSlots];
@@ -138,13 +135,6 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
     fetchMyVoteData();
   }, [userId, hash, dates, timeSlots.length]);
 
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [isDeselecting, setIsDeselecting] = useState(false);
-  const [startIndex, setStartIndex] = useState<number | null>(null);
-  const [lastDraggedDateId, setLastDraggedDateId] = useState<number | null>(
-    null
-  );
-
   const updateBinaryTable = (
     dateId: number,
     slotIndex: number,
@@ -165,89 +155,72 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
     });
   };
 
-  useEffect(() => {
-    if (!isSelecting && lastDraggedDateId !== null) {
-      const updatedData: voteData = {
-        binaryString: binaryTable[lastDraggedDateId],
-        userId: userId as number,
-        dateId: lastDraggedDateId,
-      };
-      voteTime(updatedData)
-        .then(() => {
-          setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
-        })
-        .catch((error) => console.error("Error posting vote data:", error));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastDraggedDateId, binaryTable, userId]);
-
-  const handleMouseDown = (index: number, event: React.MouseEvent) => {
-    event.preventDefault();
-    const dateIndex = Math.floor(index / timeSlots.length);
-    if (selectedColumn !== null && selectedColumn !== dateIndex) {
-      alert("한 번에 한 열만 선택할 수 있습니다.");
-      setIsSelecting(false); // 드래그 취소
-      setSelectedColumn(null);
-      return; // 드래그 동작 취소
-    }
+  const handleMouseDown = (index: number) => {
     setIsSelecting(true);
     setIsDeselecting(selectedSlots[index]);
     setStartIndex(index);
-    setSelectedColumn(dateIndex);
   };
 
   const handleMouseOver = (index: number) => {
     if (!isSelecting) return;
 
     const dateIndex = Math.floor(index / timeSlots.length);
-    if (selectedColumn !== null && selectedColumn !== dateIndex) {
-      alert("한 번에 한 열만 선택할 수 있습니다.");
-      setIsSelecting(false); // 드래그 동작 취소
-      setSelectedColumn(null);
-      return;
-    }
-    const newSelectedSlots = [...selectedSlots];
-    const rangeStart = Math.min(startIndex!, index);
-    const rangeEnd = Math.max(startIndex!, index);
+    const dateId = dates[dateIndex].dateId;
+    const slotIndex = index % timeSlots.length;
 
-    for (let i = rangeStart; i <= rangeEnd; i++) {
-      newSelectedSlots[i] = !isDeselecting;
-      const dateIndex = Math.floor(i / timeSlots.length);
-      const dateId = dates[dateIndex].dateId;
-      const slotIndex = i % timeSlots.length;
-      updateBinaryTable(dateId, slotIndex, !isDeselecting ? "1" : "0");
-    }
-    setSelectedSlots(newSelectedSlots);
+    updateBinaryTable(dateId, slotIndex, !isDeselecting ? "1" : "0");
+    setSelectedSlots((prev) => {
+      const newSelectedSlots = [...prev];
+      newSelectedSlots[index] = !isDeselecting;
+      return newSelectedSlots;
+    });
   };
 
   const handleMouseUp = () => {
     setIsSelecting(false);
     setStartIndex(null);
-    setSelectedColumn(null);
+
     if (lastDraggedDateId !== null) {
       const updatedData: voteData = {
         binaryString: binaryTable[lastDraggedDateId],
         userId: userId as number,
         dateId: lastDraggedDateId,
       };
-  
+      console.log(123);
       voteTime(updatedData)
-        .then(() => {
-          setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
-        })
+      .then(() => {
+        setRefreshTrigger((prev) => prev + 1);
+        setLastDraggedDateId(null); // 클릭 후 lastDraggedDateId 초기화
+      })
         .catch((error) => console.error("Error posting vote data:", error));
     }
   };
 
   const handleCellClick = (index: number) => {
-    const newSelectedSlots = [...selectedSlots];
-    newSelectedSlots[index] = !newSelectedSlots[index];
-    setSelectedSlots(newSelectedSlots);
-
     const dateIndex = Math.floor(index / timeSlots.length);
     const dateId = dates[dateIndex].dateId;
     const slotIndex = index % timeSlots.length;
-    updateBinaryTable(dateId, slotIndex, newSelectedSlots[index] ? "1" : "0");
+
+    updateBinaryTable(dateId, slotIndex, selectedSlots[index] ? "0" : "1");
+    setSelectedSlots((prev) => {
+      const newSelectedSlots = [...prev];
+      newSelectedSlots[index] = !newSelectedSlots[index];
+      return newSelectedSlots;
+    });
+
+    const updatedData: voteData = {
+      binaryString: binaryTable[dateId],
+      userId: userId as number,
+      dateId,
+    };
+    console.log(1234);
+    voteTime(updatedData)
+      .then(() => {
+        setRefreshTrigger((prev) => prev + 1);
+        setLastDraggedDateId(null); // 클릭 후 lastDraggedDateId 초기화
+      })
+
+      .catch((error) => console.error("Error posting vote data:", error));
   };
 
   if (isMobile) {
@@ -294,7 +267,7 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
                   left: 0,
                   zIndex: 8,
                   backgroundColor: "#fff",
-                  transform: "translateY(-7px)", // 위로 5px 이동
+                  transform: "translateY(-7px)",
                 }}
               >
                 {displayTime}
@@ -372,7 +345,7 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
                 left: 0,
                 zIndex: 8,
                 backgroundColor: "#fff",
-                transform: "translateY(-7px)", // 위로 5px 이동
+                transform: "translateY(-7px)",
               }}
             >
               {displayTime}
