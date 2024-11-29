@@ -178,7 +178,6 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
         })
         .catch((error) => console.error("Error posting vote data:", error));
     }
-    console.log(1233)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastDraggedDateId, binaryTable, userId]);
 
