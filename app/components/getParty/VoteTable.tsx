@@ -172,15 +172,15 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
         userId: userId as number,
         dateId: lastDraggedDateId,
       };
-
       voteTime(updatedData)
         .then(() => {
           setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
         })
         .catch((error) => console.error("Error posting vote data:", error));
     }
+    console.log(1233)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSelecting, lastDraggedDateId, binaryTable, userId]);
+  }, [lastDraggedDateId, binaryTable, userId]);
 
   const handleMouseDown = (index: number, event: React.MouseEvent) => {
     event.preventDefault();
@@ -225,6 +225,19 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
     setIsSelecting(false);
     setStartIndex(null);
     setSelectedColumn(null);
+    if (lastDraggedDateId !== null) {
+      const updatedData: voteData = {
+        binaryString: binaryTable[lastDraggedDateId],
+        userId: userId as number,
+        dateId: lastDraggedDateId,
+      };
+  
+      voteTime(updatedData)
+        .then(() => {
+          setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
+        })
+        .catch((error) => console.error("Error posting vote data:", error));
+    }
   };
 
   const handleCellClick = (index: number) => {
@@ -236,21 +249,7 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
     const dateId = dates[dateIndex].dateId;
     const slotIndex = index % timeSlots.length;
     updateBinaryTable(dateId, slotIndex, newSelectedSlots[index] ? "1" : "0");
-
-    const updatedData: voteData = {
-      binaryString: binaryTable[dateId],
-      userId: userId as number,
-      dateId: dateId,
-    };
-
-    voteTime(updatedData)
-      .then(() => {
-        setRefreshTrigger((prev: number) => prev + 1); // 성공 시 refreshTrigger 업데이트
-      })
-      .catch((error) => console.error("Error posting vote data:", error));
   };
-
-  
 
   if (isMobile) {
     return (
