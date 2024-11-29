@@ -143,7 +143,7 @@ const MeetDetail = () => {
         <h1 className="font-extrabold text-[24px] text-[#262669]  min-[740px]:hidden mb-4">
           추천 시간
         </h1>
-        <section className="w-1/3 max-[740px]:w-full max-[740px]:mb-12 max-h-[61vh] overflow-auto">
+        <section className="w-1/3 max-[740px]:w-full max-[740px]:mb-[60px] max-h-[61vh] overflow-auto">
           {avariableTime?.map((candi, idx) => {
             const people = candi.users.map((user) => user.userName);
             const date = new Date(candi.start);
