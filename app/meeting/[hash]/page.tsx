@@ -333,6 +333,15 @@ export default function MeetingPage() {
                 setIsLinkShareModalOpen(false);
               }}
             />
+            <div
+              className={`flex flex-row gap-1 justify-center items-center ${jua.className} text-[#6161CE]`}
+            >
+              <LuAlarmClock />
+              <span className="flex items-center justify-center">
+                현재 투표된 시간
+              </span>
+              <LuAlarmClock />
+            </div>
             <TimeTable
               userList={users}
               setUserList={setUsers}
@@ -341,12 +350,12 @@ export default function MeetingPage() {
             />
             <div className="fixed-btn-container">
               <button
-                className="fixed-btn"
+                className={`${jua.className} text-sm fixed-btn`}
                 onClick={() => {
                   setIsOpen(true);
                 }}
               >
-                +
+                투표하기
               </button>
             </div>
           </div>
@@ -475,7 +484,9 @@ export default function MeetingPage() {
                         </li>
                       ))
                     ) : (
-                      <li className={`${jua.className} col-span-3 flex justify-center text-gray-500 text-sm`}>
+                      <li
+                        className={`${jua.className} col-span-3 flex justify-center text-gray-500 text-sm`}
+                      >
                         불가능한 유저가 없습니다.
                       </li>
                     )

@@ -169,8 +169,8 @@
   color: white; /* 버튼 텍스트 색상 */
   border: none;
   border-radius: 50%; /* 원형 버튼 */
-  width: 45px; /* 버튼 크기 */
-  height: 45px;
+  width: 60px; /* 버튼 크기 */
+  height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
