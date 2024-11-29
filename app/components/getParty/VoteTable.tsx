@@ -96,7 +96,7 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
 
   const [isSelecting, setIsSelecting] = useState(false);
   const [isDeselecting, setIsDeselecting] = useState(false);
-  const [startIndex, setStartIndex] = useState<number | null>(null);
+  const [, setStartIndex] = useState<number | null>(null);
   const [lastDraggedDateId, setLastDraggedDateId] = useState<number | null>(
     null
   );
@@ -188,10 +188,10 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
       };
       console.log(123);
       voteTime(updatedData)
-      .then(() => {
-        setRefreshTrigger((prev) => prev + 1);
-        setLastDraggedDateId(null); // 클릭 후 lastDraggedDateId 초기화
-      })
+        .then(() => {
+          setRefreshTrigger((prev) => prev + 1);
+          setLastDraggedDateId(null); // 클릭 후 lastDraggedDateId 초기화
+        })
         .catch((error) => console.error("Error posting vote data:", error));
     }
   };
@@ -288,7 +288,7 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
                             ? "bg-[#A1A1FF]"
                             : "bg-white"
                         } border-l border-r border-b border-b-dashed border-gray-300`}
-                        onMouseDown={(e) => handleMouseDown(fullCellIndex, e)}
+                        onMouseDown={() => handleMouseDown(fullCellIndex)}
                         onMouseOver={() => handleMouseOver(fullCellIndex)}
                         onClick={() => handleCellClick(fullCellIndex)}
                       />
@@ -366,7 +366,7 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
                           ? "bg-[#A1A1FF]"
                           : "bg-white"
                       } border-l border-r border-b border-b-dashed border-gray-300`}
-                      onMouseDown={(e) => handleMouseDown(fullCellIndex, e)}
+                      onMouseDown={() => handleMouseDown(fullCellIndex)}
                       onMouseOver={() => handleMouseOver(fullCellIndex)}
                       onClick={() => handleCellClick(fullCellIndex)}
                     />
