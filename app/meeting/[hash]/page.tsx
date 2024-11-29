@@ -475,7 +475,7 @@ export default function MeetingPage() {
                         </li>
                       ))
                     ) : (
-                      <li className="text-gray-500 text-sm">
+                      <li className={`${jua.className} col-span-3 flex justify-center text-gray-500 text-sm`}>
                         불가능한 유저가 없습니다.
                       </li>
                     )
