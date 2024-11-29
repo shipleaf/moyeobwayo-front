@@ -111,9 +111,10 @@ export default function PartyPriority({
         const subtitle = priorityData?.party.partyDescription || "모임 설명";
         const formattedMessage = `모임명: ${title}\n설명: ${subtitle}\n날짜: ${formatDateTime(
           timeSlot.start
-        )} ~ ${formatDateTime(timeSlot.end, false)}\n장소: ${
-          completeData.locationName
-        }\n\n모여서 즐거운 시간을 보내세요!\n자세한 내용은 모여봐요에서 확인해 보세요!\n\n링크: https://moyeobwayo.com/meeting/${hash}`;
+        )} ~ ${formatDateTime(
+          timeSlot.end,
+          false
+        )}\n\n모여서 즐거운 시간을 보내세요!\n자세한 내용은 모여봐요에서 확인해 보세요!\n\n링크: https://moyeobwayo.com/meeting/${hash}`;
         setMessage(formattedMessage);
         setShowModal(true);
       } else {
@@ -155,7 +156,9 @@ export default function PartyPriority({
                 <div
                   key={index}
                   className={`priorList px-4 rounded-[5px] drop-shadow-[6px] shadow-prior backdrop-blur-48px w-[100%] mb-[3%] box-border p-[10px] flex flex-col gap-2 ${
-                    isDecisionTimeMatched ? "border-2 border-[#6161CE] bg-[rgba(97,97,206,0.1)]": ""
+                    isDecisionTimeMatched
+                      ? "border-2 border-[#6161CE] bg-[rgba(97,97,206,0.1)]"
+                      : ""
                   }`}
                 >
                   <div className="flex flex-row justify-between gap-1">
