@@ -136,7 +136,6 @@ export default function Home() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  console.log(isMobile);
 
   useEffect(() => {
     // 로컬 스토리지에서 튜토리얼 상태 확인

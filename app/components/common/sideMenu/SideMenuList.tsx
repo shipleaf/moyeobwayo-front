@@ -36,7 +36,6 @@ export default function SideMenuList({
 
           // 첫 번째 파티로 라우터 이동 (partyId 추가)
           if (response.parties && response.parties.length > 0) {
-            console.log('순서가? ', response.parties)
             if (!partyId){
               const firstPartyId =
                 response.parties[0].partyId;
@@ -71,7 +70,6 @@ export default function SideMenuList({
   const handleMeetClick = (meetId:string) =>{
     router.push(`/meetlist?partyId=${meetId}`)
   }
-  console.log('처음거가 왜 밑에 깔리지?', meetList)
   return (
     <div className="flex flex-col gap-1 w-full">
       {isLoading && (
