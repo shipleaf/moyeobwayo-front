@@ -179,50 +179,62 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
   const handleMouseUp = () => {
     setIsSelecting(false);
     setStartIndex(null);
-
+  
     if (lastDraggedDateId !== null) {
+      const currentBinaryString = binaryTable[lastDraggedDateId];
       const updatedData: voteData = {
-        binaryString: binaryTable[lastDraggedDateId],
+        binaryString: currentBinaryString,
         userId: userId as number,
         dateId: lastDraggedDateId,
       };
-      console.log(123);
+  
       voteTime(updatedData)
         .then(() => {
           setRefreshTrigger((prev) => prev + 1);
-          setLastDraggedDateId(null); // 클릭 후 lastDraggedDateId 초기화
+          setLastDraggedDateId(null); // 드래그 완료 후 초기화
         })
         .catch((error) => console.error("Error posting vote data:", error));
     }
   };
-
+  
   const handleCellClick = (index: number) => {
     const dateIndex = Math.floor(index / timeSlots.length);
     const dateId = dates[dateIndex].dateId;
     const slotIndex = index % timeSlots.length;
-
-    updateBinaryTable(dateId, slotIndex, selectedSlots[index] ? "0" : "1");
+  
+    // `setState`의 콜백으로 업데이트 후 값을 사용
+    setBinaryTable((prevTable) => {
+      const currentBinaryString = prevTable[dateId];
+      const updatedBinaryString =
+        currentBinaryString.substring(0, slotIndex) +
+        (selectedSlots[index] ? "0" : "1") +
+        currentBinaryString.substring(slotIndex + 1);
+  
+      const updatedData: voteData = {
+        binaryString: updatedBinaryString,
+        userId: userId as number,
+        dateId,
+      };
+  
+      voteTime(updatedData)
+        .then(() => {
+          setRefreshTrigger((prev) => prev + 1);
+        })
+        .catch((error) => console.error("Error posting vote data:", error));
+  
+      return {
+        ...prevTable,
+        [dateId]: updatedBinaryString,
+      };
+    });
+  
     setSelectedSlots((prev) => {
       const newSelectedSlots = [...prev];
       newSelectedSlots[index] = !newSelectedSlots[index];
       return newSelectedSlots;
     });
-
-    const updatedData: voteData = {
-      binaryString: binaryTable[dateId],
-      userId: userId as number,
-      dateId,
-    };
-    console.log(1234);
-    voteTime(updatedData)
-      .then(() => {
-        setRefreshTrigger((prev) => prev + 1);
-        setLastDraggedDateId(null); // 클릭 후 lastDraggedDateId 초기화
-      })
-
-      .catch((error) => console.error("Error posting vote data:", error));
   };
-
+  
   if (isMobile) {
     return (
       <div
