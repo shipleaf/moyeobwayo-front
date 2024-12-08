@@ -12,11 +12,11 @@ export default function MeetList() {
   const currentPartyId: string | null = searchParams.get("partyId");
   const [parties, setParties] = useState<Party[]>([]);
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const fetchMeetList = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
         // 로컬스토리지에서 jwt를 가져오고 디코딩하는 과정
         const jwt = await loadFromLocalStorage("kakaoUserJWT");
         if (jwt) {
@@ -40,8 +40,8 @@ export default function MeetList() {
         }
       } catch (error) {
         console.error("Error fetching meet list:", error);
-      } finally{
-        setIsLoading(false)
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -56,13 +56,13 @@ export default function MeetList() {
     <section className="w-full">
       {/* parties가 존재하고 배열이 비어있지 않을 경우에만 map을 실행 */}
       {isLoading && (
-          <div className='fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50'>
-            <div className='flex flex-col items-center'>
-              <div className="loader"></div>
-              <p className="mt-4 text-lg">로딩 중입니다...</p>
-            </div>
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <div className="flex flex-col items-center">
+            <div className="loader"></div>
+            <p className="mt-4 text-lg">로딩 중입니다...</p>
           </div>
-        )}
+        </div>
+      )}
       {parties.length > 0 ? (
         [...parties].reverse().map((meet, idx) => {
           const partyID = meet.partyId;
@@ -107,10 +107,13 @@ export default function MeetList() {
                 <p className="text-[#8E8E8E]">
                   {`${month}월 ${day}일 ${hours}:${minutes} ~`}
                 </p>
-                {meet.decisionDate ? <div className="bg-[#6161CE] rounded-[50px] py-[3px] px-[9px] text-white font-semibold text-[12px]">
-                  확정
-                </div> : ""}
-                
+                {meet.decisionDate ? (
+                  <div className="bg-[#6161CE] rounded-[50px] py-[3px] px-[9px] text-white font-semibold text-[12px]">
+                    확정
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
           );

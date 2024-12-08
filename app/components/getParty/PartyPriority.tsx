@@ -12,6 +12,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { MdOutlineContentCopy } from "react-icons/md";
 import { CheckFat } from "@phosphor-icons/react";
 import Image from "next/image";
+import { FaCheck } from "react-icons/fa";
 
 // 날짜 포맷 함수
 const formatDateTime = (dateTime: string, includeDate: boolean = true) => {
@@ -59,6 +60,7 @@ export default function PartyPriority({
     null
   );
   const [showModal, setShowModal] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<TimeSlot | null>(null);
   const [message, setMessage] = useState("");
   const userId = useRecoilValue(userIdValue);
   const refreshTrigger = useRecoilValue(tableRefreshTrigger);
@@ -90,7 +92,6 @@ export default function PartyPriority({
     });
 
     if (!matchingDate) {
-      console.error("해당 날짜와 일치하는 dateId를 찾을 수 없습니다.");
       return;
     }
 
@@ -170,7 +171,7 @@ export default function PartyPriority({
                       ""
                     ) : (
                       <button
-                        onClick={() => handleComplete(timeSlot)}
+                        onClick={() => setConfirmModal(timeSlot)}
                         className="border-1 rounded-[50px] w-[25%] h-[80%] text-[12px] md:text-[13px] lg:text-[14px] whitespace-nowrap font-bold font-pretendard bg-[#6161CE] text-white"
                       >
                         확정
@@ -220,9 +221,43 @@ export default function PartyPriority({
           <p>Loading...</p>
         )}
       </div>
+      {confirmModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-30 flex items-center justify-center z-[10001]">
+          <div className="bg-white p-10 rounded-lg flex flex-col items-center w-[35%] min-w-[350px] max-w-[500px]">
+            <div className="rounded-full bg-[#eee] p-3 mb-[8%]">
+              <FaCheck className="text-[#6161ce]" size={15} />
+            </div>
+            <span className="text-lg font-[600] font-pretendard">
+              일정을 확정하시겠습니까?
+            </span>
+            <div className="p-1 font-pretendard">
+              {" "}
+              {formatDateTime(confirmModal.start)} ~{" "}
+              {formatDateTime(confirmModal.end, false)}
+            </div>
+            <div className="flex gap-2 mt-4 justify-center">
+              <button
+                onClick={() => setConfirmModal(null)}
+                className="bg-white border-1 font-pretendard text-sm font-bold px-4 py-2 rounded-lg"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  handleComplete(confirmModal);
+                  setConfirmModal(null);
+                }}
+                className="bg-[#6161CE] text-white font-pretendard text-sm font-bold px-4 py-2 rounded-lg"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* 복사 가능 모달 */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-[10001]">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-30 z-[10001]">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <h2 className="text-lg font-bold mb-4 flex flex-row items-center font-pretendard">
               모임이 확정되었습니다! 🎉
@@ -237,9 +272,9 @@ export default function PartyPriority({
                 </button>
               </CopyToClipboard>
             </h2>
-            <p className="mb-4 whitespace-pre-wrap font-pretendard">
+            <span className="mb-4 whitespace-pre-wrap font-pretendard">
               {message}
-            </p>
+            </span>
             <div className="flex space-x-2">
               <button
                 onClick={closeModalAndNavigate}
