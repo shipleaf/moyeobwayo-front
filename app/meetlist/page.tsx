@@ -55,10 +55,12 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <div className="page w-[90%] max-[1000px]:w-full flex flex-col h-full bg-white rounded-[20px] 
-      max-[740px]:rounded-none z-50 p-[2%] max-[740px]:px-[13px]">
+      <div
+        className="page w-[90%] max-[1000px]:w-full flex flex-col h-full bg-white rounded-[20px] 
+      max-[740px]:rounded-none z-50 p-[2%] max-[740px]:px-[13px]"
+      >
         {/* Mobile Header */}
-        <MobileHeader endpoint="meetlist"/>
+        <MobileHeader endpoint="meetlist" />
         <div className="w-full h-[11%] max-[740px]:hidden">
           <Suspense>
             <Header />
@@ -78,7 +80,6 @@ export default function Page() {
             </Suspense>
           </div>
         </section>
-        
       </div>
       <div
         className={`absolute transition-all duration-300 z-0 ${"top-[18%] left-[10.5%]"}`}
