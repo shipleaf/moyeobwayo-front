@@ -218,7 +218,7 @@ export default function PartyPriority({
             <p>아직 투표한 사람이 없어요.</p>
           )
         ) : (
-          <p>Loading...</p>
+          <p>불러오는 중...</p>
         )}
       </div>
       {confirmModal && (

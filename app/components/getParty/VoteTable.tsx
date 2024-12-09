@@ -163,24 +163,16 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
 
   const handleMouseOver = (index: number) => {
     if (!isSelecting) return;
-
+  
     const dateIndex = Math.floor(index / timeSlots.length);
     const dateId = dates[dateIndex].dateId;
     const slotIndex = index % timeSlots.length;
-
-    updateBinaryTable(dateId, slotIndex, !isDeselecting ? "1" : "0");
-    setSelectedSlots((prev) => {
-      const newSelectedSlots = [...prev];
-      newSelectedSlots[index] = !isDeselecting;
-      return newSelectedSlots;
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsSelecting(false);
-    setStartIndex(null);
   
-    if (lastDraggedDateId !== null) {
+    // 드래그 시작 날짜와 다른 날짜로 이동하려는 경우
+    if (lastDraggedDateId !== null && lastDraggedDateId !== dateId) {
+      alert("한번에 한 날짜만 투표하실 수 있습니다.");
+  
+      // 현재까지의 변경 사항을 서버로 보내기
       const currentBinaryString = binaryTable[lastDraggedDateId];
       const updatedData: voteData = {
         binaryString: currentBinaryString,
@@ -191,17 +183,49 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
       voteTime(updatedData)
         .then(() => {
           setRefreshTrigger((prev) => prev + 1);
+        })
+        .catch((error) => console.error("Error posting vote data:", error));
+  
+      // 드래그 종료 및 초기화
+      setIsSelecting(false);
+      setLastDraggedDateId(null);
+      return;
+    }
+  
+    updateBinaryTable(dateId, slotIndex, !isDeselecting ? "1" : "0");
+    setSelectedSlots((prev) => {
+      const newSelectedSlots = [...prev];
+      newSelectedSlots[index] = !isDeselecting;
+      return newSelectedSlots;
+    });
+  };
+  
+  const handleMouseUp = () => {
+    setIsSelecting(false);
+    setStartIndex(null);
+
+    if (lastDraggedDateId !== null) {
+      const currentBinaryString = binaryTable[lastDraggedDateId];
+      const updatedData: voteData = {
+        binaryString: currentBinaryString,
+        userId: userId as number,
+        dateId: lastDraggedDateId,
+      };
+
+      voteTime(updatedData)
+        .then(() => {
+          setRefreshTrigger((prev) => prev + 1);
           setLastDraggedDateId(null); // 드래그 완료 후 초기화
         })
         .catch((error) => console.error("Error posting vote data:", error));
     }
   };
-  
+
   const handleCellClick = (index: number) => {
     const dateIndex = Math.floor(index / timeSlots.length);
     const dateId = dates[dateIndex].dateId;
     const slotIndex = index % timeSlots.length;
-  
+
     // `setState`의 콜백으로 업데이트 후 값을 사용
     setBinaryTable((prevTable) => {
       const currentBinaryString = prevTable[dateId];
@@ -209,32 +233,108 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
         currentBinaryString.substring(0, slotIndex) +
         (selectedSlots[index] ? "0" : "1") +
         currentBinaryString.substring(slotIndex + 1);
-  
+
       const updatedData: voteData = {
         binaryString: updatedBinaryString,
         userId: userId as number,
         dateId,
       };
-  
+
       voteTime(updatedData)
         .then(() => {
           setRefreshTrigger((prev) => prev + 1);
         })
         .catch((error) => console.error("Error posting vote data:", error));
-  
+
       return {
         ...prevTable,
         [dateId]: updatedBinaryString,
       };
     });
-  
+
     setSelectedSlots((prev) => {
       const newSelectedSlots = [...prev];
       newSelectedSlots[index] = !newSelectedSlots[index];
       return newSelectedSlots;
     });
   };
+
+  const handleTouchStart = (
+    e: React.TouchEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    setIsSelecting(true);
+    setIsDeselecting(selectedSlots[index]);
+    setStartIndex(index);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isSelecting) return;
   
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
+  
+    if (element && element.dataset.dateid) {
+      const fullCellIndex = parseInt(element.dataset.cellindex || "0", 10);
+      const dateIndex = Math.floor(fullCellIndex / timeSlots.length);
+      const dateId = dates[dateIndex].dateId;
+      const slotIndex = fullCellIndex % timeSlots.length;
+  
+      // 드래그 시작 날짜와 다른 날짜로 이동하려는 경우
+      if (lastDraggedDateId !== null && lastDraggedDateId !== dateId) {
+        alert("한번에 한 날짜만 투표하실 수 있습니다.");
+  
+        // 현재까지의 변경 사항을 서버로 보내기
+        const currentBinaryString = binaryTable[lastDraggedDateId];
+        const updatedData: voteData = {
+          binaryString: currentBinaryString,
+          userId: userId as number,
+          dateId: lastDraggedDateId,
+        };
+  
+        voteTime(updatedData)
+          .then(() => {
+            setRefreshTrigger((prev) => prev + 1);
+          })
+          .catch((error) => console.error("Error posting vote data:", error));
+  
+        // 드래그 종료 및 초기화
+        setIsSelecting(false);
+        setLastDraggedDateId(null);
+        return;
+      }
+  
+      updateBinaryTable(dateId, slotIndex, !isDeselecting ? "1" : "0");
+      setSelectedSlots((prev) => {
+        const newSelectedSlots = [...prev];
+        newSelectedSlots[fullCellIndex] = !isDeselecting;
+        return newSelectedSlots;
+      });
+    }
+  };
+  
+
+  const handleTouchEnd = () => {
+    setIsSelecting(false);
+    setStartIndex(null);
+
+    if (lastDraggedDateId !== null) {
+      const currentBinaryString = binaryTable[lastDraggedDateId];
+      const updatedData: voteData = {
+        binaryString: currentBinaryString,
+        userId: userId as number,
+        dateId: lastDraggedDateId,
+      };
+
+      voteTime(updatedData)
+        .then(() => {
+          setRefreshTrigger((prev) => prev + 1);
+          setLastDraggedDateId(null);
+        })
+        .catch((error) => console.error("Error posting vote data:", error));
+    }
+  };
+
   if (isMobile) {
     return (
       <div
@@ -295,6 +395,7 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
                       <div
                         key={`${date.dateId}-${fullCellIndex}`}
                         data-dateid={date.dateId}
+                        data-cellindex={fullCellIndex}
                         className={`block w-[50px] h-[20px] cursor-pointer ${
                           selectedSlots[fullCellIndex]
                             ? "bg-[#A1A1FF]"
@@ -303,6 +404,9 @@ export default function TimeSelector({ party, isMobile }: TimeSelectorProps) {
                         onMouseDown={() => handleMouseDown(fullCellIndex)}
                         onMouseOver={() => handleMouseOver(fullCellIndex)}
                         onClick={() => handleCellClick(fullCellIndex)}
+                        onTouchStart={(e) => handleTouchStart(e, fullCellIndex)}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                       />
                     );
                   });
