@@ -65,19 +65,37 @@ export default function PartyPriority({
   const userId = useRecoilValue(userIdValue);
   const refreshTrigger = useRecoilValue(tableRefreshTrigger);
 
-  const decisionDate = decisionTime ? new Date(decisionTime) : null;
+  const [decisionDate, setDecisionDate] = useState<Date | null>(null);
+
+useEffect(() => {
+  if (decisionTime) {
+    setDecisionDate(new Date(decisionTime));
+  }
+}, [decisionTime]);
 
   useEffect(() => {
     if (hash && refreshTrigger >= 0) {
       getTable({ table_id: hash as string })
         .then((data) => {
+          // decisionDate와 일치하는 start를 가진 원소를 첫 번째로 정렬
+          if (decisionDate && data.availableTime) {
+            const sortedAvailableTime = [
+              ...data.availableTime.filter(
+                (time) => new Date(time.start).getTime() === decisionDate.getTime()
+              ),
+              ...data.availableTime.filter(
+                (time) => new Date(time.start).getTime() !== decisionDate.getTime()
+              ),
+            ];
+            data.availableTime = sortedAvailableTime;
+          }
           setPriorityData(data);
         })
         .catch((error) => {
           console.error("에러 발생: ", error);
         });
     }
-  }, [hash, refreshTrigger]);
+  }, [hash, refreshTrigger, decisionDate]);
 
   // 확정하기 버튼 클릭 이벤트 핸들러
   const handleComplete = async (timeSlot: TimeSlot) => {
