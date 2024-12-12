@@ -136,22 +136,28 @@ export default function BottomSheet({
               )}
             </div>
             {activeTab === "vote" && (
-              <div>
+              <div className="flex justify-center items-center gap-4 flex-col">
                 {(globalKakaoState.kakaoUserId !== null || globalUserId) &&
                 tableData ? (
                   <TimeSelector party={tableData.party} isMobile={isMobile} />
                 ) : (
-                  <div className="flex flex-col items-center py-[20px]">
+                  <div className="flex flex-col justify-center items-center py-[20px]">
                     <span className={`${jua.className}`}>
                       로그인 후 투표가 가능합니다!
                     </span>
                     <TableLogin isMobile={isMobile} />
                   </div>
                 )}
+                <button
+                  onClick={handleClose}
+                  className={`${jua.className} bg-[#6161ce] hover:opacity-60 text-white w-[50%] p-1 rounded-[5px]`}
+                >
+                  확인
+                </button>
               </div>
             )}
             {activeTab === "recommend" && (
-              <div ref={tooltipRef}>
+              <div ref={tooltipRef} className="flex justify-center">
                 {showTooltip && (
                   <div
                     className="absolute top-[28px] right-0 bg-white text-black text-sm rounded-md 

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
-@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
 
 :root {
   --background: #ffffff; /* 필요에 맞게 색상 지정 */
@@ -32,12 +32,11 @@
   width: 0; /* 세로 스크롤바 숨기기 */
   height: 8px; /* 가로 스크롤바 높이 설정 */
   opacity: 0.5;
-
 }
 
 /* 가로 스크롤바 스타일 */
 ::-webkit-scrollbar-thumb {
-  background-color: #7272D9; /* 스크롤바 색상 */
+  background-color: #7272d9; /* 스크롤바 색상 */
   border-radius: 4px; /* 스크롤바 모서리 둥글게 */
 }
 
