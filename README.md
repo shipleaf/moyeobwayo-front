@@ -7,8 +7,7 @@
 > 고려대학교 세종캠퍼스 컴퓨터융합소프트웨어학과 개발 모임 <br /> 개발기간: 24.09 ~ 24.11
 
 ## 배포 주소
-> 프론트엔드: [https://www.moyeobwayo.com/](https://www.moyeobwayo.com/) <br />
-> 백엔드: [https://3.38.252.70.nip.io/](https://3.38.252.70.nip.io/) <br />
+> [https://www.moyeobwayo.com/](https://www.moyeobwayo.com/) <br />
 
 ## 팀원 소개
 - 프론트엔드
