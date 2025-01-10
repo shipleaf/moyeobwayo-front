@@ -14,6 +14,11 @@
 - 프론트엔드: 1명
 - 백엔드: 3명
 
+## 핵심 기능
+- 모임 참여 시간 투표 기능
+- 다른 참여자들의 가능한 시간 조회 기능
+- 카카오톡 로그인, 알림톡 수신 기능
+
 ## 프로젝트 설명
 
 📢 <strong>모여봐요</strong> 는 모든 참여자들의 가능 시간을 한눈에 볼 수 있는 서비스입니다.
@@ -21,6 +26,18 @@
 ✔️ 쉽고 빠른 일정 투표 <br />
 ✔️ 링크 하나로 간편 공유 <br />
 ✔️ 모임 확정 시 카카오톡 리마인더까지!
+
+<img src="https://github.com/user-attachments/assets/dd886795-cd84-4fd0-a796-a9585156fed0" />
+<img src="https://github.com/user-attachments/assets/205fbbef-02dc-4a58-9768-b7aea7668c83" />
+
+## 기술 스택
+- 프론트엔드
+<div display="flex">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white">
+  <img src="https://img.shields.io/badge/typescript-E34F26?style=for-the-badge&logo=typescript&logoColor=3178C6">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white">
+</div>
+
 
 <!--
 |      임규성       |          김선엽         |                                                                                                               
