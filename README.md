@@ -31,7 +31,8 @@
 <img src="https://github.com/user-attachments/assets/205fbbef-02dc-4a58-9768-b7aea7668c83" />
 
 ## 기술 스택
-- Front-end <br />
+- <strong>Front-end</strong> <br />
+
 ![Typescript](https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Html5](https://img.shields.io/badge/Html5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![Css](https://img.shields.io/badge/CSS-663399?style=for-the-badge&logo=css&logoColor=white)
@@ -40,19 +41,22 @@
 ![Recoil](https://img.shields.io/badge/Recoil-3578E5?style=for-the-badge&logo=recoil&logoColor=white)
 ![TailwindCss](https://img.shields.io/badge/tailwindcss-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 
-- Back-end <br />
+- <strong>Back-end</strong>
+
 ![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=OpenJDK&logoColor=white)
 ![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
 ![springboot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![postgresql](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)
 
-- Communication <br />
+- <strong>Communication</strong>
+
 ![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white)
 ![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)
 ![Github](https://img.shields.io/badge/Github-181717?style=for-the-badge&logo=github&logoColor=white)
 
-- Deploy <br />
+- <strong>Deployment</strong>
+
 ![Naver CLoud Platform](https://img.shields.io/badge/naver-03C75A?style=for-the-badge&logo=naver&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
