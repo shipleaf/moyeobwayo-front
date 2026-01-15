@@ -13,6 +13,32 @@ const geistSans = localFont({
   weight: "100 900",
 });
 
+export const metadata = {
+  title: "모여봐요",
+  description:
+    "모여봐요는 만남 스케줄링 서비스로, 일정 조율과 약속 관리를 간편하게 제공합니다.",
+  icons: {
+    icon: "/public/icons/moyeobwayoIcon.svg",
+    apple: "/public/icons/moyeobwayoIcon.svg",
+  },
+  openGraph: {
+    title: "모여봐요",
+    description: "만남 스케줄링 서비스 모여봐요",
+    url: "https://www.moyeobwayo.com",
+    siteName: "모여봐요",
+    // images: [
+    //   {
+    //     url: "https://www.moyeobwayo.com/og-image.png",
+    //     width: 1200,
+    //     height: 630,
+    //     alt: "모여봐요 서비스 미리보기",
+    //   },
+    // ],
+    locale: "ko_KR",
+    type: "website",
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
