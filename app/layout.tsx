@@ -14,8 +14,8 @@ export const metadata = {
   description:
     "모여봐요는 만남 스케줄링 서비스로, 일정 조율과 약속 관리를 간편하게 제공합니다.",
   icons: {
-    icon: "/icons/moyeobwayoIcon.svg",
-    apple: "/icons/moyeobwayoIcon.svg",
+    icon: "/images/moyeobwayo_blue.png",
+    apple: "/images/moyeobwayo_blue.png",
   },
   openGraph: {
     title: "모여봐요",
